@@ -94,3 +94,35 @@ def fix_children_type(df: pd.DataFrame, log: CleaningLog) -> pd.DataFrame:
         "Пропусков 4 из 119 тыс.; 0 — самое частое значение (93 %); дробный тип был только из-за пропусков.",
     ))
     return out
+
+
+def merge_undefined_meal(df: pd.DataFrame, log: CleaningLog) -> pd.DataFrame:
+    """Шаг 7: питание Undefined объединить с SC."""
+    affected = int((df["meal"] == "Undefined").sum())
+    out = df.assign(meal=df["meal"].replace("Undefined", "SC"))
+    log.add(LogEntry(
+        "7", MODIFY, "Питание Undefined → SC", len(df), len(out), affected,
+        "По документации датасета (Antonio et al., 2019) Undefined и SC означают одно: без пакета питания.",
+    ))
+    return out
+
+
+def fill_unknown_country(df: pd.DataFrame, log: CleaningLog) -> pd.DataFrame:
+    """Шаг 8: пустую страну заменить категорией unknown."""
+    affected = int(df["country"].isna().sum())
+    out = df.assign(country=df["country"].fillna("unknown"))
+    log.add(LogEntry(
+        "8", MODIFY, "Пустая страна → unknown", len(df), len(out), affected,
+        "Пропуск информативен — страну часто уточняют при заезде; удаление стоило бы 488 броней.",
+    ))
+    return out
+
+
+def drop_week_number(df: pd.DataFrame, log: CleaningLog) -> pd.DataFrame:
+    """Шаг 11: удалить колонку номера недели — она противоречит дате заезда."""
+    out = df.drop(columns="arrival_date_week_number")
+    log.add(LogEntry(
+        "11", MODIFY, "Удалена колонка arrival_date_week_number", len(df), len(out), len(df),
+        "Номер недели не совпадает с календарной неделей даты заезда в 54 % строк; неделю считаем из даты.",
+    ))
+    return out
