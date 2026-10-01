@@ -4,11 +4,13 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from src.cleaning_log import MODIFY, REMOVE, CleaningLog, LogEntry
+from src.cleaning_log import COLLAPSE, MODIFY, REMOVE, CleaningLog, LogEntry
 
 ADR_ERROR_THRESHOLD = 5000
 MAX_ADULTS = 10
 MAX_CHILDREN_OR_BABIES = 8
+RARE_AGENT_MIN_BOOKINGS = 100
+VARIANTS = ("A", "B", "C")
 
 
 @dataclass(frozen=True)
@@ -126,3 +128,88 @@ def drop_week_number(df: pd.DataFrame, log: CleaningLog) -> pd.DataFrame:
         "Номер недели не совпадает с календарной неделей даты заезда в 54 % строк; неделю считаем из даты.",
     ))
     return out
+
+
+def _with_key_and_rooms(df: pd.DataFrame, n_rooms) -> pd.DataFrame:
+    """Добавить booking_key первой колонкой и n_rooms последней."""
+    out = df.reset_index(drop=True).assign(n_rooms=n_rooms)
+    out.insert(0, "booking_key", range(len(out)))
+    return out
+
+
+def collapse_duplicates(df: pd.DataFrame, log: CleaningLog) -> pd.DataFrame:
+    """Шаг 12 (вариант C): одинаковые строки склеить в одну бронь, число номеров — в n_rooms."""
+    grouped = df.groupby(list(df.columns), dropna=False, sort=False).size()
+    out = _with_key_and_rooms(grouped.index.to_frame(index=False), grouped.to_numpy())
+    log.add(LogEntry(
+        "12", COLLAPSE, "Одинаковые строки → одна бронь с n_rooms", len(df), len(out), len(df) - len(out),
+        "ID брони удалён при обезличивании, поэтому одинаковые строки — скорее номера одной групповой брони "
+        "(75 % строк сегмента «Группы» — копии). Удаление занизило бы отмены (37 % → 27,5 %) и выручку, "
+        "сохранение как есть сделало бы зависимые наблюдения независимыми. Тесты и модель — по броням, "
+        "деньги — с весом n_rooms.",
+    ))
+    return out
+
+
+def drop_duplicate_rows(df: pd.DataFrame, log: CleaningLog) -> pd.DataFrame:
+    """Шаг 12, вариант A (для проверки устойчивости): удалить повторяющиеся строки."""
+    out = _with_key_and_rooms(df.drop_duplicates(), 1)
+    log.add(LogEntry(
+        "12A", REMOVE, "Вариант A: повторяющиеся строки удалены", len(df), len(out), len(df) - len(out),
+        "Вариант для проверки устойчивости выводов: дубли считаются ошибочными копиями.",
+    ))
+    return out
+
+
+def keep_duplicate_rows(df: pd.DataFrame, log: CleaningLog) -> pd.DataFrame:
+    """Шаг 12, вариант B (для проверки устойчивости): оставить все строки как есть."""
+    out = _with_key_and_rooms(df, 1)
+    log.add(LogEntry(
+        "12B", MODIFY, "Вариант B: дубли оставлены", len(df), len(out), 0,
+        "Вариант для проверки устойчивости выводов: каждая строка считается отдельной бронью.",
+    ))
+    return out
+
+
+def group_rare_agents(
+    df: pd.DataFrame, log: CleaningLog, min_bookings: int = RARE_AGENT_MIN_BOOKINGS
+) -> pd.DataFrame:
+    """Шаг 9 (после склейки): агентов с числом броней меньше порога объединить в other."""
+    counts = df["agent"].value_counts()
+    rare = df["agent"].isin(counts.index[counts < min_bookings])
+    agent_id = df["agent"].astype("Int64").astype("string")
+    out = df.assign(agent=agent_id.mask(rare, "other"), agent_id=agent_id)
+    log.add(LogEntry(
+        "9", MODIFY, f"Агенты с < {min_bookings} бронями → other", len(df), len(out), int(rare.sum()),
+        "Пусто в agent/company = «без агента / не от компании», а не пропуск: оставляем, флаги — в признаках. "
+        "Редкие агенты дают шум, поэтому объединяются; считаем после склейки, чтобы не склеить разные брони.",
+    ))
+    return out
+
+
+def _prepare(df_raw: pd.DataFrame, log: CleaningLog) -> pd.DataFrame:
+    """Общие шаги всех вариантов: тип children, удаления 1–6, нормализация 7, 8, 11."""
+    df = fix_children_type(df_raw, log)
+    for rule in REMOVAL_RULES:
+        df = apply_removal(df, rule, log)
+    df = merge_undefined_meal(df, log)
+    df = fill_unknown_country(df, log)
+    return drop_week_number(df, log)
+
+
+_DUPLICATE_HANDLERS = {"A": drop_duplicate_rows, "B": keep_duplicate_rows, "C": collapse_duplicates}
+
+
+def make_variant(df_raw: pd.DataFrame, variant: str) -> tuple[pd.DataFrame, CleaningLog]:
+    """Очистить сырые данные с заданной обработкой дублей: A — удалить, B — оставить, C — склеить."""
+    if variant not in VARIANTS:
+        raise ValueError(f"Неизвестный вариант {variant!r}, ожидается один из {VARIANTS}")
+    log = CleaningLog()
+    df = _prepare(df_raw, log)
+    df = _DUPLICATE_HANDLERS[variant](df, log)
+    return group_rare_agents(df, log), log
+
+
+def clean(df_raw: pd.DataFrame) -> tuple[pd.DataFrame, CleaningLog]:
+    """Основная очистка — вариант C (склейка дублей в брони с n_rooms)."""
+    return make_variant(df_raw, "C")
