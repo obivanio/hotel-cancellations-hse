@@ -29,6 +29,13 @@ def test_check_guarantees_on_small_table(group_raw):
     assert all(check_guarantees(df, len(group_raw), log).values())
 
 
+def test_check_guarantees_variant_b_fails_duplicate_guarantee(group_raw):
+    """Вариант B с одинаковыми строками не проходит гарантию 1 — в данных остаются полные дубли."""
+    df, log = build_dataset(group_raw, "B")
+    guarantees = check_guarantees(df, len(group_raw), log)
+    assert guarantees["1. нет одинаковых строк, n_rooms ≥ 1"] is False
+
+
 def test_save_outputs(tmp_path, group_raw):
     """Датасет и журнал сохраняются и читаются без потерь по размеру."""
     df, log = build_dataset(group_raw)

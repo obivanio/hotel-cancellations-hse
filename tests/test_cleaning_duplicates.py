@@ -65,6 +65,16 @@ def test_make_variant_rejects_unknown():
         make_variant(pd.DataFrame(), "D")
 
 
+def test_collapse_runs_before_rare_agent_grouping(make_raw):
+    """Склейка (шаг 12) идёт раньше объединения редких агентов (шаг 9): разные агенты не схлопываются."""
+    df = make_raw([{"agent": 240.0}, {"agent": 241.0}])
+    out, _ = clean(df)
+    assert len(out) == 2
+    assert out["n_rooms"].tolist() == [1, 1]
+    assert out["agent"].tolist() == ["other", "other"]
+    assert sorted(out["agent_id"].tolist()) == ["240", "241"]
+
+
 def test_clean_is_variant_c(make_raw):
     """clean — это вариант C: ошибочные строки удалены, дубли склеены."""
     df_raw = make_raw([{}, {}, {"adr": -1.0}, {"stays_in_weekend_nights": 0, "stays_in_week_nights": 0}])
