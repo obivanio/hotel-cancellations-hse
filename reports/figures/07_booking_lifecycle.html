@@ -4988,7 +4988,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     <!-- Main Diagram -->
     <div class="diagram-container" data-detail-level="read"
          data-preset-badge-editorial-plate="ARCHIFY / PLATE 04">
-      <svg viewBox="0 0 1239 400" data-reader-fit="intrinsic-height" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+      <svg viewBox="0 0 1240 584" data-reader-fit="intrinsic-height" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
         <title id="archify-diagram-title">Жизненный цикл брони и колонки-утечки</title>
         <desc id="archify-diagram-description">Модель может использовать только то, что известно в момент “Бронь создана”</desc>
         <!-- Definitions -->
@@ -5015,35 +5015,47 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
         <!-- Lifecycle bands -->
         <text x="18" y="88" class="t-dim" font-size="10" font-weight="600" writing-mode="vertical-rl" text-anchor="middle">Путь брони</text>
-        <text x="18" y="272" class="t-dim" font-size="10" font-weight="600" writing-mode="vertical-rl" text-anchor="middle">Исходы</text>
+        <text x="18" y="272" class="t-dim" font-size="10" font-weight="600" writing-mode="vertical-rl" text-anchor="middle">Необязательно</text>
+        <text x="18" y="456" class="t-dim" font-size="10" font-weight="600" writing-mode="vertical-rl" text-anchor="middle">Исходы</text>
 
         <!-- Primary lifecycle rail -->
 
 
         <!-- Transition paths -->
         <g data-graph-role="automatic-crossover" style="--step:0">
-          <path data-graph-role="automatic-crossover-underlay" d="M 230 88 L 298 88" fill="none" stroke="var(--mask)" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="created" data-edge-to="changes" data-edge-label="правка" data-edge-key="0" data-composition-points="230,88;298,88" data-composition-crossover="halo" d="M 230 88 L 298 88" class="a-emphasis" stroke-width="1.6" marker-end="url(#arrowhead-emphasis)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 220 88 L 785 88" fill="none" stroke="var(--mask)" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="created" data-edge-to="checkin" data-edge-label="гость приехал" data-edge-key="0" data-composition-points="220,88;785,88" data-composition-crossover="halo" d="M 220 88 L 785 88" class="a-emphasis" stroke-width="1.6" marker-end="url(#arrowhead-emphasis)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:1">
-          <path data-graph-role="automatic-crossover-underlay" d="M 468 88 L 742 88" fill="none" stroke="var(--mask)" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="changes" data-edge-to="checkin" data-edge-label="дата заезда" data-edge-key="1" data-composition-points="468,88;742,88" data-composition-crossover="halo" d="M 468 88 L 742 88" class="a-emphasis" stroke-width="1.6" marker-end="url(#arrowhead-emphasis)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 975 88 L 1030 88" fill="none" stroke="var(--mask)" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="checkin" data-edge-to="checkout" data-edge-key="1" data-composition-points="975,88;1030,88" data-composition-crossover="halo" d="M 975 88 L 1030 88" class="a-emphasis" stroke-width="1.6" marker-end="url(#arrowhead-emphasis)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:2">
-          <path data-graph-role="automatic-crossover-underlay" d="M 912 88 L 979 88" fill="none" stroke="var(--mask)" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="checkin" data-edge-to="checkout" data-edge-key="2" data-composition-points="912,88;979,88" data-composition-crossover="halo" d="M 912 88 L 979 88" class="a-emphasis" stroke-width="1.6" marker-end="url(#arrowhead-emphasis)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 110 120 L 110 158 Q 110 168 120 168 L 350 168 Q 360 168 360 178 L 360 240" fill="none" stroke="var(--mask)" stroke-width="5.1" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="created" data-edge-to="changes" data-edge-label="правка" data-edge-key="2" data-composition-points="110,120;110,168;360,168;360,240" data-composition-crossover="halo" d="M 110 120 L 110 158 Q 110 168 120 168 L 350 168 Q 360 168 360 178 L 360 240" class="a-dashed" stroke-width="1.1" marker-end="url(#arrowhead-dashed)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:3">
-          <path data-graph-role="automatic-crossover-underlay" d="M 383 120 L 383 240" fill="none" stroke="var(--mask)" stroke-width="5.1" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="changes" data-edge-to="canceled" data-edge-label="отмена" data-edge-key="3" data-composition-points="383,120;383,240" data-composition-crossover="halo" d="M 383 120 L 383 240" class="a-security" stroke-width="1.1" marker-end="url(#arrowhead-security)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 390 240 L 390 202 Q 390 192 400 192 L 870 192 Q 880 192 880 182 L 880 120" fill="none" stroke="var(--mask)" stroke-width="5.1" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="changes" data-edge-to="checkin" data-edge-key="3" data-composition-points="390,240;390,192;880,192;880,120" data-composition-crossover="halo" d="M 390 240 L 390 202 Q 390 192 400 192 L 870 192 Q 880 192 880 182 L 880 120" class="a-dashed" stroke-width="1.1" marker-end="url(#arrowhead-dashed)"/>
         </g>
-        <path data-edge-from="created" data-edge-to="noshow" data-edge-label="не приехал" data-edge-key="4" data-composition-points="230,88;230,338;727,338;727,272" d="M 230 88 L 230 328 Q 230 338 240 338 L 717 338 Q 727 338 727 328 L 727 272" class="a-security" stroke-width="1.1" marker-end="url(#arrowhead-security)"/>
+        <g data-graph-role="automatic-crossover" style="--step:4">
+          <path data-graph-role="automatic-crossover-underlay" d="M 140 120 L 140 366 Q 140 376 150 376 L 350 376 Q 360 376 360 386 L 360 424" fill="none" stroke="var(--mask)" stroke-width="5.1" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="created" data-edge-to="canceled" data-edge-label="отмена" data-edge-key="4" data-composition-points="140,120;140,376;360,376;360,424" data-composition-crossover="halo" d="M 140 120 L 140 366 Q 140 376 150 376 L 350 376 Q 360 376 360 386 L 360 424" class="a-security" stroke-width="1.1" marker-end="url(#arrowhead-security)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:5">
+          <path data-graph-role="automatic-crossover-underlay" d="M 375 304 L 375 424" fill="none" stroke="var(--mask)" stroke-width="5.1" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="changes" data-edge-to="canceled" data-edge-key="5" data-composition-points="375,304;375,424" data-composition-crossover="halo" d="M 375 304 L 375 424" class="a-security" stroke-width="1.1" marker-end="url(#arrowhead-security)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:6">
+          <path data-graph-role="automatic-crossover-underlay" d="M 170 120 L 170 342 Q 170 352 180 352 L 620 352 Q 630 352 630 362 L 630 424" fill="none" stroke="var(--mask)" stroke-width="5.1" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="created" data-edge-to="noshow" data-edge-label="не приехал" data-edge-key="6" data-composition-points="170,120;170,352;630,352;630,424" data-composition-crossover="halo" d="M 170 120 L 170 342 Q 170 352 180 352 L 620 352 Q 630 352 630 362 L 630 424" class="a-security" stroke-width="1.1" marker-end="url(#arrowhead-security)"/>
+        </g>
 
         <!-- States -->
-        <g id="node-created" data-node-id="created" data-node-label="Бронь создана" tabindex="0" role="button" aria-label="Focus Бронь создана, lead_time, adr, deposit_type, Путь брони" aria-pressed="false" data-node-kind="start" data-node-sublabel="lead_time, adr, deposit_type" data-node-tag="известно модели" data-node-context="Путь брони">
-          <title>Бронь создана · lead_time, adr, deposit_type · Путь брони · известно модели</title>
-          <rect x="60" y="56" width="170" height="64" rx="7" class="c-mask"/>
-          <rect x="60" y="56" width="170" height="64" rx="7" class="c-frontend" stroke-width="1.5"/>
+        <g id="node-created" data-node-id="created" data-node-label="Бронь создана" tabindex="0" role="button" aria-label="Focus Бронь создана, ИЗВЕСТНО: lead_time, adr, ..., Путь брони" aria-pressed="false" data-node-kind="start" data-node-sublabel="ИЗВЕСТНО: lead_time, adr, ..." data-node-context="Путь брони">
+          <title>Бронь создана · ИЗВЕСТНО: lead_time, adr, ... · Путь брони</title>
+          <rect x="60" y="56" width="160" height="64" rx="7" class="c-mask"/>
+          <rect x="60" y="56" width="160" height="64" rx="7" class="c-frontend" stroke-width="1.5"/>
           <g aria-hidden="true" data-lifecycle-initial-marker="">
             <circle cx="38" cy="88" r="4.5" style="fill: var(--arrow-emphasis)"/><path d="M 42.5 88 L 53 88" class="a-emphasis" stroke-width="1.4"/><path d="M 52 84.5 L 59 88 L 52 91.5 Z" style="fill: var(--arrow-emphasis)"/>
           </g>
@@ -5052,121 +5064,120 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
             <path d="m7 5.4 3.6 2.6L7 10.6Z" class="sigil-fill"/>
           </g>
         <text data-detail="fine" x="83" y="70" class="t-frontend" font-size="8" font-weight="700">01</text>
-          <text data-node-label="" data-detail-anchor="" x="145" y="79" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Бронь создана</text>
-          <text data-detail="context" x="145" y="96" class="t-muted" font-size="8" text-anchor="middle">lead_time, adr, deposit_type</text>
-        <text data-detail="fine" x="145" y="108" class="t-frontend" font-size="8" text-anchor="middle">известно модели</text>
+          <text data-node-label="" data-detail-anchor="" x="140" y="79" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Бронь создана</text>
+          <text data-detail="context" x="140" y="96" class="t-muted" font-size="8" text-anchor="middle">ИЗВЕСТНО: lead_time, adr, ...</text>
         </g>
 
-        <g id="node-changes" data-node-id="changes" data-node-label="Изменения брони" tabindex="0" role="button" aria-label="Focus Изменения брони, УТЕЧКА: booking_changes, Путь брони" aria-pressed="false" data-node-kind="active" data-node-sublabel="УТЕЧКА: booking_changes" data-node-tag="утечка" data-node-context="Путь брони">
-          <title>Изменения брони · УТЕЧКА: booking_changes · Путь брони · утечка</title>
-          <rect x="298" y="56" width="170" height="64" rx="7" class="c-mask"/>
-          <rect x="298" y="56" width="170" height="64" rx="7" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="active" class="semantic-sigil s-frontend" transform="translate(304 62) scale(0.6875)">
+        <g id="node-changes" data-node-id="changes" data-node-label="Изменения брони" tabindex="0" role="button" aria-label="Focus Изменения брони, УТЕЧКА: booking_changes, Необязательно" aria-pressed="false" data-node-kind="waiting" data-node-sublabel="УТЕЧКА: booking_changes" data-node-context="Необязательно">
+          <title>Изменения брони · УТЕЧКА: booking_changes · Необязательно</title>
+          <rect x="300" y="240" width="150" height="64" rx="7" class="c-mask"/>
+          <rect x="300" y="240" width="150" height="64" rx="7" class="c-cloud" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="waiting" class="semantic-sigil s-cloud" transform="translate(306 246) scale(0.6875)">
+            <path d="M4 2.5h8M4 13.5h8M5 3c0 2.8 2 3.2 3 5-1 1.8-3 2.2-3 5M11 3c0 2.8-2 3.2-3 5 1 1.8 3 2.2 3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="375" y="263" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Изменения брони</text>
+          <text data-detail="context" x="375" y="280" class="t-muted" font-size="8" text-anchor="middle">УТЕЧКА: booking_changes</text>
+        </g>
+
+        <g id="node-checkin" data-node-id="checkin" data-node-label="Заезд" tabindex="0" role="button" aria-label="Focus Заезд, УТЕЧКА: assigned_room_type; country*, Путь брони" aria-pressed="false" data-node-kind="active" data-node-sublabel="УТЕЧКА: assigned_room_type; country*" data-node-context="Путь брони">
+          <title>Заезд · УТЕЧКА: assigned_room_type; country* · Путь брони</title>
+          <rect x="785" y="56" width="190" height="64" rx="7" class="c-mask"/>
+          <rect x="785" y="56" width="190" height="64" rx="7" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="active" class="semantic-sigil s-frontend" transform="translate(791 62) scale(0.6875)">
             <path d="M2 8h3l1.5-3.5L9 12l1.6-4H14"/>
           </g>
-        <text data-detail="fine" x="321" y="70" class="t-frontend" font-size="8" font-weight="700">02</text>
-          <text data-node-label="" data-detail-anchor="" x="383.1" y="79" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Изменения брони</text>
-          <text data-detail="context" x="383" y="96" class="t-muted" font-size="8" text-anchor="middle">УТЕЧКА: booking_changes</text>
-        <text data-detail="fine" x="383" y="108" class="t-frontend" font-size="8" text-anchor="middle">утечка</text>
+        <text data-detail="fine" x="808" y="70" class="t-frontend" font-size="8" font-weight="700">02</text>
+          <text data-node-label="" data-detail-anchor="" x="880" y="79" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Заезд</text>
+          <text data-detail="context" x="880" y="96" class="t-muted" font-size="8" text-anchor="middle">УТЕЧКА: assigned_room_type; country*</text>
         </g>
 
-        <g id="node-checkin" data-node-id="checkin" data-node-label="Заезд" tabindex="0" role="button" aria-label="Focus Заезд, УТЕЧКА: assigned_room_type, Путь брони" aria-pressed="false" data-node-kind="active" data-node-sublabel="УТЕЧКА: assigned_room_type" data-node-tag="утечка" data-node-context="Путь брони">
-          <title>Заезд · УТЕЧКА: assigned_room_type · Путь брони · утечка</title>
-          <rect x="742" y="56" width="170" height="64" rx="7" class="c-mask"/>
-          <rect x="742" y="56" width="170" height="64" rx="7" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="active" class="semantic-sigil s-frontend" transform="translate(748 62) scale(0.6875)">
-            <path d="M2 8h3l1.5-3.5L9 12l1.6-4H14"/>
-          </g>
-        <text data-detail="fine" x="765" y="70" class="t-frontend" font-size="8" font-weight="700">03</text>
-          <text data-node-label="" data-detail-anchor="" x="827" y="79" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Заезд</text>
-          <text data-detail="context" x="827" y="96" class="t-muted" font-size="8" text-anchor="middle">УТЕЧКА: assigned_room_type</text>
-        <text data-detail="fine" x="827" y="108" class="t-frontend" font-size="8" text-anchor="middle">утечка</text>
-        </g>
-
-        <g id="node-checkout" data-node-id="checkout" data-node-label="Выезд" tabindex="0" role="button" aria-label="Focus Выезд, УТЕЧКА: is_canceled=0, Check-Out, Путь брони" aria-pressed="false" data-node-kind="success" data-node-sublabel="УТЕЧКА: is_canceled=0, Check-Out" data-node-tag="утечка" data-node-context="Путь брони">
-          <title>Выезд · УТЕЧКА: is_canceled=0, Check-Out · Путь брони · утечка</title>
-          <rect x="979" y="56" width="200" height="64" rx="7" class="c-mask"/>
-          <rect x="979" y="56" width="200" height="64" rx="7" class="c-backend" stroke-width="1.5"/>
-          <rect x="982" y="59" width="194" height="58" rx="4" class="c-backend" style="fill: none" stroke-width="1"/>
-          <g aria-hidden="true" data-semantic-sigil="success" class="semantic-sigil s-backend" transform="translate(985 62) scale(0.6875)">
+        <g id="node-checkout" data-node-id="checkout" data-node-label="Выезд" tabindex="0" role="button" aria-label="Focus Выезд, ЦЕЛЬ: is_canceled=0, Путь брони" aria-pressed="false" data-node-kind="success" data-node-sublabel="ЦЕЛЬ: is_canceled=0" data-node-context="Путь брони">
+          <title>Выезд · ЦЕЛЬ: is_canceled=0 · Путь брони</title>
+          <rect x="1030" y="56" width="150" height="64" rx="7" class="c-mask"/>
+          <rect x="1030" y="56" width="150" height="64" rx="7" class="c-backend" stroke-width="1.5"/>
+          <rect x="1033" y="59" width="144" height="58" rx="4" class="c-backend" style="fill: none" stroke-width="1"/>
+          <g aria-hidden="true" data-semantic-sigil="success" class="semantic-sigil s-backend" transform="translate(1036 62) scale(0.6875)">
             <circle cx="8" cy="8" r="5.3"/>
             <path d="m5.2 8 1.8 1.8 3.8-4"/>
           </g>
-        <text data-detail="fine" x="1002" y="70" class="t-backend" font-size="8" font-weight="700">04</text>
-          <text data-node-label="" data-detail-anchor="" x="1079" y="79" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Выезд</text>
-          <text data-detail="context" x="1079" y="96" class="t-muted" font-size="8" text-anchor="middle">УТЕЧКА: is_canceled=0, Check-Out</text>
-        <text data-detail="fine" x="1079" y="108" class="t-backend" font-size="8" text-anchor="middle">утечка</text>
+        <text data-detail="fine" x="1053" y="70" class="t-backend" font-size="8" font-weight="700">03</text>
+          <text data-node-label="" data-detail-anchor="" x="1105" y="79" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Выезд</text>
+          <text data-detail="context" x="1105" y="96" class="t-muted" font-size="8" text-anchor="middle">ЦЕЛЬ: is_canceled=0</text>
         </g>
 
-        <g id="node-canceled" data-node-id="canceled" data-node-label="Отменена" tabindex="0" role="button" aria-label="Focus Отменена, УТЕЧКА: is_canceled=1, status, date, Исходы" aria-pressed="false" data-node-kind="failure" data-node-sublabel="УТЕЧКА: is_canceled=1, status, date" data-node-tag="утечка" data-node-context="Исходы">
-          <title>Отменена · УТЕЧКА: is_canceled=1, status, date · Исходы · утечка</title>
-          <rect x="283" y="240" width="200" height="64" rx="7" class="c-mask"/>
-          <rect x="283" y="240" width="200" height="64" rx="7" class="c-security" stroke-width="1.5"/>
-          <rect x="286" y="243" width="194" height="58" rx="4" class="c-security" style="fill: none" stroke-width="1"/>
-          <g aria-hidden="true" data-semantic-sigil="failure" class="semantic-sigil s-security" transform="translate(289 246) scale(0.6875)">
+        <g id="node-canceled" data-node-id="canceled" data-node-label="Отменена" tabindex="0" role="button" aria-label="Focus Отменена, ЦЕЛЬ: is_canceled=1; УТЕЧКА: status, Исходы" aria-pressed="false" data-node-kind="failure" data-node-sublabel="ЦЕЛЬ: is_canceled=1; УТЕЧКА: status" data-node-context="Исходы">
+          <title>Отменена · ЦЕЛЬ: is_canceled=1; УТЕЧКА: status · Исходы</title>
+          <rect x="275" y="424" width="200" height="64" rx="7" class="c-mask"/>
+          <rect x="275" y="424" width="200" height="64" rx="7" class="c-security" stroke-width="1.5"/>
+          <rect x="278" y="427" width="194" height="58" rx="4" class="c-security" style="fill: none" stroke-width="1"/>
+          <g aria-hidden="true" data-semantic-sigil="failure" class="semantic-sigil s-security" transform="translate(281 430) scale(0.6875)">
             <circle cx="8" cy="8" r="5.3"/>
             <path d="m5.7 5.7 4.6 4.6m0-4.6-4.6 4.6"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="383" y="263" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Отменена</text>
-          <text data-detail="context" x="383" y="280" class="t-muted" font-size="8" text-anchor="middle">УТЕЧКА: is_canceled=1, status, date</text>
-        <text data-detail="fine" x="383" y="292" class="t-security" font-size="8" text-anchor="middle">утечка</text>
+          <text data-node-label="" data-detail-anchor="" x="375" y="447" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Отменена</text>
+          <text data-detail="context" x="375" y="464" class="t-muted" font-size="8" text-anchor="middle">ЦЕЛЬ: is_canceled=1; УТЕЧКА: status</text>
         </g>
 
-        <g id="node-noshow" data-node-id="noshow" data-node-label="Не приехал" tabindex="0" role="button" aria-label="Focus Не приехал, УТЕЧКА: is_canceled=1, No-Show, Исходы" aria-pressed="false" data-node-kind="failure" data-node-sublabel="УТЕЧКА: is_canceled=1, No-Show" data-node-tag="утечка" data-node-context="Исходы">
-          <title>Не приехал · УТЕЧКА: is_canceled=1, No-Show · Исходы · утечка</title>
-          <rect x="727" y="240" width="200" height="64" rx="7" class="c-mask"/>
-          <rect x="727" y="240" width="200" height="64" rx="7" class="c-security" stroke-width="1.5"/>
-          <rect x="730" y="243" width="194" height="58" rx="4" class="c-security" style="fill: none" stroke-width="1"/>
-          <g aria-hidden="true" data-semantic-sigil="failure" class="semantic-sigil s-security" transform="translate(733 246) scale(0.6875)">
+        <g id="node-noshow" data-node-id="noshow" data-node-label="Не приехал" tabindex="0" role="button" aria-label="Focus Не приехал, ЦЕЛЬ: is_canceled=1; УТЕЧКА: status, Исходы" aria-pressed="false" data-node-kind="failure" data-node-sublabel="ЦЕЛЬ: is_canceled=1; УТЕЧКА: status" data-node-context="Исходы">
+          <title>Не приехал · ЦЕЛЬ: is_canceled=1; УТЕЧКА: status · Исходы</title>
+          <rect x="530" y="424" width="200" height="64" rx="7" class="c-mask"/>
+          <rect x="530" y="424" width="200" height="64" rx="7" class="c-security" stroke-width="1.5"/>
+          <rect x="533" y="427" width="194" height="58" rx="4" class="c-security" style="fill: none" stroke-width="1"/>
+          <g aria-hidden="true" data-semantic-sigil="failure" class="semantic-sigil s-security" transform="translate(536 430) scale(0.6875)">
             <circle cx="8" cy="8" r="5.3"/>
             <path d="m5.7 5.7 4.6 4.6m0-4.6-4.6 4.6"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="827" y="263" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Не приехал</text>
-          <text data-detail="context" x="827" y="280" class="t-muted" font-size="8" text-anchor="middle">УТЕЧКА: is_canceled=1, No-Show</text>
-        <text data-detail="fine" x="827" y="292" class="t-security" font-size="8" text-anchor="middle">утечка</text>
+          <text data-node-label="" data-detail-anchor="" x="630" y="447" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Не приехал</text>
+          <text data-detail="context" x="630" y="464" class="t-muted" font-size="8" text-anchor="middle">ЦЕЛЬ: is_canceled=1; УТЕЧКА: status</text>
         </g>
 
         <!-- Transition labels -->
-        <g data-detail="context" data-edge-from="created" data-edge-to="changes" data-edge-label="правка" data-edge-key="0">
-          <rect x="243.3" y="67" width="41.400000000000006" height="16" rx="4" class="c-mask"/>
-          <text x="264" y="78" class="t-edge-emphasis" font-size="8" text-anchor="middle">правка</text>
-        </g>
-        <g data-detail="context" data-edge-from="changes" data-edge-to="checkin" data-edge-label="дата заезда" data-edge-key="1">
-          <rect x="572.05" y="67" width="65.9" height="16" rx="4" class="c-mask"/>
-          <text x="605" y="78" class="t-edge-emphasis" font-size="8" text-anchor="middle">дата заезда</text>
+        <g data-detail="context" data-edge-from="created" data-edge-to="checkin" data-edge-label="гость приехал" data-edge-key="0">
+          <rect x="464.65" y="67" width="75.7" height="16" rx="4" class="c-mask"/>
+          <text x="502.5" y="78" class="t-edge-emphasis" font-size="8" text-anchor="middle">гость приехал</text>
         </g>
 
-        <g data-detail="context" data-edge-from="changes" data-edge-to="canceled" data-edge-label="отмена" data-edge-key="3">
-          <rect x="335.6" y="172" width="41.400000000000006" height="16" rx="4" class="c-mask"/>
-          <text x="356.3" y="183" class="t-edge-security" font-size="8" text-anchor="middle">отмена</text>
+        <g data-detail="context" data-edge-from="created" data-edge-to="changes" data-edge-label="правка" data-edge-key="2">
+          <rect x="62.599999999999994" y="136" width="41.400000000000006" height="16" rx="4" class="c-mask"/>
+          <text x="83.3" y="147" class="t-edge-dashed" font-size="8" text-anchor="middle">правка</text>
         </g>
-        <g data-detail="context" data-edge-from="created" data-edge-to="noshow" data-edge-label="не приехал" data-edge-key="4">
-          <rect x="163" y="205" width="61" height="16" rx="4" class="c-mask"/>
-          <text x="193.5" y="216" class="t-edge-security" font-size="8" text-anchor="middle">не приехал</text>
+
+        <g data-detail="context" data-edge-from="created" data-edge-to="canceled" data-edge-label="отмена" data-edge-key="4">
+          <rect x="229.3" y="385" width="41.400000000000006" height="16" rx="4" class="c-mask"/>
+          <text x="250" y="396" class="t-edge-security" font-size="8" text-anchor="middle">отмена</text>
+        </g>
+
+        <g data-detail="context" data-edge-from="created" data-edge-to="noshow" data-edge-label="не приехал" data-edge-key="6">
+          <rect x="176" y="228" width="61" height="16" rx="4" class="c-mask"/>
+          <text x="206.5" y="239" class="t-edge-security" font-size="8" text-anchor="middle">не приехал</text>
         </g>
 
         <!-- Legend -->
         <g data-legend="" data-legend-bridge="">
-          <text x="40" y="344" class="t-primary" font-size="12" font-weight="650">Legend</text>
-          <g data-legend-semantic-kind="start" data-legend-kind="start" data-legend-label="initial state" data-legend-x="40" data-legend-baseline="364" data-legend-width="120">
-            <circle cx="44.5" cy="360.5" r="4.5" style="fill: var(--arrow-emphasis)"/><path d="M 49 360.5 L 58 360.5" class="a-emphasis" stroke-width="1.4"/><path d="M 57 357 L 64 360.5 L 57 364 Z" style="fill: var(--arrow-emphasis)"/>
-            <text x="74" y="364" class="t-muted" font-size="10" font-weight="500">initial state</text>
+          <text x="40" y="528" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <g data-legend-semantic-kind="start" data-legend-kind="start" data-legend-label="начальное состояние" data-legend-x="40" data-legend-baseline="548" data-legend-width="150">
+            <circle cx="44.5" cy="544.5" r="4.5" style="fill: var(--arrow-emphasis)"/><path d="M 49 544.5 L 58 544.5" class="a-emphasis" stroke-width="1.4"/><path d="M 57 541 L 64 544.5 L 57 548 Z" style="fill: var(--arrow-emphasis)"/>
+            <text x="74" y="548" class="t-muted" font-size="10" font-weight="500">начальное состояние</text>
           </g>
-          <g data-legend-semantic-kind="active" data-legend-kind="active" data-legend-label="active" data-legend-x="182" data-legend-baseline="364" data-legend-width="73">
-            <rect x="182" y="356" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
-            <text x="204" y="364" class="t-muted" font-size="10" font-weight="500">active</text>
+          <g data-legend-semantic-kind="active" data-legend-kind="active" data-legend-label="промежуточное" data-legend-x="212" data-legend-baseline="548" data-legend-width="108">
+            <rect x="212" y="540" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
+            <text x="234" y="548" class="t-muted" font-size="10" font-weight="500">промежуточное</text>
           </g>
-          <g data-legend-semantic-kind="success" data-legend-kind="success" data-legend-label="success" data-legend-x="277" data-legend-baseline="364" data-legend-width="78">
-            <rect x="277" y="356" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
-            <text x="299" y="364" class="t-muted" font-size="10" font-weight="500">success</text>
+          <g data-legend-semantic-kind="waiting" data-legend-kind="waiting" data-legend-label="необязательное" data-legend-x="342" data-legend-baseline="548" data-legend-width="113">
+            <rect x="342" y="540" width="14" height="9" rx="2" class="c-cloud" stroke-width="1"/>
+            <text x="364" y="548" class="t-muted" font-size="10" font-weight="500">необязательное</text>
           </g>
-          <g data-legend-semantic-kind="failure" data-legend-kind="failure" data-legend-label="failure / exit" data-legend-x="377" data-legend-baseline="364" data-legend-width="113">
-            <rect x="377" y="356" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
-            <text x="399" y="364" class="t-muted" font-size="10" font-weight="500">failure / exit</text>
+          <g data-legend-semantic-kind="success" data-legend-kind="success" data-legend-label="исход: приехал и выехал" data-legend-x="477" data-legend-baseline="548" data-legend-width="158">
+            <rect x="477" y="540" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
+            <text x="499" y="548" class="t-muted" font-size="10" font-weight="500">исход: приехал и выехал</text>
           </g>
-          <g data-legend-semantic-kind="final" data-legend-x="512" data-legend-baseline="364" data-legend-width="79">
-            <rect x="512" y="356" width="14" height="9" rx="2" class="c-external" stroke-width="1"/><rect x="514.5" y="358.5" width="9" height="4" rx="1" class="c-external" style="fill: none" stroke-width="0.8"/>
-            <text x="536" y="364" class="t-muted" font-size="10" font-weight="500">final state</text>
+          <g data-legend-semantic-kind="failure" data-legend-kind="failure" data-legend-label="исход: отмена / неприезд" data-legend-x="657" data-legend-baseline="548" data-legend-width="163">
+            <rect x="657" y="540" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
+            <text x="679" y="548" class="t-muted" font-size="10" font-weight="500">исход: отмена / неприезд</text>
+          </g>
+          <g data-legend-semantic-kind="final" data-legend-x="842" data-legend-baseline="548" data-legend-width="79">
+            <rect x="842" y="540" width="14" height="9" rx="2" class="c-external" stroke-width="1"/><rect x="844.5" y="542.5" width="9" height="4" rx="1" class="c-external" style="fill: none" stroke-width="0.8"/>
+            <text x="866" y="548" class="t-muted" font-size="10" font-weight="500">final state</text>
           </g>
         </g>
       </svg>
@@ -5365,9 +5376,19 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         </div>
         <ul>
           <li>booking_changes: итог известен только в конце</li>
-          <li>reservation_status, reservation_status_date, is_canceled: это и есть исход</li>
+          <li>reservation_status, reservation_status_date: это и есть исход</li>
           <li>assigned_room_type: номер выдаётся при заезде</li>
-          <li>country: часто уточняется при заезде — частично из будущего</li>
+          <li>country*: уточняется при заезде — частично из будущего</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>Цель</h3>
+        </div>
+        <ul>
+          <li>is_canceled — целевая переменная (что предсказываем), не признак</li>
         </ul>
       </div>
     </div>
