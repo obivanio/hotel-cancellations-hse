@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .venv/
 .ipynb_checkpoints/
+*.egg-info/
 
 # Данные: сырые и промежуточные файлы не храним в git
 data/raw/*

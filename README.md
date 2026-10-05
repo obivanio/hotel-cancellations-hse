@@ -16,24 +16,30 @@ Hotel Booking Demand — 119 390 броней двух отелей в Порт�
 ## Структура
 
 ```
-src/          код: загрузка, очистка, признаки, статистика, модели, графики
-notebooks/    ноутбук с ходом работы и выводами
-data/raw/     исходные данные (не хранятся в git)
-reports/      итоговые графики, таблицы, отчёт
+src/          код: загрузка (data), очистка (cleaning, cleaning_log), признаки (features), сборка (pipeline)
+tests/        тесты pytest
+notebooks/    ноутбуки с ходом работы и выводами (01 — загрузка и очистка)
+data/raw/     исходные данные (скачиваются автоматически, не хранятся в git)
+data/processed/  очищенный датасет (создаётся ноутбуком, не хранится в git)
+reports/      артефакты: журнал очистки, графики, таблицы
 ```
 
 ## Запуск
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt && pip install -e .
 jupyter notebook notebooks/
 ```
 
 ## Проверка кода
 
 ```bash
-flake8 src/
-pylint src/
+pytest
+flake8 src tests
+pylint src tests
 nbqa flake8 notebooks/
 ```
+
+Интеграционные тесты (`test_real_data_*`) работают на настоящем датасете: при первом запуске он
+скачивается автоматически, поэтому нужен доступ в интернет.
