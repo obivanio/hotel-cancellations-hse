@@ -4,8 +4,8 @@ import pandas as pd
 import pytest
 
 from src.evaluation import (
-    best_threshold, calibration_table, loss_curve, losses, score_table, threshold_report, threshold_sensitivity,
-    value_at_risk,
+    Assumptions, best_threshold, calibration_table, loss_curve, loss_sensitivity, losses, score_table,
+    threshold_report, threshold_sensitivity, value_at_risk,
 )
 
 Y = pd.Series([1, 1, 0, 0])
@@ -52,6 +52,16 @@ def test_sensitivity_grows_with_loss_prob():
     y = pd.Series((rng.random(2000) < proba).astype(int))
     table = threshold_sensitivity(y, proba, np.full(2000, 100.0), [0.5], [0.05, 0.2])
     assert table.loc[0.5, 0.05] < table.loc[0.5, 0.2]
+
+
+def test_loss_sensitivity_is_minimum_of_curve():
+    """Каждая клетка — минимум суммарных потерь по порогам при своих допущениях; дороже ошибки — больше потерь."""
+    table = loss_sensitivity(Y, PROBA, VALUE, [0.3, 0.7], [0.05, 0.2])
+    for unsold in (0.3, 0.7):
+        for loss_prob in (0.05, 0.2):
+            curve = loss_curve(Y, PROBA, VALUE, Assumptions(unsold, loss_prob))
+            assert table.loc[unsold, loss_prob] == pytest.approx(curve["total"].min())
+    assert table.loc[0.3, 0.05] <= table.loc[0.7, 0.05] <= table.loc[0.7, 0.2]
 
 
 def test_calibration_table():

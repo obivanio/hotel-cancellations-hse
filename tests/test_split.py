@@ -5,7 +5,7 @@ from src.split import split_summary, time_split
 
 
 def test_time_split_order_and_coverage():
-    """Части не пересекаются, покрывают все брони и идят строго друг за другом по дате заезда."""
+    """Части не пересекаются, покрывают все брони и идут строго друг за другом по дате заезда."""
     dates = pd.date_range("2016-01-01", periods=100, freq="D").repeat(2)
     df = pd.DataFrame({"arrival_date": dates, "booking_key": range(200)})
     train, valid, test = time_split(df)

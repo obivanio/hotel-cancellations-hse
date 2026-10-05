@@ -79,6 +79,17 @@ def threshold_sensitivity(y: pd.Series, proba: np.ndarray, value: np.ndarray, un
     })
 
 
+def loss_sensitivity(y: pd.Series, proba: np.ndarray, value: np.ndarray, unsold_grid: list[float],
+                     loss_grid: list[float]) -> pd.DataFrame:
+    """Минимальные суммарные потери (при оптимальном пороге) для каждой пары допущений; оси — как у порога."""
+    return pd.DataFrame({
+        loss_prob: {
+            unsold: float(loss_curve(y, proba, value, Assumptions(unsold, loss_prob))["total"].min())
+            for unsold in unsold_grid
+        } for loss_prob in loss_grid
+    })
+
+
 def threshold_report(y: pd.Series, proba: np.ndarray, threshold: float) -> dict[str, float]:
     """Точность, полнота и доля броней, с которых берём предоплату, при выбранном пороге."""
     prepay = proba >= threshold

@@ -101,4 +101,4 @@ def odds_ratios(model: Pipeline) -> pd.Series:
     """
     names = model[0].get_feature_names_out()
     odds = pd.Series(np.exp(model[-1].coef_[0]), index=names)
-    return odds.reindex(odds.map(lambda value: abs(np.log(value))).sort_values(ascending=False).index)
+    return odds.reindex(np.log(odds).abs().sort_values(ascending=False).index)
