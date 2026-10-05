@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 
 from src.data import load_raw
-from src.hypotheses import STATEMENTS, h2_pairwise, hypotheses_table, robustness, save_hypotheses, segments
+from src.hypotheses import STATEMENTS, h2_pairwise, h6_seasonality, hypotheses_table, reject_h0, robustness
+from src.hypotheses import save_hypotheses, segments
 
 SEGMENTS = ["Online TA", "Direct", "Groups", "Corporate", "Aviation"]
 
@@ -49,6 +50,30 @@ def test_no_hypothesis_rejected_without_effect():
     """Без эффектов ни одна нулевая гипотеза не отвергается."""
     table = hypotheses_table(_bookings(effect=False))
     assert not table["reject_h0"].any(), table[["hypothesis", "p_holm", "effect"]]
+
+
+def test_h6_bootstrap_ci_with_effect():
+    """С заложенной сезонностью курорта бутстреп-ДИ разницы ε² целиком выше нуля и содержит оценку."""
+    res = h6_seasonality(_bookings(effect=True))
+    assert 0 < res.ci_low <= res.effect <= res.ci_high
+
+
+def test_h6_bootstrap_ci_reproducible():
+    """Бутстреп с фиксированным зерном даёт одинаковый ДИ при повторном запуске."""
+    df = _bookings(effect=True)
+    first, second = h6_seasonality(df), h6_seasonality(df)
+    assert (first.ci_low, first.ci_high) == (second.ci_low, second.ci_high)
+
+
+def test_reject_h0_rule():
+    """H0 отвергается только при p < 0,05, нужном знаке и ДИ, не накрывающем 0 (пустой ДИ не мешает)."""
+    nan = float("nan")
+    p_holm = pd.Series([0.001, 0.001, 0.001, 0.2, 0.001, 0.001])
+    effect = pd.Series([0.3, 0.3, -0.3, 0.3, 0.3, -0.2])
+    expected = pd.Series([1, 1, 1, 1, 1, -1])
+    ci_low = pd.Series([nan, -0.1, nan, nan, 0.1, -0.3])
+    ci_high = pd.Series([nan, 0.5, nan, nan, 0.5, -0.1])
+    assert reject_h0(p_holm, effect, expected, ci_low, ci_high).tolist() == [True, False, False, False, True, True]
 
 
 def test_table_shape():

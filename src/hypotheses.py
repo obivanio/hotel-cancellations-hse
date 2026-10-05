@@ -25,6 +25,8 @@ STATEMENTS = {
 }
 EXPECTED_SIGN = {"H1": 1, "H2": 1, "H3": -1, "H4": -1, "H5": 1, "H6": 1}
 ROBUSTNESS_CHECKS = ("C", "A", "B", "C без Non Refund")
+BOOTSTRAP_RESAMPLES = 200
+BOOTSTRAP_SEED = 0
 
 
 def _rate_diff(df: pd.DataFrame, flag: pd.Series) -> StatResult:
@@ -87,17 +89,36 @@ def h6_by_hotel(df: pd.DataFrame) -> dict[str, StatResult]:
     return {str(hotel): kruskal_wallis(group["adr"], group["arrival_month"]) for hotel, group in paid.groupby("hotel")}
 
 
+def h6_bootstrap_ci(df: pd.DataFrame, resamples: int = BOOTSTRAP_RESAMPLES) -> tuple[float, float]:
+    """95 % перцентильный бутстреп-ДИ для ε² курорта минус ε² города.
+
+    Строки платных броней пересэмплируются с возвращением отдельно внутри каждого отеля.
+    """
+    rng = np.random.default_rng(BOOTSTRAP_SEED)
+    paid = df[df["is_free"] == 0]
+    hotels = {str(hotel): group[["adr", "arrival_month"]].to_numpy() for hotel, group in paid.groupby("hotel")}
+    diffs = []
+    for _ in range(resamples):
+        effect = {}
+        for hotel, rows in hotels.items():
+            sample = rows[rng.integers(0, len(rows), len(rows))]
+            effect[hotel] = kruskal_wallis(pd.Series(sample[:, 0]), pd.Series(sample[:, 1])).effect
+        diffs.append(effect["Resort Hotel"] - effect["City Hotel"])
+    low, high = np.percentile(diffs, [2.5, 97.5])
+    return float(low), float(high)
+
+
 def h6_seasonality(df: pd.DataFrame) -> StatResult:
     """H6: сезонность цены у курорта сильнее, чем у города.
 
     Статистика — H курорта; p-value — наибольший из двух отелей (сезонность значима у обоих);
-    эффект — ε² курорта минус ε² города (> 0 — у курорта сильнее).
+    эффект — ε² курорта минус ε² города (> 0 — у курорта сильнее) с бутстреп-ДИ этой разницы.
     """
     by_hotel = h6_by_hotel(df)
     resort, city = by_hotel["Resort Hotel"], by_hotel["City Hotel"]
     return StatResult(
         resort.test, resort.statistic, max(resort.p_value, city.p_value), "ε² курорт − ε² город",
-        resort.effect - city.effect,
+        resort.effect - city.effect, *h6_bootstrap_ci(df),
     )
 
 
@@ -107,13 +128,24 @@ _TESTS = {
 }
 
 
+def reject_h0(p_holm: pd.Series, effect: pd.Series, expected_sign: pd.Series,
+              ci_low: pd.Series, ci_high: pd.Series) -> pd.Series:
+    """Решение «отвергаем H0»: p с поправкой < ALPHA, знак эффекта ожидаемый и ДИ эффекта не накрывает 0.
+
+    Если ДИ не посчитан (NaN), решение принимается по p и знаку.
+    """
+    ci_missing = ci_low.isna() | ci_high.isna()
+    ci_excludes_zero = (ci_low > 0) | (ci_high < 0)
+    return (p_holm < ALPHA) & (np.sign(effect) == expected_sign) & (ci_missing | ci_excludes_zero)
+
+
 def hypotheses_table(df: pd.DataFrame) -> pd.DataFrame:
     """Сводная таблица H1–H6: тесты, эффекты, поправка Холма и решение по каждой гипотезе."""
     rows = [{"hypothesis": key, "statement": STATEMENTS[key], **asdict(test(df))} for key, test in _TESTS.items()]
     out = pd.DataFrame(rows)
     out["p_holm"] = holm(out["p_value"])
     expected = out["hypothesis"].map(EXPECTED_SIGN)
-    out["reject_h0"] = (out["p_holm"] < ALPHA) & (np.sign(out["effect"]) == expected)
+    out["reject_h0"] = reject_h0(out["p_holm"], out["effect"], expected, out["ci_low"], out["ci_high"])
     return out
 
 
