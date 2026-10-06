@@ -40,6 +40,11 @@ def _mln(value: float) -> str:
     return f"{value / 1e6:.2f} млн €".replace(".", ",")
 
 
+def _num(value: float) -> str:
+    """Число с одним знаком после запятой и десятичной запятой: 4,2."""
+    return f"{value:.1f}".replace(".", ",")
+
+
 def _pct(share: float) -> str:
     """Доля в процентах: 60 %."""
     return f"{share * 100:.0f} %"
@@ -244,8 +249,8 @@ def _texts(summary: dict, dates: pd.DataFrame, curves: pd.DataFrame, risk: pd.Da
                   f"При предоплате с {_pct(summary['share'])} броней выбор по модели теряет "
                   f"{_mln(at_share['модель'])}, по сроку брони — {_mln(at_share['срок брони'])}."),
         "slider": _slider_text(curves),
-        "overbooking": (f"В среднем на дату ожидалось {pooled['expected'].mean():.1f} отмен, "
-                        f"случилось {pooled['actual'].mean():.1f}. ".replace(".", ",") +
+        "overbooking": (f"В среднем на дату ожидалось {_num(pooled['expected'].mean())} отмен, "
+                        f"случилось {_num(pooled['actual'].mean())}. "
                         f"Осторожная оценка модели перепродаёт {plans.loc['модель', 'resold']:.0f} номеров "
                         f"(бенчмарк — {plans.loc['бенчмарк', 'resold']:.0f}), но в "
                         f"{plans.loc['модель', 'short_dates']:.0f} парах «отель × дата» гостям не хватило бы "

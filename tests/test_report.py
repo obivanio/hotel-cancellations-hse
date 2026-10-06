@@ -4,10 +4,10 @@ import pandas as pd
 import plotly.graph_objects as go
 import pytest
 
-from src.overbooking import WALK_COSTS, date_table
+from src.overbooking import WALK_COSTS, date_table, outcome_table
 from src.policies import equal_share_curves, policy_table, scored
-from src.report import (MONTH_NAMES, SECTIONS, _assumptions_html, _risk_text, _slider_text, build_report,
-                        fig_overbooking, fig_risk, fig_share_curve, fig_top_share, risk_table)
+from src.report import (MONTH_NAMES, SECTIONS, _assumptions_html, _risk_text, _slider_text, _summary, _texts,
+                        build_report, fig_overbooking, fig_risk, fig_share_curve, fig_top_share, risk_table)
 
 
 @pytest.fixture(name="tables", scope="module")
@@ -143,3 +143,13 @@ def test_assumptions_mention_every_walk_cost():
     html = _assumptions_html()
     for cost in WALK_COSTS:
         assert str(cost).replace(".", ",") in html
+
+
+def test_overbooking_text_decimal_comma_only_in_numbers(tables):
+    """Десятичная запятая только в числах: конец предложения остаётся точкой, а не «, »."""
+    summary = _summary(tables["policies"], tables["curves"], outcome_table(tables["dates"]))
+    text = _texts(summary, tables["dates"], tables["curves"], tables["risk"])["overbooking"]
+    pooled = tables["dates"][tables["dates"]["hotel"] == "все отели"]
+    mean_expected = f"{pooled['expected'].mean():.1f}".replace(".", ",")
+    mean_actual = f"{pooled['actual'].mean():.1f}".replace(".", ",")
+    assert text.startswith(f"В среднем на дату ожидалось {mean_expected} отмен, случилось {mean_actual}. Осторожная")
