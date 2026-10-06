@@ -4,17 +4,17 @@ import pandas as pd
 import plotly.graph_objects as go
 import pytest
 
-from src.overbooking import date_table, outcome_table
+from src.overbooking import WALK_COSTS, date_table
 from src.policies import equal_share_curves, policy_table, scored
-from src.report import (SECTIONS, _summary, _texts, build_report, fig_overbooking, fig_risk,
-                        fig_share_curve, fig_top_share, risk_table)
+from src.report import (MONTH_NAMES, SECTIONS, _assumptions_html, _risk_text, _slider_text, build_report,
+                        fig_overbooking, fig_risk, fig_share_curve, fig_top_share, risk_table)
 
 
 @pytest.fixture(name="tables", scope="module")
 def fixture_tables():
     """Таблицы шага 4 на синтетических бронях двух отелей (те же функции, что и на реальных данных)."""
     rng = np.random.default_rng(0)
-    n = 400
+    n = 1200
     df = pd.DataFrame({
         "hotel": rng.choice(["City Hotel", "Resort Hotel"], n),
         "arrival_date": pd.Timestamp("2017-05-01") + pd.to_timedelta(rng.integers(0, 60, n), unit="D"),
@@ -72,49 +72,74 @@ def test_build_report(tables, tmp_path):
 
 
 def test_chart2_slider_relayout_no_visible(tables):
-    """Слайдер графика 2 использует relayout (не visible), для подвижного маркера и аннотации."""
+    """Слайдер графика 2 только перерисовывает маркер (relayout), видимость трасс не трогает."""
     fig = fig_top_share(tables["curves"])
-    assert len(fig.layout.sliders) > 0
-    slider = fig.layout.sliders[0]
-    for step in slider.steps:
-        # Все шаги должны быть relayout, не меняющие видимость трасс
+    for step in fig.layout.sliders[0].steps:
         assert step.method == "relayout"
-        # args должны содержать shapes/annotations, а не visible
-        assert isinstance(step.args, (list, tuple)) and len(step.args) > 0
-        relayout_dict = step.args[1] if len(step.args) > 1 else step.args[0]
-        assert isinstance(relayout_dict, dict)
-        assert "shapes" in relayout_dict or "annotations" in relayout_dict
+        assert set(step.args[0]) == {"shapes", "annotations"}
+
+
+def test_chart2_annotation_has_every_hotel(tables):
+    """Подпись шага слайдера содержит числа по каждому отелю; маркер первого шага нарисован сразу."""
+    fig = fig_top_share(tables["curves"])
+    step = fig.layout.sliders[0].steps[3]
+    text = step.args[0]["annotations"][0]["text"]
+    model = tables["curves"][tables["curves"]["method"] == "модель"].set_index(["hotel", "share"])
+    share = float(step.args[0]["shapes"][0]["x0"]) / 100
+    assert text.startswith(f"топ-{share * 100:.0f} %")
+    for hotel in ("все отели", "City Hotel", "Resort Hotel"):
+        loss = model.loc[(hotel, share), "total"] / model.loc[(hotel, 0.0), "total"] * 100
+        assert f"{hotel} — потери {loss:.0f} %" in text
+    assert len(fig.layout.shapes) == 1 and fig.layout.annotations[0].text.startswith("топ-5 %")
 
 
 def test_chart2_has_restyle_dropdown(tables):
-    """График 2 имеет выпадающий список для выбора отеля (restyle для видимости)."""
+    """Выбор отеля на графике 2 — выпадающий список с restyle, видимость задана для всех трасс."""
     fig = fig_top_share(tables["curves"])
-    assert len(fig.layout.updatemenus) > 0
-    dropdown = fig.layout.updatemenus[0]
-    assert len(dropdown.buttons) > 0
-    # Каждый бутон должен использовать restyle для видимости
-    for button in dropdown.buttons:
-        assert button.method == "restyle"
-        assert "visible" in button.args[0]
-        assert len(button.args[0]["visible"]) == len(fig.data)
+    for button in fig.layout.updatemenus[0].buttons:
+        assert button.method == "restyle" and len(button.args[0]["visible"]) == len(fig.data)
 
 
-def test_slider_text_derived_from_curves(tables):
-    """Вывод под графиком 2 содержит числа из таблицы кривых, не hardcoded."""
-    summary = _summary(tables["policies"], tables["curves"], outcome_table(tables["dates"]))
-    texts = _texts(summary, tables["dates"], tables["curves"], tables["risk"])
-    slider_text = texts["slider"]
-    # Не должно быть hardcoded claim про падение-рост потерь
-    assert "потери сначала падают, потом растут" not in slider_text
-    # Должны быть конкретные числовые данные (доля с минимумом)
-    assert "%" in slider_text
+def test_slider_text_has_best_share_per_hotel(tables):
+    """Вывод к графику 2 называет долю с минимальными потерями, посчитанную по входной кривой, для каждого отеля."""
+    curves = tables["curves"]
+    text = _slider_text(curves)
+    model = curves[curves["method"] == "модель"]
+    for hotel, rows in model.groupby("hotel"):
+        best = rows.loc[rows["total"].idxmin()]
+        assert f"{hotel} — {best['share'] * 100:.0f} % (задето {best['touched_reliable'] * 100:.0f} %" in text
+    assert "легенд" not in text
 
 
-def test_risk_text_derived_from_risk_table(tables):
-    """Вывод под графиком 4 содержит числовые данные: максимальный риск из таблицы."""
-    # _texts принимает summary, dates, curves, risk
-    # для chart 4 (risk) используются данные из tables["risk"]
-    texts = _texts({}, tables["dates"], None, tables["risk"])
-    risk_text = texts["risk"]
-    # Текст не должен быть только hint'ом, должны быть данные из таблицы
-    assert "риск" in risk_text and "%" in risk_text
+def test_risk_text_names_true_argmax(tables):
+    """Вывод к графику 4 называет сегмент и месяц с наибольшим риском, взвешенным по броням (пересчёт вручную)."""
+    risk = tables["risk"]
+    text = _risk_text(risk, min_bookings=50)
+    pooled = risk[risk["hotel"] == "все отели"]
+    for column, label in (("market_segment", "сегмент"), ("arrival_month", "месяц")):
+        mean = {key: np.average(g["mean_proba"], weights=g["bookings"]) for key, g in pooled.groupby(column)
+                if g["bookings"].sum() >= 50}
+        best = max(mean, key=mean.get)
+        expected = f"«{best}»" if label == "сегмент" else f"«{MONTH_NAMES[best]}»"
+        assert f"{expected} ({mean[best] * 100:.0f} %)" in text
+
+
+def test_risk_text_min_bookings_filter(tables):
+    """Группы меньше порога не участвуют: при высоком пороге остаются только самые крупные сегменты."""
+    risk = tables["risk"]
+    sizes = risk[risk["hotel"] == "все отели"].groupby("market_segment")["bookings"].sum()
+    big = sizes.idxmax()
+    assert f"«{big}»" in _risk_text(risk, min_bookings=int(sizes.max()))
+
+
+def test_risk_months_in_calendar_order(tables):
+    """Ось месяцев графика 4 идёт по календарю, а не по порядку появления."""
+    fig = fig_risk(tables["risk"])
+    assert list(fig.layout.xaxis.categoryarray) == [MONTH_NAMES[i] for i in range(1, 13)]
+
+
+def test_assumptions_mention_every_walk_cost():
+    """Допущения упоминают каждое значение WALK_COSTS с десятичной запятой."""
+    html = _assumptions_html()
+    for cost in WALK_COSTS:
+        assert str(cost).replace(".", ",") in html

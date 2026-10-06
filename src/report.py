@@ -16,6 +16,7 @@ LAYOUT = {"template": "plotly_white", "separators": ", "}
 MONTH_NAMES = {1: "янв", 2: "фев", 3: "мар", 4: "апр", 5: "май", 6: "июн", 7: "июл", 8: "авг", 9: "сен", 10: "окт",
                11: "ноя", 12: "дек"}
 TOP_CATEGORIES = ["потери, % от «как сейчас»", "задето надёжных гостей, %", "поймано отмен, %"]
+MIN_BOOKINGS = 200
 SECTIONS = {
     "curve": "1. Доля предоплаты и потери: модель против срока брони",
     "slider": "2. Топ-X % броней по риску",
@@ -107,22 +108,21 @@ def _create_top_share_dropdown(hotels: list[str], metrics: list) -> list[dict]:
              "y": 1.15, "yanchor": "top"}]
 
 
-def _create_top_share_slider_steps(model: pd.DataFrame, hotels: list[str], baseline: pd.Series,
-                                   shares: list) -> list[dict]:
-    """Создать шаги слайдера с вертикальной линией и аннотацией (relayout)."""
-    steps = []
-    for share in shares:
-        if share == 0:
-            continue
-        row = model[(model["hotel"] == hotels[0]) & (model["share"] == share)].iloc[0]
-        loss_pct = row['total'] / baseline[hotels[0]] * 100
-        ann_text = f"топ-{_pct(share)}: потери {loss_pct:.0f} %"
-        steps.append({"label": _pct(share), "method": "relayout", "args": [{
-            "shapes": [{"type": "line", "x0": share * 100, "x1": share * 100, "y0": 0, "y1": 100,
-                       "line": {"color": "rgba(100,100,100,0.3)", "width": 2}}],
-            "annotations": [{"text": ann_text, "x": share * 100, "y": 100, "showarrow": False,
-                            "bgcolor": "rgba(255,255,255,0.8)", "bordercolor": "gray"}]}]})
-    return steps
+def _slider_marker(model: pd.DataFrame, hotels: list[str], baseline: pd.Series, share: float) -> dict:
+    """Вертикальная линия и подпись для выбранной доли: числа по каждому отелю, что бы ни показывал список."""
+    lines = []
+    for hotel in hotels:
+        row = model[(model["hotel"] == hotel) & (model["share"] == share)].iloc[0]
+        lines.append(f"{hotel} — потери {row['total'] / baseline[hotel] * 100:.0f} %, "
+                     f"задето {_pct(row['touched_reliable'])}, поймано {_pct(row['caught_cancels'])}")
+    x = share * 100
+    return {
+        "shapes": [{"type": "line", "x0": x, "x1": x, "y0": 0, "y1": 1, "yref": "paper",
+                    "line": {"color": "rgba(100,100,100,0.3)", "width": 2}}],
+        "annotations": [{"text": f"топ-{_pct(share)}<br>" + "<br>".join(lines), "x": x, "y": 1, "yref": "paper",
+                         "yanchor": "top", "showarrow": False, "align": "left",
+                         "bgcolor": "rgba(255,255,255,0.8)", "bordercolor": "gray"}],
+    }
 
 
 def fig_top_share(curves: pd.DataFrame) -> go.Figure:
@@ -132,15 +132,16 @@ def fig_top_share(curves: pd.DataFrame) -> go.Figure:
     metrics = [("total", "потери, % от базовой"), ("touched_reliable", "задето надёжных, %"),
                ("caught_cancels", "поймано отмен, %")]
     baseline = model[model["share"] == 0.0].set_index("hotel")["total"]
-    shares = sorted(model["share"].unique())
+    shares = [share for share in sorted(model["share"].unique()) if share > 0]
     fig = go.Figure()
     _add_top_share_traces(fig, model, hotels, baseline, metrics)
     dropdown = _create_top_share_dropdown(hotels, metrics)
-    steps = _create_top_share_slider_steps(model, hotels, baseline, shares)
+    markers = [_slider_marker(model, hotels, baseline, share) for share in shares]
+    steps = [{"label": _pct(share), "method": "relayout", "args": [marker]} for share, marker in zip(shares, markers)]
     fig.update_layout(**LAYOUT, updatemenus=dropdown,
                       xaxis_title="доля броней с предоплатой, %", yaxis_title="%",
                       sliders=[{"steps": steps, "currentvalue": {"prefix": "топ-"}, "len": 0.9}],
-                      shapes=[], annotations=[])
+                      **markers[0])
     return fig
 
 
@@ -204,58 +205,52 @@ def _key_numbers(summary: dict) -> dict[str, str]:
     }
 
 
-def _texts(summary: dict, dates: pd.DataFrame, curves: pd.DataFrame = None,
-           risk: pd.DataFrame = None) -> dict[str, str]:
-    """Короткие выводы под графиками; числа берутся из таблиц, а не пишутся руками."""  # pylint: disable=R0914
-    total = summary.get("total")
-    at_share = summary.get("at_share")
-    best = total["total"].idxmin() if total is not None else "?"
-    curve_text = ""
-    if total is not None and at_share is not None and "share" in summary:
-        curve_text = (f"Меньше всего потерь у правила «{best}» — {_mln(total.loc[best, 'total'])}; "
-                      f"«со всех» — {_mln(total.loc['со всех', 'total'])}, но задевает всех надёжных гостей. "
-                      f"При предоплате с {_pct(summary['share'])} броней выбор по модели теряет "
-                      f"{_mln(at_share['модель'])}, по сроку брони — {_mln(at_share['срок брони'])}.")
-    pooled_cond = dates is not None and len(dates) > 0
-    pooled = dates[dates["hotel"] == ALL_HOTELS] if pooled_cond else pd.DataFrame()
-    mean_exp = f"{pooled['expected'].mean():.1f}".replace(".", ",") if len(pooled) > 0 else "?"
-    mean_act = f"{pooled['actual'].mean():.1f}".replace(".", ",") if len(pooled) > 0 else "?"
-    model = summary.get("plans", {}).get("модель", {})
-    bench = summary.get("plans", {}).get("бенчмарк", {})
-    slider_conclusion = ""
-    if curves is not None:
-        model_curves = curves[(curves["method"] == "модель") & (curves["hotel"] == ALL_HOTELS)]
-        if len(model_curves) > 0:
-            min_loss_idx = model_curves["total"].idxmin()
-            min_share = model_curves.loc[min_loss_idx, "share"]
-            touched = model_curves.loc[min_loss_idx, "touched_reliable"]
-            slider_conclusion = (f"Минимальные потери при предоплате с {_pct(min_share)} "
-                                 f"самых рискованных броней: задето {_pct(touched)} надёжных гостей. ")
-    if not slider_conclusion:
-        slider_conclusion = "Двигайте ползунок, чтобы видеть потери при разных долях предоплаты. "
-    risk_conclusion = ""
-    if risk is not None:
-        if len(risk) > 0:
-            max_risk_idx = risk["mean_proba"].idxmax()
-            max_risk_row = risk.loc[max_risk_idx]
-            segment = max_risk_row["market_segment"]
-            month = max_risk_row["arrival_month"]
-            month_name = MONTH_NAMES.get(month, str(month))
-            risk_value = f"{max_risk_row['mean_proba'] * 100:.0f}"
-            risk_conclusion = (f"Максимальный риск отмены ({risk_value} %) в сегменте «{segment}» "
-                               f"в {month_name}. ")
-    if not risk_conclusion:
-        risk_conclusion = "Сегменты и месяцы показаны легендой. "
-    overbooking_text = (f"В среднем на дату ожидалось {mean_exp} отмен, случилось {mean_act}. "
-                        f"Осторожная оценка модели перепродаёт {model.get('resold', 0):.0f} номеров "
-                        f"(бенчмарк — {bench.get('resold', 0):.0f}), но в "
-                        f"{model.get('short_dates', 0):.0f} парах «отель × дата» гостям не хватило бы "
-                        f"номера ({model.get('walked', 0):.0f} гостей).")
+def _slider_text(curves: pd.DataFrame) -> str:
+    """Вывод к графику 2: при какой доле предоплаты потери модели минимальны — по каждому отелю."""
+    model = curves[curves["method"] == "модель"]
+    parts = []
+    for hotel in _hotels(curves):
+        rows = model[model["hotel"] == hotel]
+        best = rows.loc[rows["total"].idxmin()]
+        parts.append(f"{hotel} — {_pct(best['share'])} (задето {_pct(best['touched_reliable'])} надёжных гостей)")
+    return "Минимум потерь достигается при предоплате с такой доли самых рискованных броней: " + "; ".join(parts) + "."
+
+
+def _riskiest(pooled: pd.DataFrame, column: str, min_bookings: int) -> tuple:
+    """Значение признака с наибольшим средним риском (взвешенным по броням) среди групп от min_bookings броней."""
+    groups = pooled.groupby(column)[["weighted", "bookings"]].sum()
+    mean_risk = (groups["weighted"] / groups["bookings"])[groups["bookings"] >= min_bookings]
+    return mean_risk.idxmax(), mean_risk.max()
+
+
+def _risk_text(risk: pd.DataFrame, min_bookings: int = MIN_BOOKINGS) -> str:
+    """Вывод к графику 4: сегмент и месяц с наибольшим средним риском по всем отелям."""
+    pooled = risk[risk["hotel"] == ALL_HOTELS].assign(weighted=lambda t: t["mean_proba"] * t["bookings"])
+    segment, segment_risk = _riskiest(pooled, "market_segment", min_bookings)
+    month, month_risk = _riskiest(pooled, "arrival_month", min_bookings)
+    return (f"По всем отелям самый высокий средний риск отмены у сегмента «{segment}» ({segment_risk * 100:.0f} %) "
+            f"и у броней с заездом в месяце «{MONTH_NAMES[month]}» ({month_risk * 100:.0f} %); "
+            f"учтены группы от {min_bookings} броней.")
+
+
+def _texts(summary: dict, dates: pd.DataFrame, curves: pd.DataFrame, risk: pd.DataFrame) -> dict[str, str]:
+    """Короткие выводы под графиками; числа берутся из таблиц, а не пишутся руками."""
+    total, at_share, plans = summary["total"], summary["at_share"], summary["plans"]
+    pooled = dates[dates["hotel"] == ALL_HOTELS]
+    best = total["total"].idxmin()
     return {
-        "curve": curve_text,
-        "slider": slider_conclusion + "Отель скрывается щелчком по легенде.",
-        "overbooking": overbooking_text,
-        "risk": risk_conclusion + "Сегменты включаются щелчком по легенде. Это связь, а не причина.",
+        "curve": (f"Меньше всего потерь у правила «{best}» — {_mln(total.loc[best, 'total'])}; "
+                  f"«со всех» — {_mln(total.loc['со всех', 'total'])}, но задевает всех надёжных гостей. "
+                  f"При предоплате с {_pct(summary['share'])} броней выбор по модели теряет "
+                  f"{_mln(at_share['модель'])}, по сроку брони — {_mln(at_share['срок брони'])}."),
+        "slider": _slider_text(curves),
+        "overbooking": (f"В среднем на дату ожидалось {pooled['expected'].mean():.1f} отмен, "
+                        f"случилось {pooled['actual'].mean():.1f}. ".replace(".", ",") +
+                        f"Осторожная оценка модели перепродаёт {plans.loc['модель', 'resold']:.0f} номеров "
+                        f"(бенчмарк — {plans.loc['бенчмарк', 'resold']:.0f}), но в "
+                        f"{plans.loc['модель', 'short_dates']:.0f} парах «отель × дата» гостям не хватило бы "
+                        f"номера ({plans.loc['модель', 'walked']:.0f} гостей)."),
+        "risk": _risk_text(risk) + " Сегменты включаются щелчком по легенде. Это связь, а не причина.",
     }
 
 
@@ -268,7 +263,7 @@ def _assumptions_html() -> str:
         "Брони «без возврата» уже оплачены: их отмена ничего не стоит отелю.",
         f"Овербукинг: осторожная оценка — число отмен, которое наступит с вероятностью не ниже "
         f"{_pct(OVERBOOK_CONFIDENCE)}; «гость без номера» стоит одну стоимость его брони (проверено "
-        f"{str(WALK_COSTS[0]).replace('.', ',')} и {str(WALK_COSTS[-1]).replace('.', ',')}).",
+        f"{'; '.join(str(cost).replace('.', ',') for cost in WALK_COSTS)} стоимости брони).",
         "Вместимости отелей в данных нет: перепродажа считается сверх фактически забронированного.",
         "Отмены считаются независимыми; групповые отмены это нарушают.",
         "Тест — май–август 2017 года, два отеля в Португалии; связь, а не причина.",
