@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from src.evaluation import DEFAULT_ASSUMPTIONS, Assumptions, value_at_risk
+from src.evaluation import DEFAULT_ASSUMPTIONS, Assumptions, mask_losses, value_at_risk
 from src.pipeline import ROOT
 
 REPORTS_DIR = ROOT / "reports"
@@ -53,17 +53,19 @@ def top_share_mask(scores: np.ndarray, share: float) -> np.ndarray:
 
 
 def policy_metrics(s: Scored, prepay: np.ndarray, assumptions: Assumptions = DEFAULT_ASSUMPTIONS) -> dict[str, float]:
-    """Потери правила (как в шаге 3) и его цена для гостей: доля предоплат, задетых надёжных, пойманных отмен."""
-    missed = float(s.value[s.canceled & ~prepay].sum() * assumptions.unsold_share)
-    false_alarm = float(s.value[~s.canceled & prepay].sum() * assumptions.loss_prob)
-    reliable, canceled = (~s.canceled).sum(), s.canceled.sum()
+    """Потери правила (та же формула, что в шаге 3) и его цена для гостей.
+
+    prepay_share — доля всех броней, попавших под правило (у топ-X % это ровно X %). Доли задетых надёжных гостей
+    и пойманных отмен считаются только среди броней, которые чего-то стоят при отмене (value > 0): брони «без
+    возврата» уже оплачены, а бесплатные ничего не стоят, — требование предоплаты для них ничего не меняет.
+    """
+    reliable = ~s.canceled & (s.value > 0)
+    canceled = s.canceled & (s.value > 0)
     return {
-        "missed": missed,
-        "false_alarm": false_alarm,
-        "total": missed + false_alarm,
+        **mask_losses(s.canceled, prepay, s.value, assumptions),
         "prepay_share": float(prepay.mean()),
-        "touched_reliable": float((prepay & ~s.canceled).sum() / reliable) if reliable else 0.0,
-        "caught_cancels": float((prepay & s.canceled).sum() / canceled) if canceled else 0.0,
+        "touched_reliable": float((prepay & reliable).sum() / reliable.sum()) if reliable.any() else 0.0,
+        "caught_cancels": float((prepay & canceled).sum() / canceled.sum()) if canceled.any() else 0.0,
     }
 
 

@@ -45,6 +45,11 @@ def _num(value: float) -> str:
     return f"{value:.1f}".replace(".", ",")
 
 
+def _int(value: float) -> str:
+    """Целое число с пробелом между тысячами: 4 898."""
+    return f"{value:,.0f}".replace(",", " ")
+
+
 def _pct(share: float) -> str:
     """Доля в процентах: 60 %."""
     return f"{share * 100:.0f} %"
@@ -100,7 +105,7 @@ def _add_top_share_traces(fig: go.Figure, model: pd.DataFrame, hotels: list[str]
             fig.add_trace(go.Scatter(
                 x=part["share"] * 100, y=y, mode="lines", name=metric_name, visible=i == 0,
                 line={"color": metric_colors[metric_key], "width": 2}, legendgroup=metric_key,
-                showlegend=i == 0, hovertemplate="топ-%{x:.0f} %: %{y:.0f} %<extra></extra>"))
+                showlegend=True, hovertemplate=metric_name + ", топ-%{x:.0f} %: %{y:.0f} %<extra></extra>"))
 
 
 def _create_top_share_dropdown(hotels: list[str], metrics: list) -> list[dict]:
@@ -201,12 +206,16 @@ def _summary(policies: pd.DataFrame, curves: pd.DataFrame, outcomes: pd.DataFram
 def _key_numbers(summary: dict) -> dict[str, str]:
     """Ключевые цифры для шапки отчёта."""
     rule, at_share, model = summary["rule"], summary["at_share"], summary["plans"].loc["модель"]
+    everyone = summary["total"].loc["со всех"]
     return {
         "без предоплаты": _mln(summary["total"].loc[BASELINE, "total"]),
-        rule.name: f"{_mln(rule['total'])} (задето {_pct(rule['touched_reliable'])} надёжных гостей)",
+        "со всех": f"{_mln(everyone['total'])} (задето {_pct(everyone['touched_reliable'])} надёжных гостей)",
+        f"{rule.name} (подобран на валидации)":
+            f"{_mln(rule['total'])} (задето {_pct(rule['touched_reliable'])} надёжных гостей)",
         f"предоплата с {_pct(summary['share'])} броней":
             f"модель {_mln(at_share['модель'])}, срок брони {_mln(at_share['срок брони'])}",
-        "овербукинг по модели": f"перепродано {model['resold']:.0f} номеров, без номера {model['walked']:.0f} гостей",
+        "овербукинг по модели":
+            f"перепродано {_int(model['resold'])} номеров, без номера {_int(model['walked'])} гостей",
     }
 
 
@@ -218,7 +227,9 @@ def _slider_text(curves: pd.DataFrame) -> str:
         rows = model[model["hotel"] == hotel]
         best = rows.loc[rows["total"].idxmin()]
         parts.append(f"{hotel} — {_pct(best['share'])} (задето {_pct(best['touched_reliable'])} надёжных гостей)")
-    return "Минимум потерь достигается при предоплате с такой доли самых рискованных броней: " + "; ".join(parts) + "."
+    return ("Минимум потерь на тесте достигается при предоплате с такой доли самых рискованных броней: "
+            + "; ".join(parts) + ". Эти доли видны только задним числом; рабочее правило — порог, подобранный "
+            "на валидации.")
 
 
 def _riskiest(pooled: pd.DataFrame, column: str, min_bookings: int) -> tuple:
@@ -240,21 +251,25 @@ def _risk_text(risk: pd.DataFrame, min_bookings: int = MIN_BOOKINGS) -> str:
 
 def _texts(summary: dict, dates: pd.DataFrame, curves: pd.DataFrame, risk: pd.DataFrame) -> dict[str, str]:
     """Короткие выводы под графиками; числа берутся из таблиц, а не пишутся руками."""
-    total, at_share, plans = summary["total"], summary["at_share"], summary["plans"]
+    total, rule, at_share, plans = summary["total"], summary["rule"], summary["at_share"], summary["plans"]
     pooled = dates[dates["hotel"] == ALL_HOTELS]
-    best = total["total"].idxmin()
+    everyone = total.loc["со всех"]
     return {
-        "curve": (f"Меньше всего потерь у правила «{best}» — {_mln(total.loc[best, 'total'])}; "
-                  f"«со всех» — {_mln(total.loc['со всех', 'total'])}, но задевает всех надёжных гостей. "
-                  f"При предоплате с {_pct(summary['share'])} броней выбор по модели теряет "
-                  f"{_mln(at_share['модель'])}, по сроку брони — {_mln(at_share['срок брони'])}."),
+        "curve": (f"Рабочее правило — «{rule.name}» (порог подобран на валидации): потери "
+                  f"{_mln(rule['total'])} против {_mln(total.loc[BASELINE, 'total'])} без предоплаты. Основную "
+                  f"экономию даёт сама предоплата: «со всех» теряет {_mln(everyone['total'])} и задевает "
+                  f"{_pct(everyone['touched_reliable'])} надёжных гостей; модель дешевле на "
+                  f"{_mln(everyone['total'] - rule['total'])} и задевает {_pct(rule['touched_reliable'])} "
+                  f"вместо {_pct(everyone['touched_reliable'])}. При предоплате с {_pct(summary['share'])} броней "
+                  f"выбор по модели теряет {_mln(at_share['модель'])}, по сроку брони — "
+                  f"{_mln(at_share['срок брони'])}."),
         "slider": _slider_text(curves),
         "overbooking": (f"В среднем на дату ожидалось {_num(pooled['expected'].mean())} отмен, "
                         f"случилось {_num(pooled['actual'].mean())}. "
-                        f"Осторожная оценка модели перепродаёт {plans.loc['модель', 'resold']:.0f} номеров "
-                        f"(бенчмарк — {plans.loc['бенчмарк', 'resold']:.0f}), но в "
-                        f"{plans.loc['модель', 'short_dates']:.0f} парах «отель × дата» гостям не хватило бы "
-                        f"номера ({plans.loc['модель', 'walked']:.0f} гостей)."),
+                        f"Осторожная оценка модели перепродаёт {_int(plans.loc['модель', 'resold'])} номеров "
+                        f"(бенчмарк — {_int(plans.loc['бенчмарк', 'resold'])}), но в "
+                        f"{_int(plans.loc['модель', 'short_dates'])} парах «отель × дата» гостям не хватило бы "
+                        f"номера ({_int(plans.loc['модель', 'walked'])} гостей)."),
         "risk": _risk_text(risk) + " Сегменты включаются щелчком по легенде. Это связь, а не причина.",
     }
 
@@ -265,7 +280,9 @@ def _assumptions_html() -> str:
         f"Не перепродаётся {_pct(DEFAULT_ASSUMPTIONS.unsold_share)} стоимости отменённой брони; надёжный гость уходит "
         f"из-за требования предоплаты с вероятностью {_pct(DEFAULT_ASSUMPTIONS.loss_prob)} (чувствительность — в "
         "ноутбуке 04).",
-        "Брони «без возврата» уже оплачены: их отмена ничего не стоит отелю.",
+        "Брони «без возврата» уже оплачены: их отмена ничего не стоит отелю, и они не считаются ни задетыми "
+        "надёжными гостями, ни пойманными отменами.",
+        "Деньги предоплаты и овербукинга не складываются: оба решения опираются на одни и те же отмены.",
         f"Овербукинг: осторожная оценка — число отмен, которое наступит с вероятностью не ниже "
         f"{_pct(OVERBOOK_CONFIDENCE)}; «гость без номера» стоит одну стоимость его брони (проверено "
         f"{'; '.join(str(cost).replace('.', ',') for cost in WALK_COSTS)} стоимости брони).",

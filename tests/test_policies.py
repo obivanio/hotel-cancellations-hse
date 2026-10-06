@@ -41,6 +41,16 @@ def test_policy_metrics_no_cancels():
     assert policy_metrics(part, np.ones(2, dtype=bool))["touched_reliable"] == 0.0
 
 
+def test_policy_metrics_skips_prepaid():
+    """Брони без стоимости при отмене («без возврата» — уже оплачены) не считаются задетыми и пойманными."""
+    s = Scored(np.array([True, True, False, False]), np.zeros(4), np.zeros(4),
+               np.array([0.0, 200.0, 0.0, 400.0]), np.array(["A"] * 4))
+    metrics = policy_metrics(s, np.array([True, False, True, False]))
+    assert metrics["prepay_share"] == 0.5
+    assert metrics["touched_reliable"] == 0.0 and metrics["caught_cancels"] == 0.0
+    assert policy_metrics(s, np.ones(4, dtype=bool))["touched_reliable"] == 1.0
+
+
 def test_top_share_mask_ties():
     """Топ-X % берёт ровно X % броней даже при равных скорах; из равных — те, что раньше в таблице."""
     assert top_share_mask(np.full(10, 0.5), 0.3).tolist() == [True] * 3 + [False] * 7

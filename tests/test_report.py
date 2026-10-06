@@ -6,8 +6,9 @@ import pytest
 
 from src.overbooking import WALK_COSTS, date_table, outcome_table
 from src.policies import equal_share_curves, policy_table, scored
-from src.report import (MONTH_NAMES, SECTIONS, _assumptions_html, _risk_text, _slider_text, _summary, _texts,
-                        build_report, fig_overbooking, fig_risk, fig_share_curve, fig_top_share, risk_table)
+from src.report import (MONTH_NAMES, SECTIONS, _assumptions_html, _int, _key_numbers, _risk_text, _slider_text,
+                        _summary, _texts, build_report, fig_overbooking, fig_risk, fig_share_curve, fig_top_share,
+                        risk_table)
 
 
 @pytest.fixture(name="tables", scope="module")
@@ -41,11 +42,11 @@ def test_figures_have_data(tables):
                fig_overbooking(tables["dates"]), fig_risk(tables["risk"])]
     for fig in figures:
         assert isinstance(fig, go.Figure) and len(fig.data) > 0
-        # Проверяем dropdowns: для restyle нужна visible, для relayout проверяем наличие меню
-        for menu in fig.layout.updatemenus:
-            for button in menu.buttons:
-                if button.method == "restyle":
-                    assert len(button.args[0]["visible"]) == len(fig.data)
+        buttons = [button for menu in fig.layout.updatemenus for button in menu.buttons]
+        assert [button.label for button in buttons] == ["все отели", "City Hotel", "Resort Hotel"]
+        for button in buttons:
+            assert button.method in {"restyle", "update"}
+            assert len(button.args[0]["visible"]) == len(fig.data) and any(button.args[0]["visible"])
     slider = figures[1].layout.sliders[0]
     assert len(slider.steps) == 20 and slider.steps[0].label == "5 %"
 
@@ -93,11 +94,42 @@ def test_chart2_annotation_has_every_hotel(tables):
     assert len(fig.layout.shapes) == 1 and fig.layout.annotations[0].text.startswith("топ-5 %")
 
 
-def test_chart2_has_restyle_dropdown(tables):
-    """Выбор отеля на графике 2 — выпадающий список с restyle, видимость задана для всех трасс."""
+def test_chart2_legend_and_hover_for_every_hotel(tables):
+    """На графике 2 у видимых линий любого отеля есть легенда, а подсказка называет показатель."""
     fig = fig_top_share(tables["curves"])
     for button in fig.layout.updatemenus[0].buttons:
-        assert button.method == "restyle" and len(button.args[0]["visible"]) == len(fig.data)
+        shown = [trace for trace, visible in zip(fig.data, button.args[0]["visible"]) if visible]
+        assert len(shown) == 3 and all(trace.showlegend for trace in shown)
+        assert all(trace.hovertemplate.startswith(trace.name) for trace in shown)
+
+
+def test_curve_text_names_validation_rule_and_baseline(tables):
+    """Вывод к графику 1: рабочее правило — порог с валидации; «со всех» и вклад самой предоплаты названы числами."""
+    policies = tables["policies"]
+    summary = _summary(policies, tables["curves"], outcome_table(tables["dates"]))
+    text = _texts(summary, tables["dates"], tables["curves"], tables["risk"])["curve"]
+    total = policies[policies["hotel"] == "все отели"].set_index("policy")
+    everyone = total.loc["со всех", "total"]
+    assert "«модель, порог 0,17»" in text and "подобран на валидации" in text
+    assert f"«со всех» теряет {everyone / 1e6:.2f}".replace(".", ",") in text
+    assert "сама предоплата" in text
+    keys = _key_numbers(summary)
+    assert keys["со всех"].startswith(f"{everyone / 1e6:.2f}".replace(".", ","))
+
+
+def test_slider_text_marks_hindsight(tables):
+    """Вывод к графику 2 оговаривает, что минимум найден на тесте задним числом."""
+    assert "задним числом" in _slider_text(tables["curves"])
+
+
+def test_thousands_separator():
+    """Целые числа в отчёте — с пробелом между тысячами: 4 898."""
+    assert _int(4898.0) == "4 898" and _int(90) == "90"
+
+
+def test_assumptions_forbid_summing():
+    """Допущения предупреждают, что деньги предоплаты и овербукинга не складываются."""
+    assert "не складываются" in _assumptions_html()
 
 
 def test_slider_text_has_best_share_per_hotel(tables):
