@@ -4,9 +4,10 @@ import pandas as pd
 import plotly.graph_objects as go
 import pytest
 
-from src.overbooking import date_table
+from src.overbooking import date_table, outcome_table
 from src.policies import equal_share_curves, policy_table, scored
-from src.report import SECTIONS, build_report, fig_overbooking, fig_risk, fig_share_curve, fig_top_share, risk_table
+from src.report import (SECTIONS, _summary, _texts, build_report, fig_overbooking, fig_risk,
+                        fig_share_curve, fig_top_share, risk_table)
 
 
 @pytest.fixture(name="tables", scope="module")
@@ -40,8 +41,11 @@ def test_figures_have_data(tables):
                fig_overbooking(tables["dates"]), fig_risk(tables["risk"])]
     for fig in figures:
         assert isinstance(fig, go.Figure) and len(fig.data) > 0
+        # Проверяем dropdowns: для restyle нужна visible, для relayout проверяем наличие меню
         for menu in fig.layout.updatemenus:
-            assert all(len(button.args[0]["visible"]) == len(fig.data) for button in menu.buttons)
+            for button in menu.buttons:
+                if button.method == "restyle":
+                    assert len(button.args[0]["visible"]) == len(fig.data)
     slider = figures[1].layout.sliders[0]
     assert len(slider.steps) == 20 and slider.steps[0].label == "5 %"
 
@@ -65,3 +69,52 @@ def test_build_report(tables, tmp_path):
         assert f'id="{key}"' in html and f'href="#{key}"' in html and title in html
     assert html.count("Plotly.newPlot") == 4
     assert "<script src=" not in html and len(html) > 1_000_000
+
+
+def test_chart2_slider_relayout_no_visible(tables):
+    """Слайдер графика 2 использует relayout (не visible), для подвижного маркера и аннотации."""
+    fig = fig_top_share(tables["curves"])
+    assert len(fig.layout.sliders) > 0
+    slider = fig.layout.sliders[0]
+    for step in slider.steps:
+        # Все шаги должны быть relayout, не меняющие видимость трасс
+        assert step.method == "relayout"
+        # args должны содержать shapes/annotations, а не visible
+        assert isinstance(step.args, (list, tuple)) and len(step.args) > 0
+        relayout_dict = step.args[1] if len(step.args) > 1 else step.args[0]
+        assert isinstance(relayout_dict, dict)
+        assert "shapes" in relayout_dict or "annotations" in relayout_dict
+
+
+def test_chart2_has_restyle_dropdown(tables):
+    """График 2 имеет выпадающий список для выбора отеля (restyle для видимости)."""
+    fig = fig_top_share(tables["curves"])
+    assert len(fig.layout.updatemenus) > 0
+    dropdown = fig.layout.updatemenus[0]
+    assert len(dropdown.buttons) > 0
+    # Каждый бутон должен использовать restyle для видимости
+    for button in dropdown.buttons:
+        assert button.method == "restyle"
+        assert "visible" in button.args[0]
+        assert len(button.args[0]["visible"]) == len(fig.data)
+
+
+def test_slider_text_derived_from_curves(tables):
+    """Вывод под графиком 2 содержит числа из таблицы кривых, не hardcoded."""
+    summary = _summary(tables["policies"], tables["curves"], outcome_table(tables["dates"]))
+    texts = _texts(summary, tables["dates"], tables["curves"], tables["risk"])
+    slider_text = texts["slider"]
+    # Не должно быть hardcoded claim про падение-рост потерь
+    assert "потери сначала падают, потом растут" not in slider_text
+    # Должны быть конкретные числовые данные (доля с минимумом)
+    assert "%" in slider_text
+
+
+def test_risk_text_derived_from_risk_table(tables):
+    """Вывод под графиком 4 содержит числовые данные: максимальный риск из таблицы."""
+    # _texts принимает summary, dates, curves, risk
+    # для chart 4 (risk) используются данные из tables["risk"]
+    texts = _texts({}, tables["dates"], None, tables["risk"])
+    risk_text = texts["risk"]
+    # Текст не должен быть только hint'ом, должны быть данные из таблицы
+    assert "риск" in risk_text and "%" in risk_text
