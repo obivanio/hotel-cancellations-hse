@@ -80,15 +80,9 @@ def fig_share_curve(curves: pd.DataFrame, policies: pd.DataFrame) -> go.Figure:
     return fig
 
 
-def fig_top_share(curves: pd.DataFrame) -> go.Figure:
-    """График 2: кривые потерь по топ-X % броней с выбором отеля и ползунком."""
-    model = curves[curves["method"] == "модель"].sort_values(["hotel", "share"])
-    hotels = _hotels(curves)
-    metrics = [("total", "потери, % от базовой"), ("touched_reliable", "задето надёжных, %"),
-               ("caught_cancels", "поймано отмен, %")]
-    baseline = model[model["share"] == 0.0].set_index("hotel")["total"]
-    fig = go.Figure()
-    shares = sorted(model["share"].unique())
+def _add_top_share_traces(fig: go.Figure, model: pd.DataFrame, hotels: list[str], baseline: pd.Series,
+                          metrics: list) -> None:
+    """Добавить линии кривых потерь по отелям и метрикам."""
     metric_colors = {"total": "#636EFA", "touched_reliable": "#EF553B", "caught_cancels": "#00CC96"}
     for i, hotel in enumerate(hotels):
         part = model[model["hotel"] == hotel]
@@ -101,13 +95,23 @@ def fig_top_share(curves: pd.DataFrame) -> go.Figure:
                 x=part["share"] * 100, y=y, mode="lines", name=metric_name, visible=i == 0,
                 line={"color": metric_colors[metric_key], "width": 2}, legendgroup=metric_key,
                 showlegend=i == 0, hovertemplate="топ-%{x:.0f} %: %{y:.0f} %<extra></extra>"))
-    hotel_buttons = []
+
+
+def _create_top_share_dropdown(hotels: list[str], metrics: list) -> list[dict]:
+    """Создать выпадающий список для выбора отеля с методом restyle."""
+    buttons = []
     for i, hotel in enumerate(hotels):
         visible = [j // len(metrics) == i for j in range(len(hotels) * len(metrics))]
-        hotel_buttons.append({
-            "label": hotel, "method": "restyle", "args": [{"visible": visible}]})
+        buttons.append({"label": hotel, "method": "restyle", "args": [{"visible": visible}]})
+    return [{"buttons": buttons, "direction": "down", "x": 1.0, "xanchor": "right",
+             "y": 1.15, "yanchor": "top"}]
+
+
+def _create_top_share_slider_steps(model: pd.DataFrame, hotels: list[str], baseline: pd.Series,
+                                   shares: list) -> list[dict]:
+    """Создать шаги слайдера с вертикальной линией и аннотацией (relayout)."""
     steps = []
-    for k, share in enumerate(shares):
+    for share in shares:
         if share == 0:
             continue
         row = model[(model["hotel"] == hotels[0]) & (model["share"] == share)].iloc[0]
@@ -118,8 +122,21 @@ def fig_top_share(curves: pd.DataFrame) -> go.Figure:
                        "line": {"color": "rgba(100,100,100,0.3)", "width": 2}}],
             "annotations": [{"text": ann_text, "x": share * 100, "y": 100, "showarrow": False,
                             "bgcolor": "rgba(255,255,255,0.8)", "bordercolor": "gray"}]}]})
-    dropdown = [{"buttons": hotel_buttons, "direction": "down", "x": 1.0, "xanchor": "right",
-                 "y": 1.15, "yanchor": "top"}]
+    return steps
+
+
+def fig_top_share(curves: pd.DataFrame) -> go.Figure:
+    """График 2: кривые потерь по топ-X % броней с выбором отеля и ползунком."""
+    model = curves[curves["method"] == "модель"].sort_values(["hotel", "share"])
+    hotels = _hotels(curves)
+    metrics = [("total", "потери, % от базовой"), ("touched_reliable", "задето надёжных, %"),
+               ("caught_cancels", "поймано отмен, %")]
+    baseline = model[model["share"] == 0.0].set_index("hotel")["total"]
+    shares = sorted(model["share"].unique())
+    fig = go.Figure()
+    _add_top_share_traces(fig, model, hotels, baseline, metrics)
+    dropdown = _create_top_share_dropdown(hotels, metrics)
+    steps = _create_top_share_slider_steps(model, hotels, baseline, shares)
     fig.update_layout(**LAYOUT, updatemenus=dropdown,
                       xaxis_title="доля броней с предоплатой, %", yaxis_title="%",
                       sliders=[{"steps": steps, "currentvalue": {"prefix": "топ-"}, "len": 0.9}],
