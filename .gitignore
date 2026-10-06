@@ -18,3 +18,6 @@ data/processed/*
 
 # Рабочая папка archify
 .archify/
+
+# Служебная папка CatBoost
+catboost_info/
