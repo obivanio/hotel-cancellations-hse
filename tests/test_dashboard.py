@@ -4,9 +4,9 @@ import pandas as pd
 import pytest
 
 from src.dashboard import (
-    SCORED_COLUMNS, SCORED_TEST_PATH, count, display_rules, fig_heatmap, fig_share_curves, fig_weeks, filter_frame,
-    key_numbers, model_threshold, overbooking_summary, risk_tables, rules_table, scored_frame, share_curves,
-    to_scored,
+    SCORED_COLUMNS, SCORED_TEST_PATH, comma, count, display_rules, fig_heatmap, fig_share_curves, fig_weeks,
+    filter_frame, key_numbers, lead_total_at_share, model_threshold, overbooking_summary, risk_tables, rules_table,
+    scored_frame, share_curves, to_scored,
 )
 from src.evaluation import Assumptions
 from src.policies import ALL_HOTELS, policy_metrics
@@ -136,3 +136,16 @@ def test_figures():
     assert [trace.type for trace in fig_weeks(dates, "A").data] == ["bar", "scatter", "scatter"]
     tables = risk_tables(FRAME)
     assert fig_heatmap(tables["risk"], tables["bookings"], "риск").data[0].type == "heatmap"
+
+
+def test_comma():
+    """Десятичная запятая вместо точки, число знаков настраивается."""
+    assert comma(0.1666) == "0,17"
+    assert comma(2.0, 0) == "2"
+
+
+def test_lead_total_at_share():
+    """Потери по сроку берутся с кривой на нужной доле; нет такой доли - None."""
+    curves = share_curves(FRAME, shares=np.array([0.0, 1.0]))
+    assert lead_total_at_share(curves, 1.0) == pytest.approx(40.0)
+    assert lead_total_at_share(curves, 0.5) is None

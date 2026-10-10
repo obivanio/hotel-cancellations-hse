@@ -59,3 +59,11 @@ def test_extreme_assumptions(app):
     app.sidebar.slider(key="loss").set_value(20).run()
     assert not app.exception
     assert any("не ниже 0,40" in caption.value for caption in app.caption)
+
+
+def test_empty_months_show_messages(app):
+    """Без месяцев: предупреждение вместо цифр и сообщение на вкладке овербукинга, без ошибок."""
+    app.sidebar.multiselect(key="months").set_value([]).run()
+    assert not app.exception
+    assert app.warning and "нет броней" in app.warning[0].value
+    assert any("Нет дат заезда" in info.value for info in app.info)

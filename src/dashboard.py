@@ -154,6 +154,17 @@ def percent(share: float) -> str:
     return f"{share * 100:.0f} %"
 
 
+def comma(value: float, digits: int = 2) -> str:
+    """Число с десятичной запятой: 0,17."""
+    return f"{value:.{digits}f}".replace(".", ",")
+
+
+def lead_total_at_share(curves: pd.DataFrame, share: float) -> float | None:
+    """Потери при выборе броней по сроку на заданной доле; None, если такой доли нет на кривой."""
+    row = curves[(curves["method"] == "срок брони") & curves["share"].round(2).eq(round(share, 2))]
+    return None if row.empty else float(row["total"].iloc[0])
+
+
 def display_rules(table: pd.DataFrame) -> pd.DataFrame:
     """Таблица правил для показа: деньги в млн € и доли в % строками с десятичной запятой, русские заголовки."""
     shown = table[list(RULE_COLUMNS)].copy()

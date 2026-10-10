@@ -3,9 +3,9 @@ import pandas as pd
 import streamlit as st
 
 from src.dashboard import (
-    HOTELS, SCORED_TEST_PATH, SCORED_VALID_PATH, count, dates_slice, display_rules, fig_heatmap, fig_share_curves,
-    fig_weeks, filter_frame, key_numbers, money, overbooking_summary, percent, risk_tables, rules_table,
-    share_curves, to_scored,
+    HOTELS, SCORED_TEST_PATH, SCORED_VALID_PATH, comma, count, dates_slice, display_rules, fig_heatmap,
+    fig_share_curves, fig_weeks, filter_frame, key_numbers, lead_total_at_share, money, overbooking_summary,
+    percent, risk_tables, rules_table, share_curves, to_scored,
 )
 from src.evaluation import Assumptions
 from src.overbooking import OVERBOOK_CONFIDENCE, OVERBOOKING_PATH
@@ -30,11 +30,6 @@ def lead_days_for(unsold_share: float, loss_prob: float) -> int:
     return best_lead_days(to_scored(load_tables()["valid"]), Assumptions(unsold_share, loss_prob))
 
 
-def comma(value: float, digits: int = 2) -> str:
-    """Число с десятичной запятой."""
-    return f"{value:.{digits}f}".replace(".", ",")
-
-
 def sidebar(test: pd.DataFrame) -> dict:
     """Фильтры и допущения в боковой панели."""
     st.sidebar.header("Фильтры")
@@ -55,14 +50,15 @@ def sidebar(test: pd.DataFrame) -> dict:
 
 def cards(numbers: dict) -> None:
     """Ключевые цифры среза и порог модели."""
-    columns = st.columns(5)
+    columns = st.columns(3)
     columns[0].metric("Без предоплаты", money(numbers["baseline"]), help="Потери от отмен, если не брать предоплату.")
     columns[1].metric("Предоплата со всех", money(numbers["everyone"]),
                       help="Потери, если брать предоплату с каждой брони.")
     columns[2].metric("Предоплата по модели", money(numbers["model"]),
                       help="Потери, если брать предоплату только с рискованных броней.")
-    columns[3].metric("Модель дешевле «со всех»", money(numbers["saving"]))
-    columns[4].metric("Задето надёжных гостей", percent(numbers["touched_reliable"]),
+    columns = st.columns(3)
+    columns[0].metric("Модель дешевле «со всех»", money(numbers["saving"]))
+    columns[1].metric("Задето надёжных гостей", percent(numbers["touched_reliable"]),
                       help="Доля гостей, которые и так бы приехали, но с них по модели взяли бы предоплату.")
     st.caption(f"Модель берёт предоплату с броней, у которых риск отмены не ниже {comma(numbers['threshold'])} "
                f"({percent(numbers['prepay_share'])} выбранных броней). Порог зависит от допущений слева.")
@@ -84,12 +80,12 @@ def tab_rules(frame: pd.DataFrame, assumptions: Assumptions) -> None:
     lead_days = lead_days_for(assumptions.unsold_share, assumptions.loss_prob)
     table = rules_table(frame, lead_days, share, assumptions)
     top = table.iloc[-1]
-    by_lead = curves[(curves["method"] == "срок брони") & curves["share"].round(2).eq(round(share, 2))]
+    by_lead = lead_total_at_share(curves, share)
     st.markdown(
         f"При предоплате с {percent(share)} самых рискованных броней потери — {money(top['total'])}, задето "
         f"{percent(top['touched_reliable'])} надёжных гостей, поймано {percent(top['caught_cancels'])} отмен."
-        + (f" Если взять столько же броней по сроку, потери — {money(by_lead['total'].iloc[0])}."
-           if not by_lead.empty else ""))
+        + (f" Если взять столько же броней по сроку, потери — {money(by_lead)}."
+           if by_lead is not None else ""))
     st.subheader("Пять правил для выбранных броней")
     st.dataframe(display_rules(table), hide_index=True, width="stretch")
     st.caption(f"N для правила по сроку подобран на валидации при текущих допущениях: {lead_days} дн. Порог модели "
