@@ -46,14 +46,18 @@ def value_at_risk(df: pd.DataFrame) -> np.ndarray:
     return df["booking_value"].where(df["deposit_type"] != NON_REFUND, 0.0).to_numpy(dtype=float)
 
 
-def losses(y: pd.Series, proba: np.ndarray, value: np.ndarray, threshold: float,
-           assumptions: Assumptions = DEFAULT_ASSUMPTIONS) -> dict[str, float]:
-    """Потери при правиле «предоплата, если вероятность отмены ≥ порога»: пропущенные отмены и лишние предоплаты."""
-    canceled = np.asarray(y) == 1
-    prepay = proba >= threshold
+def mask_losses(canceled: np.ndarray, prepay: np.ndarray, value: np.ndarray,
+                assumptions: Assumptions = DEFAULT_ASSUMPTIONS) -> dict[str, float]:
+    """Потери при заданной маске предоплаты: пропущенные отмены (× unsold_share) и лишние предоплаты (× loss_prob)."""
     missed = float(value[canceled & ~prepay].sum() * assumptions.unsold_share)
     false_alarm = float(value[~canceled & prepay].sum() * assumptions.loss_prob)
     return {"missed": missed, "false_alarm": false_alarm, "total": missed + false_alarm}
+
+
+def losses(y: pd.Series, proba: np.ndarray, value: np.ndarray, threshold: float,
+           assumptions: Assumptions = DEFAULT_ASSUMPTIONS) -> dict[str, float]:
+    """Потери при правиле «предоплата, если вероятность отмены ≥ порога»: пропущенные отмены и лишние предоплаты."""
+    return mask_losses(np.asarray(y) == 1, proba >= threshold, value, assumptions)
 
 
 def loss_curve(y: pd.Series, proba: np.ndarray, value: np.ndarray,

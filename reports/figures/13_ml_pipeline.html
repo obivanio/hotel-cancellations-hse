@@ -4988,7 +4988,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     <!-- Main Diagram -->
     <div class="diagram-container" data-detail-level="read"
          data-preset-badge-editorial-plate="ARCHIFY / PLATE 04">
-      <svg viewBox="0 0 1184 534" data-layout-contract="readable-v2" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+      <svg viewBox="0 0 1224 528" data-layout-contract="readable-v2" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
         <title id="archify-diagram-title">ML-конвейер: от броней до проверки на тесте</title>
         <desc id="archify-diagram-description">Модель учится на прошлом и проверяется на будущем; всё, что известно только после брони, исключено</desc>
         <!-- Definitions -->
@@ -5014,14 +5014,14 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <rect width="100%" height="100%" fill="url(#grid)" />
 
         <!-- Swimlanes -->
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="1128" height="106" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / Данные</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="1168" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / Данные (деление по времени: обучение · валидация · тест)</text>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="178" width="1128" height="106" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="200" class="t-dim" font-size="10" font-weight="600">02 / Обучение и выбор (валидация)</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="176" width="1168" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="198" class="t-dim" font-size="10" font-weight="600">02 / Обучение и выбор (валидация)</text>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="304" width="1128" height="106" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="326" class="t-dim" font-size="10" font-weight="600">03 / Итог (тест, один раз)</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="300" width="1168" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="322" class="t-dim" font-size="10" font-weight="600">03 / Итог (тест, один раз; 2,11 млн € — потери без предоплаты)</text>
 
         <!-- Phase headers -->
 
@@ -5030,136 +5030,133 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
 
         <!-- Edge paths -->
-        <path data-edge-from="bookings" data-edge-to="split" data-edge-key="0" data-edge-id="e1" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="198,120;226,120" d="M 198 120 L 226 120" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="split" data-edge-to="features" data-edge-key="1" data-edge-id="e2" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="406,120;434,120" d="M 406 120 L 434 120" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="features" data-edge-to="models" data-edge-label="обучение" data-edge-key="2" data-edge-id="e3" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="539,146;539,212" d="M 539 146 L 539 212" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="models" data-edge-to="calib" data-edge-key="3" data-edge-id="e4" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="644,246;672,246" d="M 644 246 L 672 246" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="calib" data-edge-to="threshold" data-edge-key="4" data-edge-id="e5" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="862,246;890,246" d="M 862 246 L 890 246" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="threshold" data-edge-to="final" data-edge-label="тест открыт один раз" data-edge-key="5" data-edge-id="e6" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="990,272;990,338" d="M 990 272 L 990 338" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="bookings" data-edge-to="split" data-edge-key="0" data-edge-id="e1" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="173,119;201,119" d="M 173 119 L 201 119" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="split" data-edge-to="features" data-edge-key="1" data-edge-id="e2" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="371,119;399,119" d="M 371 119 L 399 119" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="features" data-edge-to="models" data-edge-label="обучение" data-edge-key="2" data-edge-id="e3" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="519,145;519,217" d="M 519 145 L 519 217" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="models" data-edge-to="calib" data-edge-key="3" data-edge-id="e4" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="626.5,243;654.5,243" d="M 626.5 243 L 654.5 243" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="calib" data-edge-to="threshold" data-edge-key="4" data-edge-id="e5" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="879.5,243;907.5,243" d="M 879.5 243 L 907.5 243" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="threshold" data-edge-to="final" data-edge-label="тест открыт один раз" data-edge-key="5" data-edge-id="e6" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="1030,269;1030,341" d="M 1030 269 L 1030 341" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
 
         <!-- Nodes -->
-        <g id="node-bookings" data-node-id="bookings" data-node-label="Брони-решения" tabindex="0" role="button" aria-label="Focus Брони-решения, 86 617 броней, Данные" aria-pressed="false" data-node-kind="database" data-node-sublabel="86 617 броней" data-node-context="Данные">
-          <title>Брони-решения · 86 617 броней · Данные</title>
-          <rect x="48" y="94" width="150" height="52" rx="6" class="c-mask"/>
-          <rect x="48" y="94" width="150" height="52" rx="6" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(54 100) scale(0.6875)">
+        <g id="node-bookings" data-node-id="bookings" data-node-label="Брони-решения" tabindex="0" role="button" aria-label="Focus Брони-решения, 86 617 броней, Данные (деление по времени: обучение · валидация · тест)" aria-pressed="false" data-node-kind="database" data-node-sublabel="86 617 броней" data-node-context="Данные (деление по времени: обучение · валидация · тест)">
+          <title>Брони-решения · 86 617 броней · Данные (деление по времени: обучение · валидация · тест)</title>
+          <rect x="48" y="93" width="125" height="52" rx="6" class="c-mask"/>
+          <rect x="48" y="93" width="125" height="52" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(54 99) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="123" y="115" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Брони-решения</text>
-          <text data-detail="context" x="123" y="132" class="t-muted" font-size="8" text-anchor="middle">86 617 броней</text>
+          <text data-node-label="" data-detail-anchor="" x="110.5" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Брони-решения</text>
+          <text data-detail="context" x="110.5" y="131" class="t-muted" font-size="8" text-anchor="middle">86 617 броней</text>
         </g>
 
-        <g id="node-split" data-node-id="split" data-node-label="Сплит по времени" tabindex="0" role="button" aria-label="Focus Сплит по времени, 51 926 / 17 340 / 17 351, Данные" aria-pressed="false" data-node-kind="backend" data-node-sublabel="51 926 / 17 340 / 17 351" data-node-tag="обучение / валидация / тест" data-node-context="Данные">
-          <title>Сплит по времени · 51 926 / 17 340 / 17 351 · Данные · обучение / валидация / тест</title>
-          <rect x="226" y="86" width="180" height="68" rx="6" class="c-mask"/>
-          <rect x="226" y="86" width="180" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(232 92) scale(0.6875)">
+        <g id="node-split" data-node-id="split" data-node-label="Деление по времени" tabindex="0" role="button" aria-label="Focus Деление по времени, 51 926 · 17 340 · 17 351, Данные (деление по времени: обучение · валидация · тест)" aria-pressed="false" data-node-kind="backend" data-node-sublabel="51 926 · 17 340 · 17 351" data-node-context="Данные (деление по времени: обучение · валидация · тест)">
+          <title>Деление по времени · 51 926 · 17 340 · 17 351 · Данные (деление по времени: обучение · валидация · тест)</title>
+          <rect x="201" y="93" width="170" height="52" rx="6" class="c-mask"/>
+          <rect x="201" y="93" width="170" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(207 99) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="316" y="107" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Сплит по времени</text>
-          <text data-detail="context" x="316" y="124" class="t-muted" font-size="8" text-anchor="middle">51 926 / 17 340 / 17 351</text>
-        <text data-detail="fine" x="316" y="142" class="t-backend" font-size="7" text-anchor="middle">обучение / валидация / тест</text>
+          <text data-node-label="" data-detail-anchor="" x="286" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Деление по времени</text>
+          <text data-detail="context" x="286" y="131" class="t-muted" font-size="8" text-anchor="middle">51 926 · 17 340 · 17 351</text>
         </g>
 
-        <g id="node-features" data-node-id="features" data-node-label="Признаки при брони" tabindex="0" role="button" aria-label="Focus Признаки при брони, минус 4 утечки, парковка, страна, Данные" aria-pressed="false" data-node-kind="security" data-node-sublabel="минус 4 утечки, парковка, страна" data-node-context="Данные">
-          <title>Признаки при брони · минус 4 утечки, парковка, страна · Данные</title>
-          <rect x="434" y="94" width="210" height="52" rx="6" class="c-mask"/>
-          <rect x="434" y="94" width="210" height="52" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(440 100) scale(0.6875)">
+        <g id="node-features" data-node-id="features" data-node-label="Признаки при брони" tabindex="0" role="button" aria-label="Focus Признаки при брони, убраны 4 поля после брони, парковка, страна, Данные (деление по времени: обучение · валидация · тест)" aria-pressed="false" data-node-kind="security" data-node-sublabel="убраны 4 поля после брони, парковка, страна" data-node-context="Данные (деление по времени: обучение · валидация · тест)">
+          <title>Признаки при брони · убраны 4 поля после брони, парковка, страна · Данные (деление по времени: обучение · валидация · тест)</title>
+          <rect x="399" y="93" width="240" height="52" rx="6" class="c-mask"/>
+          <rect x="399" y="93" width="240" height="52" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(405 99) scale(0.6875)">
             <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
             <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="539" y="115" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Признаки при брони</text>
-          <text data-detail="context" x="539" y="132" class="t-muted" font-size="8" text-anchor="middle">минус 4 утечки, парковка, страна</text>
+          <text data-node-label="" data-detail-anchor="" x="519" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Признаки при брони</text>
+          <text data-detail="context" x="519" y="131" class="t-muted" font-size="8" text-anchor="middle">убраны 4 поля после брони, парковка, страна</text>
         </g>
 
-        <g id="node-models" data-node-id="models" data-node-label="Модели" tabindex="0" role="button" aria-label="Focus Модели, лучшая — CatBoost, PR-AUC 0,640, Обучение и выбор (валидация)" aria-pressed="false" data-node-kind="backend" data-node-sublabel="лучшая — CatBoost, PR-AUC 0,640" data-node-tag="правила, логрегрессия, HistGB, CatBoost" data-node-context="Обучение и выбор (валидация)">
-          <title>Модели · лучшая — CatBoost, PR-AUC 0,640 · Обучение и выбор (валидация) · правила, логрегрессия, HistGB, CatBoost</title>
-          <rect x="434" y="212" width="210" height="68" rx="6" class="c-mask"/>
-          <rect x="434" y="212" width="210" height="68" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(440 218) scale(0.6875)">
+        <g id="node-models" data-node-id="models" data-node-label="Модели" tabindex="0" role="button" aria-label="Focus Модели, лучшая CatBoost: качество (PR-AUC) 0,640, Обучение и выбор (валидация)" aria-pressed="false" data-node-kind="backend" data-node-sublabel="лучшая CatBoost: качество (PR-AUC) 0,640" data-node-context="Обучение и выбор (валидация)">
+          <title>Модели · лучшая CatBoost: качество (PR-AUC) 0,640 · Обучение и выбор (валидация)</title>
+          <rect x="411.5" y="217" width="215" height="52" rx="6" class="c-mask"/>
+          <rect x="411.5" y="217" width="215" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(417.5 223) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="539" y="233" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Модели</text>
-          <text data-detail="context" x="539" y="250" class="t-muted" font-size="8" text-anchor="middle">лучшая — CatBoost, PR-AUC 0,640</text>
-        <text data-detail="fine" x="539" y="268" class="t-backend" font-size="7" text-anchor="middle">правила, логрегрессия, HistGB, CatBoost</text>
+          <text data-node-label="" data-detail-anchor="" x="519" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Модели</text>
+          <text data-detail="context" x="519" y="255" class="t-muted" font-size="8" text-anchor="middle">лучшая CatBoost: качество (PR-AUC) 0,640</text>
         </g>
 
-        <g id="node-calib" data-node-id="calib" data-node-label="Калибровка" tabindex="0" role="button" aria-label="Focus Калибровка, изотоническая, на валидации, Обучение и выбор (валидация)" aria-pressed="false" data-node-kind="backend" data-node-sublabel="изотоническая, на валидации" data-node-context="Обучение и выбор (валидация)">
-          <title>Калибровка · изотоническая, на валидации · Обучение и выбор (валидация)</title>
-          <rect x="672" y="220" width="190" height="52" rx="6" class="c-mask"/>
-          <rect x="672" y="220" width="190" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(678 226) scale(0.6875)">
+        <g id="node-calib" data-node-id="calib" data-node-label="Калибровка" tabindex="0" role="button" aria-label="Focus Калибровка, поправочная таблица: заниженные % → реальные, Обучение и выбор (валидация)" aria-pressed="false" data-node-kind="backend" data-node-sublabel="поправочная таблица: заниженные % → реальные" data-node-context="Обучение и выбор (валидация)">
+          <title>Калибровка · поправочная таблица: заниженные % → реальные · Обучение и выбор (валидация)</title>
+          <rect x="654.5" y="217" width="225" height="52" rx="6" class="c-mask"/>
+          <rect x="654.5" y="217" width="225" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(660.5 223) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="767" y="241" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Калибровка</text>
-          <text data-detail="context" x="767" y="258" class="t-muted" font-size="8" text-anchor="middle">изотоническая, на валидации</text>
+          <text data-node-label="" data-detail-anchor="" x="767" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Калибровка</text>
+          <text data-detail="context" x="767" y="255" class="t-muted" font-size="8" text-anchor="middle">поправочная таблица: заниженные % → реальные</text>
         </g>
 
-        <g id="node-threshold" data-node-id="threshold" data-node-label="Порог по деньгам" tabindex="0" role="button" aria-label="Focus Порог по деньгам, 0,17; допущения 50 % и 10 %, Обучение и выбор (валидация)" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="0,17; допущения 50 % и 10 %" data-node-context="Обучение и выбор (валидация)">
-          <title>Порог по деньгам · 0,17; допущения 50 % и 10 % · Обучение и выбор (валидация)</title>
-          <rect x="890" y="220" width="200" height="52" rx="6" class="c-mask"/>
-          <rect x="890" y="220" width="200" height="52" rx="6" class="c-messagebus" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(896 226) scale(0.6875)">
+        <g id="node-threshold" data-node-id="threshold" data-node-label="Порог по деньгам" tabindex="0" role="button" aria-label="Focus Порог по деньгам, 0,17; пропуск отмены 50 %, лишняя предоплата 10 %, Обучение и выбор (валидация)" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="0,17; пропуск отмены 50 %, лишняя предоплата 10 %" data-node-context="Обучение и выбор (валидация)">
+          <title>Порог по деньгам · 0,17; пропуск отмены 50 %, лишняя предоплата 10 % · Обучение и выбор (валидация)</title>
+          <rect x="907.5" y="217" width="245" height="52" rx="6" class="c-mask"/>
+          <rect x="907.5" y="217" width="245" height="52" rx="6" class="c-messagebus" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(913.5 223) scale(0.6875)">
             <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
             <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
             <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
             <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="990" y="241" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Порог по деньгам</text>
-          <text data-detail="context" x="990" y="258" class="t-muted" font-size="8" text-anchor="middle">0,17; допущения 50 % и 10 %</text>
+          <text data-node-label="" data-detail-anchor="" x="1030" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Порог по деньгам</text>
+          <text data-detail="context" x="1030" y="255" class="t-muted" font-size="8" text-anchor="middle">0,17; пропуск отмены 50 %, лишняя предоплата 10 %</text>
         </g>
 
-        <g id="node-final" data-node-id="final" data-node-label="Тест" tabindex="0" role="button" aria-label="Focus Тест, PR-AUC 0,626; потери 0,56 против 2,11 млн €, Итог (тест, один раз)" aria-pressed="false" data-node-kind="external" data-node-sublabel="PR-AUC 0,626; потери 0,56 против 2,11 млн €" data-node-tag="без предоплаты — 2,11" data-node-context="Итог (тест, один раз)">
-          <title>Тест · PR-AUC 0,626; потери 0,56 против 2,11 млн € · Итог (тест, один раз) · без предоплаты — 2,11</title>
-          <rect x="860" y="338" width="260" height="68" rx="6" class="c-mask"/>
-          <rect x="860" y="338" width="260" height="68" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(866 344) scale(0.6875)">
+        <g id="node-final" data-node-id="final" data-node-label="Тест" tabindex="0" role="button" aria-label="Focus Тест, качество 0,626; потери 0,56 против 2,11 млн €, Итог (тест, один раз; 2,11 млн € — потери без предоплаты)" aria-pressed="false" data-node-kind="external" data-node-sublabel="качество 0,626; потери 0,56 против 2,11 млн €" data-node-context="Итог (тест, один раз; 2,11 млн € — потери без предоплаты)">
+          <title>Тест · качество 0,626; потери 0,56 против 2,11 млн € · Итог (тест, один раз; 2,11 млн € — потери без предоплаты)</title>
+          <rect x="907.5" y="341" width="245" height="52" rx="6" class="c-mask"/>
+          <rect x="907.5" y="341" width="245" height="52" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(913.5 347) scale(0.6875)">
             <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="990" y="359" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Тест</text>
-          <text data-detail="context" x="990" y="376" class="t-muted" font-size="8" text-anchor="middle">PR-AUC 0,626; потери 0,56 против 2,11 млн €</text>
-        <text data-detail="fine" x="990" y="394" class="t-external" font-size="7" text-anchor="middle">без предоплаты — 2,11</text>
+          <text data-node-label="" data-detail-anchor="" x="1030" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Тест</text>
+          <text data-detail="context" x="1030" y="379" class="t-muted" font-size="8" text-anchor="middle">качество 0,626; потери 0,56 против 2,11 млн €</text>
         </g>
 
         <!-- Edge labels -->
 
 
         <g data-detail="context" data-edge-from="features" data-edge-to="models" data-edge-label="обучение" data-edge-key="2" data-edge-id="e3">
-          <rect x="514.8" y="169" width="48.4" height="14" rx="3" class="c-mask"/>
-          <text x="539" y="179" class="t-edge-emphasis" font-size="8" text-anchor="middle">обучение</text>
+          <rect x="494.8" y="171" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="519" y="181" class="t-edge-emphasis" font-size="8" text-anchor="middle">обучение</text>
         </g>
 
 
         <g data-detail="context" data-edge-from="threshold" data-edge-to="final" data-edge-label="тест открыт один раз" data-edge-key="5" data-edge-id="e6">
-          <rect x="937" y="295" width="106" height="14" rx="3" class="c-mask"/>
-          <text x="990" y="305" class="t-edge-emphasis" font-size="8" text-anchor="middle">тест открыт один раз</text>
+          <rect x="977" y="295" width="106" height="14" rx="3" class="c-mask"/>
+          <text x="1030" y="305" class="t-edge-emphasis" font-size="8" text-anchor="middle">тест открыт один раз</text>
         </g>
 
         <!-- Legend -->
         <g data-legend="" data-legend-bridge="">
-          <text x="20" y="434" class="t-primary" font-size="12" font-weight="650">Legend</text>
-          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Agent logic" data-legend-x="20" data-legend-baseline="454" data-legend-width="91">
-            <rect x="20" y="446" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
-            <text x="42" y="454" class="t-muted" font-size="7.5" font-weight="500">Agent logic</text>
+          <text x="20" y="428" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Agent logic" data-legend-x="20" data-legend-baseline="448" data-legend-width="91">
+            <rect x="20" y="440" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
+            <text x="42" y="448" class="t-muted" font-size="7.5" font-weight="500">Agent logic</text>
           </g>
-          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Policy" data-legend-x="118" data-legend-baseline="454" data-legend-width="70">
-            <rect x="118" y="446" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
-            <text x="140" y="454" class="t-muted" font-size="7.5" font-weight="500">Policy</text>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Policy" data-legend-x="118" data-legend-baseline="448" data-legend-width="70">
+            <rect x="118" y="440" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
+            <text x="140" y="448" class="t-muted" font-size="7.5" font-weight="500">Policy</text>
           </g>
-          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="Tool action" data-legend-x="195" data-legend-baseline="454" data-legend-width="91">
-            <rect x="195" y="446" width="14" height="9" rx="2" class="c-messagebus" stroke-width="1"/>
-            <text x="217" y="454" class="t-muted" font-size="7.5" font-weight="500">Tool action</text>
+          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="Tool action" data-legend-x="195" data-legend-baseline="448" data-legend-width="91">
+            <rect x="195" y="440" width="14" height="9" rx="2" class="c-messagebus" stroke-width="1"/>
+            <text x="217" y="448" class="t-muted" font-size="7.5" font-weight="500">Tool action</text>
           </g>
-          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Context / trace" data-legend-x="293" data-legend-baseline="454" data-legend-width="109">
-            <rect x="293" y="446" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
-            <text x="315" y="454" class="t-muted" font-size="7.5" font-weight="500">Context / trace</text>
+          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Context / trace" data-legend-x="293" data-legend-baseline="448" data-legend-width="109">
+            <rect x="293" y="440" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
+            <text x="315" y="448" class="t-muted" font-size="7.5" font-weight="500">Context / trace</text>
           </g>
-          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External system" data-legend-x="409" data-legend-baseline="454" data-legend-width="109">
-            <rect x="409" y="446" width="14" height="9" rx="2" class="c-external" stroke-width="1"/>
-            <text x="431" y="454" class="t-muted" font-size="7.5" font-weight="500">External system</text>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External system" data-legend-x="409" data-legend-baseline="448" data-legend-width="109">
+            <rect x="409" y="440" width="14" height="9" rx="2" class="c-external" stroke-width="1"/>
+            <text x="431" y="448" class="t-muted" font-size="7.5" font-weight="500">External system</text>
           </g>
         </g>
       </svg>
@@ -5353,7 +5350,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       <div class="card">
         <div class="card-header">
           <div class="card-dot rose"></div>
-          <h3>PR-AUC на валидации</h3>
+          <h3>Качество (PR-AUC) на валидации</h3>
         </div>
         <ul>
           <li>Правила: 0,449 и 0,487</li>
