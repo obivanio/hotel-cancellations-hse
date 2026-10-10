@@ -4,8 +4,9 @@ import pandas as pd
 import pytest
 
 from src.dashboard import (
-    SCORED_COLUMNS, SCORED_TEST_PATH, count, display_rules, filter_frame, key_numbers, model_threshold,
-    overbooking_summary, risk_tables, rules_table, scored_frame, share_curves, to_scored,
+    SCORED_COLUMNS, SCORED_TEST_PATH, count, display_rules, fig_heatmap, fig_share_curves, fig_weeks, filter_frame,
+    key_numbers, model_threshold, overbooking_summary, risk_tables, rules_table, scored_frame, share_curves,
+    to_scored,
 )
 from src.evaluation import Assumptions
 from src.policies import ALL_HOTELS, policy_metrics
@@ -125,3 +126,13 @@ def test_scored_frame_columns():
     assert frame.columns.tolist() == SCORED_COLUMNS
     assert frame["value"].tolist() == [0.0, 50.0]
     assert SCORED_TEST_PATH.is_absolute()
+
+
+def test_figures():
+    """Графики дашборда: две кривые, три трассы недель (столбики и две линии), тепловая карта."""
+    assert len(fig_share_curves(share_curves(FRAME), 0.5).data) == 2
+    dates = pd.DataFrame({"hotel": ["A", "A"], "arrival_date": ["2017-05-01", "2017-05-09"], "actual": [2, 3],
+                          "expected": [2.5, 2.0], "bench_expected": [1.0, 1.5]})
+    assert [trace.type for trace in fig_weeks(dates, "A").data] == ["bar", "scatter", "scatter"]
+    tables = risk_tables(FRAME)
+    assert fig_heatmap(tables["risk"], tables["bookings"], "риск").data[0].type == "heatmap"

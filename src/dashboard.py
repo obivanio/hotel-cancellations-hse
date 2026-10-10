@@ -1,11 +1,12 @@
 """Расчёты и графики дашборда: срез броней по фильтрам, ключевые цифры, правила, овербукинг и риск по сегментам."""
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 
 from src.evaluation import DEFAULT_ASSUMPTIONS, Assumptions, value_at_risk
-from src.overbooking import overbooking_outcome
+from src.overbooking import overbooking_outcome, weekly_table
 from src.policies import ALL_HOTELS, BASELINE, REPORTS_DIR, SHARES, Scored, policy_masks, policy_metrics, share_curve
-from src.report import MONTH_NAMES
+from src.report import LAYOUT, MONTH_NAMES, week_traces
 
 SCORED_TEST_PATH = REPORTS_DIR / "scored_test.csv"
 SCORED_VALID_PATH = REPORTS_DIR / "scored_valid.csv"
@@ -161,3 +162,39 @@ def display_rules(table: pd.DataFrame) -> pd.DataFrame:
     for column in ("prepay_share", "touched_reliable", "caught_cancels"):
         shown[column] = shown[column].map(percent)
     return shown.rename(columns=RULE_COLUMNS)
+
+
+def fig_share_curves(curves: pd.DataFrame, share: float) -> go.Figure:
+    """Кривые «доля броней с предоплатой → потери» для модели и срока брони и отметка выбранной доли."""
+    fig = go.Figure()
+    for method, dash in (("модель", "solid"), ("срок брони", "dash")):
+        line = curves[curves["method"] == method]
+        fig.add_trace(go.Scatter(
+            x=line["share"] * 100, y=line["total"] / 1e6, mode="lines+markers", name=f"брони выбирает {method}",
+            line={"dash": dash}, customdata=line["touched_reliable"] * 100,
+            hovertemplate="предоплата с %{x:.0f} % броней<br>потери %{y:.2f} млн €"
+                          "<br>задето надёжных %{customdata:.0f} %<extra></extra>"))
+    fig.add_vline(x=share * 100, line={"color": "grey", "dash": "dot"},
+                  annotation_text=f"выбрано: {percent(share)}")
+    fig.update_layout(**LAYOUT, xaxis_title="доля броней с предоплатой, %", yaxis_title="потери, млн €",
+                      legend={"orientation": "h", "y": -0.25})
+    return fig
+
+
+def fig_weeks(dates: pd.DataFrame, hotel: str) -> go.Figure:
+    """По неделям заезда для одного отеля: столбики фактических отмен, линии ожидания модели и бенчмарка."""
+    fig = go.Figure(week_traces(weekly_table(dates, hotel)))
+    fig.update_layout(**LAYOUT, xaxis_title="неделя заезда", yaxis_title="отмен за неделю", xaxis_tickangle=-45,
+                      legend={"orientation": "h", "y": -0.45})
+    return fig
+
+
+def fig_heatmap(pivot: pd.DataFrame, counts: pd.DataFrame, title: str) -> go.Figure:
+    """Тепловая карта «сегмент × месяц» в процентах; в подсказке — число броней в клетке."""
+    fig = go.Figure(go.Heatmap(
+        z=pivot.to_numpy(), x=list(pivot.columns), y=list(pivot.index), colorscale="Blues", zmin=0, zmax=100,
+        text=pivot.round(0).to_numpy(), texttemplate="%{text:.0f}", customdata=counts.to_numpy(),
+        hovertemplate="%{y}, %{x}: %{z:.0f} %<br>броней: %{customdata:.0f}<extra></extra>",
+        colorbar={"title": "%"}))
+    fig.update_layout(**LAYOUT, title=title, xaxis_title="месяц заезда", yaxis_title="сегмент")
+    return fig

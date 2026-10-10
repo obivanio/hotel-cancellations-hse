@@ -159,22 +159,28 @@ def fig_top_share(curves: pd.DataFrame) -> go.Figure:
     return fig
 
 
+def week_traces(weeks: pd.DataFrame, visible: bool = True) -> list:
+    """Трассы недельного графика из `weekly_table`: столбики фактических отмен, линии ожидания модели и бенчмарка."""
+    x = week_labels(weeks)
+    return [
+        go.Bar(x=x, y=weeks["actual"], name="сколько отмен было", marker_color="lightgrey", visible=visible,
+               hovertemplate="%{x}<br>было отмен: %{y:.0f}<extra></extra>"),
+        go.Scatter(x=x, y=weeks["expected"], mode="lines+markers", name="сколько ждала модель",
+                   line={"color": "#1f77b4", "width": 3}, visible=visible,
+                   hovertemplate="%{x}<br>ждала модель: %{y:.0f}<extra></extra>"),
+        go.Scatter(x=x, y=weeks["bench_expected"], mode="lines+markers",
+                   name="сколько ждал бенчмарк «месяц × день недели»",
+                   line={"color": "#2ca02c", "width": 2, "dash": "dash"}, visible=visible,
+                   hovertemplate="%{x}<br>ждал бенчмарк: %{y:.0f}<extra></extra>"),
+    ]
+
+
 def fig_overbooking(dates: pd.DataFrame) -> go.Figure:
     """График 3: по неделям заезда — столбики фактических отмен, линии ожидания модели и бенчмарка."""
     fig = go.Figure()
     hotels = _hotels(dates)
     for i, hotel in enumerate(hotels):
-        weeks = weekly_table(dates, hotel)
-        x, show = week_labels(weeks), i == 0
-        fig.add_trace(go.Bar(x=x, y=weeks["actual"], name="сколько отмен было", marker_color="lightgrey",
-                             visible=show, hovertemplate="%{x}<br>было отмен: %{y:.0f}<extra></extra>"))
-        fig.add_trace(go.Scatter(x=x, y=weeks["expected"], mode="lines+markers", name="сколько ждала модель",
-                                 line={"color": "#1f77b4", "width": 3}, visible=show,
-                                 hovertemplate="%{x}<br>ждала модель: %{y:.0f}<extra></extra>"))
-        fig.add_trace(go.Scatter(x=x, y=weeks["bench_expected"], mode="lines+markers",
-                                 name="сколько ждал бенчмарк «месяц × день недели»",
-                                 line={"color": "#2ca02c", "width": 2, "dash": "dash"}, visible=show,
-                                 hovertemplate="%{x}<br>ждал бенчмарк: %{y:.0f}<extra></extra>"))
+        fig.add_traces(week_traces(weekly_table(dates, hotel), visible=i == 0))
     fig.update_layout(**LAYOUT, updatemenus=_hotel_menu(hotels, 3), xaxis_title="неделя заезда",
                       yaxis_title="отмен за неделю", xaxis_tickangle=-45, legend={"orientation": "h", "y": -0.35})
     return fig
