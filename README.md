@@ -50,10 +50,10 @@ jupyter notebook notebooks/
 Модель и исходные данные дашборду не нужны: он читает готовые таблицы из `reports/`, поэтому работает без
 интернета и без обучения.
 
-На чистом компьютере:
+На чистом компьютере (нужен Python 3.11 или новее; проверено на 3.14):
 
 ```bash
-git clone <адрес репозитория> && cd hotel-booking-cancellations
+git clone https://github.com/obivanio/hotel-booking-cancellations.git && cd hotel-booking-cancellations
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 streamlit run app.py
