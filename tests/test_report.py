@@ -69,6 +69,7 @@ def test_build_report(tables, tmp_path):
     for key, title in SECTIONS.items():
         assert f'id="{key}"' in html and f'href="#{key}"' in html and title in html
     assert html.count("Plotly.newPlot") == 4
+    assert "без предоплаты.</p><p>Основную экономию" in html
     assert "<script src=" not in html and len(html) > 1_000_000
 
 

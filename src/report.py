@@ -1,4 +1,4 @@
-"""Интерактивный HTML-отчёт для revenue-менеджера: графики Plotly по таблицам reports/*.csv."""
+"""Интерактивный HTML-отчёт для бизнеса: графики Plotly по таблицам reports/*.csv."""
 from html import escape
 from pathlib import Path
 
@@ -250,17 +250,17 @@ def _risk_text(risk: pd.DataFrame, min_bookings: int = MIN_BOOKINGS) -> str:
 
 
 def _texts(summary: dict, dates: pd.DataFrame, curves: pd.DataFrame, risk: pd.DataFrame) -> dict[str, str]:
-    """Короткие выводы под графиками; числа берутся из таблиц, а не пишутся руками."""
+    """Короткие выводы под графиками (абзацы через пустую строку); числа берутся из таблиц, а не пишутся руками."""
     total, rule, at_share, plans = summary["total"], summary["rule"], summary["at_share"], summary["plans"]
     pooled = dates[dates["hotel"] == ALL_HOTELS]
     everyone = total.loc["со всех"]
     return {
         "curve": (f"Рабочее правило — «{rule.name}» (порог подобран на валидации): потери "
-                  f"{_mln(rule['total'])} против {_mln(total.loc[BASELINE, 'total'])} без предоплаты. Основную "
+                  f"{_mln(rule['total'])} против {_mln(total.loc[BASELINE, 'total'])} без предоплаты.\n\nОсновную "
                   f"экономию даёт сама предоплата: «со всех» теряет {_mln(everyone['total'])} и задевает "
                   f"{_pct(everyone['touched_reliable'])} надёжных гостей; модель дешевле на "
                   f"{_mln(everyone['total'] - rule['total'])} и задевает {_pct(rule['touched_reliable'])} "
-                  f"вместо {_pct(everyone['touched_reliable'])}. При предоплате с {_pct(summary['share'])} броней "
+                  f"вместо {_pct(everyone['touched_reliable'])}.\n\nПри предоплате с {_pct(summary['share'])} броней "
                   f"выбор по модели теряет {_mln(at_share['модель'])}, по сроку брони — "
                   f"{_mln(at_share['срок брони'])}."),
         "slider": _slider_text(curves),
@@ -330,8 +330,9 @@ def build_report(reports_dir: Path = REPORTS_DIR, path: Path = REPORT_PATH) -> P
     toc = "".join(f'<li><a href="#{key}">{escape(title)}</a></li>' for key, title in SECTIONS.items())
     body = []
     for i, (key, fig) in enumerate(figures.items()):
+        paragraphs = "".join(f"<p>{escape(part)}</p>" for part in texts[key].split("\n\n"))
         chart = fig.to_html(full_html=False, include_plotlyjs=i == 0, config={"displaylogo": False})
-        body.append(f'<section id="{key}"><h2>{escape(SECTIONS[key])}</h2><p>{escape(texts[key])}</p>{chart}</section>')
+        body.append(f'<section id="{key}"><h2>{escape(SECTIONS[key])}</h2>{paragraphs}{chart}</section>')
     body.append(f'<section id="assumptions"><h2>{SECTIONS["assumptions"]}</h2>{_assumptions_html()}</section>')
     html = (
         '<!doctype html><html lang="ru"><head><meta charset="utf-8">'
