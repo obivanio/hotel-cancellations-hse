@@ -87,3 +87,19 @@ def outcome_table(table: pd.DataFrame, walk_costs: tuple[float, ...] = WALK_COST
     rows = [{"plan": name, "walk_cost_share": cost, **overbooking_outcome(hotels, plan, cost)}
             for name, plan in {"модель": "cautious", "бенчмарк": "bench_cautious"}.items() for cost in walk_costs]
     return pd.DataFrame(rows)
+
+
+def weekly_table(dates: pd.DataFrame, hotel: str = ALL_HOTELS) -> pd.DataFrame:
+    """Отмены по календарным неделям (пн–вс) для одного отеля (по умолчанию «все отели»).
+
+    Строки таблицы `date_table` с датой заезда в одной неделе суммируются. Колонки: week_start и week_end —
+    первая и последняя даты недели, которые есть в таблице (у неполной недели это её реальный срок);
+    actual, expected, bench_expected — суммы факта, ожидания модели и ожидания бенчмарка за неделю.
+    """
+    part = dates[dates["hotel"] == hotel].copy()
+    dt = pd.to_datetime(part["arrival_date"])
+    part["week"] = dt.dt.to_period("W-SUN")
+    part["arrival_date"] = dt
+    return (part.groupby("week").agg(week_start=("arrival_date", "min"), week_end=("arrival_date", "max"),
+                                     actual=("actual", "sum"), expected=("expected", "sum"),
+                                     bench_expected=("bench_expected", "sum")).reset_index(drop=True))

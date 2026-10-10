@@ -5,7 +5,7 @@ import pytest
 
 from src.overbooking import (
     benchmark_proba, benchmark_rates, cancel_distribution, cautious_count, date_table, outcome_table,
-    overbooking_outcome,
+    overbooking_outcome, weekly_table,
 )
 from src.policies import ALL_HOTELS
 
@@ -76,3 +76,18 @@ def test_outcome_table_hotels_only():
     outcomes = outcome_table(table, walk_costs=(1.0,)).set_index("plan")
     assert outcomes.loc["модель", "resold"] == 3.0
     assert outcomes.loc["бенчмарк", "walked"] == 0.0
+
+
+def test_weekly_table_sums_and_partial_weeks():
+    """Неполная неделя (ср–вс) и ещё одна (пн–вт): суммы, реальный срок, другой отель не мешает."""
+    days = pd.to_datetime(["2017-05-03", "2017-05-07", "2017-05-08", "2017-05-09"])
+    dates = pd.DataFrame({"hotel": ALL_HOTELS, "arrival_date": days, "actual": [1, 2, 3, 4],
+                          "expected": [1.5, 2.5, 3.5, 4.5], "bench_expected": [1.0, 1.0, 2.0, 2.0]})
+    other = dates.assign(hotel="City Hotel", actual=100)
+    out = weekly_table(pd.concat([dates, other], ignore_index=True))
+    assert list(out.columns) == ["week_start", "week_end", "actual", "expected", "bench_expected"]
+    assert out["week_start"].tolist() == [days[0], days[2]]
+    assert out["week_end"].tolist() == [days[1], days[3]]
+    assert out["actual"].tolist() == [3, 7]
+    assert out["expected"].tolist() == pytest.approx([4.0, 8.0])
+    assert out["bench_expected"].tolist() == pytest.approx([2.0, 4.0])
