@@ -4,9 +4,9 @@ import pandas as pd
 import pytest
 
 from src.dashboard import (
-    SCORED_COLUMNS, SCORED_TEST_PATH, comma, count, display_rules, fig_heatmap, fig_share_curves, fig_weeks,
-    filter_frame, key_numbers, lead_total_at_share, model_threshold, overbooking_summary, risk_tables, rules_table,
-    scored_frame, share_curves, to_scored,
+    SCORED_COLUMNS, SCORED_TEST_PATH, comma, count, dates_slice, display_rules, fig_heatmap, fig_share_curves,
+    fig_weeks, filter_frame, key_numbers, lead_total_at_share, model_threshold, money, overbooking_summary,
+    risk_tables, rules_table, saving_card, scored_frame, share_curves, to_scored, top_share_row,
 )
 from src.evaluation import Assumptions
 from src.policies import ALL_HOTELS, policy_metrics
@@ -84,8 +84,15 @@ def test_rules_table_five_rules():
     assert table.loc[4, "prepay_share"] == 0.5
     shown = display_rules(table)
     assert shown.loc[4, "предоплата, % броней"] == "50 %"
-    assert shown.loc[0, "потери, млн €"] == "0,001"
+    assert shown.loc[0, "потери, тыс. €"] == "0,6"
+    assert top_share_row(table)["policy"] == "модель, топ-50 %"
     assert count(4898) == "4 898"
+
+
+def test_display_rules_millions():
+    """Крупные суммы — в млн € с тремя знаками после запятой."""
+    table = rules_table(FRAME.assign(value=FRAME["value"] * 1e4), lead_days=50, share=0.5)
+    assert display_rules(table).loc[0, "потери, млн €"] == "5,500"
 
 
 def test_share_curves_ends():
@@ -134,14 +141,54 @@ def test_figures():
     dates = pd.DataFrame({"hotel": ["A", "A"], "arrival_date": ["2017-05-01", "2017-05-09"], "actual": [2, 3],
                           "expected": [2.5, 2.0], "bench_expected": [1.0, 1.5]})
     assert [trace.type for trace in fig_weeks(dates, "A").data] == ["bar", "scatter", "scatter"]
+    assert [trace.name for trace in fig_weeks(dates, "A").data] == [
+        "сколько отмен было", "сколько ждала модель", "сколько ждал бенчмарк «месяц × день недели»"]
     tables = risk_tables(FRAME)
     assert fig_heatmap(tables["risk"], tables["bookings"], "риск").data[0].type == "heatmap"
+
+
+def test_heatmap_empty_cell_has_no_nan():
+    """Клетка «сегмент × месяц» без броней — пустая: ни «nan» в тексте, ни NaN в числе броней, без подсказки."""
+    tables = risk_tables(FRAME)
+    assert tables["risk"].isna().any().any()
+    heatmap = fig_heatmap(tables["risk"], tables["bookings"], "риск").data[0]
+    assert "nan" not in " ".join(heatmap.text.ravel()).lower()
+    assert "" in heatmap.text.ravel()
+    assert not np.isnan(heatmap.customdata.astype(float)).any()
+    assert heatmap.hoverongaps is False
+
+
+def test_money():
+    """От 0,1 млн € — миллионы, меньше — тысячи; малые отрицательные суммы без «-0»."""
+    assert money(2_109_480) == "2,11 млн €"
+    assert money(-1_234_567) == "-1,23 млн €"
+    assert money(23_400) == "23,4 тыс. €"
+    assert money(1_940) == "1,9 тыс. €"
+    assert money(-0.4) == "0,0 тыс. €"
+    assert money(-40) == "0,0 тыс. €"
+    assert money(0.0) == "0,0 тыс. €"
+
+
+def test_saving_card():
+    """Карточка экономии модели: «дешевле» при плюсе, «дороже» при минусе, «почти одинаково» около нуля."""
+    assert saving_card(80_000) == ("Модель дешевле «со всех» на", "80,0 тыс. €")
+    assert saving_card(-2_000) == ("Модель дороже «со всех» на", "2,0 тыс. €")
+    assert saving_card(-0.4) == ("Модель против «со всех»", "почти одинаково")
+
+
+def test_dates_slice():
+    """Строки таблицы овербукинга нужного отеля и месяцев заезда."""
+    dates = pd.DataFrame({"hotel": ["A", "A", "B"],
+                          "arrival_date": pd.to_datetime(["2017-05-01", "2017-06-01", "2017-05-01"])})
+    assert dates_slice(dates, "A", [5])["arrival_date"].tolist() == [pd.Timestamp("2017-05-01")]
+    assert dates_slice(dates, "A", []).empty
 
 
 def test_comma():
     """Десятичная запятая вместо точки, число знаков настраивается."""
     assert comma(0.1666) == "0,17"
     assert comma(2.0, 0) == "2"
+    assert comma(-0.0004, 3) == "0,000"
 
 
 def test_lead_total_at_share():

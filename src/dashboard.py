@@ -13,10 +13,11 @@ SCORED_VALID_PATH = REPORTS_DIR / "scored_valid.csv"
 SCORED_COLUMNS = ["hotel", "market_segment", "arrival_month", "lead_time", "value", "is_canceled", "proba"]
 HOTELS = {"оба отеля": ALL_HOTELS, "городской": "City Hotel", "курортный": "Resort Hotel"}
 RULE_COLUMNS = {
-    "policy": "правило", "total": "потери, млн €", "saving": "экономия против «как сейчас», млн €",
+    "policy": "правило", "total": "потери, {unit}", "saving": "экономия против «как сейчас», {unit}",
     "prepay_share": "предоплата, % броней", "touched_reliable": "задето надёжных гостей, %",
     "caught_cancels": "поймано отмен, %",
 }
+SMALL_MONEY = 100_000
 
 
 def scored_frame(df: pd.DataFrame, proba: np.ndarray) -> pd.DataFrame:
@@ -140,8 +141,29 @@ def risk_tables(frame: pd.DataFrame) -> dict[str, pd.DataFrame]:
 
 
 def money(value: float) -> str:
-    """Сумма в миллионах евро с десятичной запятой: 2,11 млн €."""
-    return f"{value / 1e6:.2f} млн €".replace(".", ",")
+    """Сумма с десятичной запятой: от 0,1 млн € — в миллионах (2,11 млн €), меньше — в тысячах (23,4 тыс. €)."""
+    if abs(value) < SMALL_MONEY:
+        return f"{comma(value / 1e3, 1)} тыс. €"
+    return f"{comma(value / 1e6)} млн €"
+
+
+def money_unit(values: pd.Series) -> tuple[float, str, int]:
+    """Единица для ряда сумм: тысячи евро, если все суммы меньше 0,1 млн €, иначе миллионы.
+
+    Возвращает делитель, подпись единицы и число знаков после запятой.
+    """
+    if values.abs().max() < SMALL_MONEY:
+        return 1e3, "тыс. €", 1
+    return 1e6, "млн €", 3
+
+
+def saving_card(saving: float) -> tuple[str, str]:
+    """Подпись и значение карточки «модель против предоплаты со всех»: дешевле, дороже или почти одинаково."""
+    if abs(saving) < 50:
+        return "Модель против «со всех»", "почти одинаково"
+    if saving > 0:
+        return "Модель дешевле «со всех» на", money(saving)
+    return "Модель дороже «со всех» на", money(-saving)
 
 
 def count(value: float) -> str:
@@ -155,8 +177,8 @@ def percent(share: float) -> str:
 
 
 def comma(value: float, digits: int = 2) -> str:
-    """Число с десятичной запятой: 0,17."""
-    return f"{value:.{digits}f}".replace(".", ",")
+    """Число с десятичной запятой: 0,17 (без «-0,00» у малых отрицательных)."""
+    return f"{round(value, digits) + 0.0:.{digits}f}".replace(".", ",")
 
 
 def lead_total_at_share(curves: pd.DataFrame, share: float) -> float | None:
@@ -165,29 +187,37 @@ def lead_total_at_share(curves: pd.DataFrame, share: float) -> float | None:
     return None if row.empty else float(row["total"].iloc[0])
 
 
+def top_share_row(table: pd.DataFrame) -> pd.Series:
+    """Строка правила «модель, топ-X %» из таблицы rules_table."""
+    return table[table["policy"].str.startswith("модель, топ")].iloc[0]
+
+
 def display_rules(table: pd.DataFrame) -> pd.DataFrame:
-    """Таблица правил для показа: деньги в млн € и доли в % строками с десятичной запятой, русские заголовки."""
+    """Таблица правил для показа: деньги в млн € (у малых срезов — в тыс. €) и доли в % строками с десятичной
+    запятой, русские заголовки."""
     shown = table[list(RULE_COLUMNS)].copy()
+    scale, unit, digits = money_unit(shown["total"])
     for column in ("total", "saving"):
-        shown[column] = shown[column].map(lambda value: f"{value / 1e6:.3f}".replace(".", ","))
+        shown[column] = shown[column].map(lambda value: comma(value / scale, digits))
     for column in ("prepay_share", "touched_reliable", "caught_cancels"):
         shown[column] = shown[column].map(percent)
-    return shown.rename(columns=RULE_COLUMNS)
+    return shown.rename(columns={key: name.format(unit=unit) for key, name in RULE_COLUMNS.items()})
 
 
 def fig_share_curves(curves: pd.DataFrame, share: float) -> go.Figure:
     """Кривые «доля броней с предоплатой → потери» для модели и срока брони и отметка выбранной доли."""
     fig = go.Figure()
+    scale, unit, _ = money_unit(curves["total"])
     for method, dash in (("модель", "solid"), ("срок брони", "dash")):
         line = curves[curves["method"] == method]
         fig.add_trace(go.Scatter(
-            x=line["share"] * 100, y=line["total"] / 1e6, mode="lines+markers", name=f"брони выбирает {method}",
+            x=line["share"] * 100, y=line["total"] / scale, mode="lines+markers", name=f"брони выбирает {method}",
             line={"dash": dash}, customdata=line["touched_reliable"] * 100,
-            hovertemplate="предоплата с %{x:.0f} % броней<br>потери %{y:.2f} млн €"
+            hovertemplate=f"предоплата с %{{x:.0f}} % броней<br>потери %{{y:.2f}} {unit}"
                           "<br>задето надёжных %{customdata:.0f} %<extra></extra>"))
     fig.add_vline(x=share * 100, line={"color": "grey", "dash": "dot"},
                   annotation_text=f"выбрано: {percent(share)}")
-    fig.update_layout(**LAYOUT, xaxis_title="доля броней с предоплатой, %", yaxis_title="потери, млн €",
+    fig.update_layout(**LAYOUT, xaxis_title="доля броней с предоплатой, %", yaxis_title=f"потери, {unit}",
                       legend={"orientation": "h", "y": -0.25})
     return fig
 
@@ -201,10 +231,14 @@ def fig_weeks(dates: pd.DataFrame, hotel: str) -> go.Figure:
 
 
 def fig_heatmap(pivot: pd.DataFrame, counts: pd.DataFrame, title: str) -> go.Figure:
-    """Тепловая карта «сегмент × месяц» в процентах; в подсказке — число броней в клетке."""
+    """Тепловая карта «сегмент × месяц» в процентах; в подсказке — число броней в клетке.
+
+    Клетка без броней остаётся пустой: без текста и без подсказки.
+    """
     fig = go.Figure(go.Heatmap(
         z=pivot.to_numpy(), x=list(pivot.columns), y=list(pivot.index), colorscale="Blues", zmin=0, zmax=100,
-        text=pivot.round(0).to_numpy(), texttemplate="%{text:.0f}", customdata=counts.to_numpy(),
+        text=pivot.map(lambda value: "" if pd.isna(value) else f"{value:.0f}").to_numpy(), texttemplate="%{text}",
+        customdata=counts.fillna(0).to_numpy(), hoverongaps=False,
         hovertemplate="%{y}, %{x}: %{z:.0f} %<br>броней: %{customdata:.0f}<extra></extra>",
         colorbar={"title": "%"}))
     fig.update_layout(**LAYOUT, title=title, xaxis_title="месяц заезда", yaxis_title="сегмент")

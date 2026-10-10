@@ -5,7 +5,7 @@ import streamlit as st
 from src.dashboard import (
     HOTELS, SCORED_TEST_PATH, SCORED_VALID_PATH, comma, count, dates_slice, display_rules, fig_heatmap,
     fig_share_curves, fig_weeks, filter_frame, key_numbers, lead_total_at_share, money, overbooking_summary,
-    percent, risk_tables, rules_table, share_curves, to_scored,
+    percent, risk_tables, rules_table, saving_card, share_curves, to_scored, top_share_row,
 )
 from src.evaluation import Assumptions
 from src.overbooking import OVERBOOK_CONFIDENCE, OVERBOOKING_PATH
@@ -57,11 +57,15 @@ def cards(numbers: dict) -> None:
     columns[2].metric("Предоплата по модели", money(numbers["model"]),
                       help="Потери, если брать предоплату только с рискованных броней.")
     columns = st.columns(3)
-    columns[0].metric("Модель дешевле «со всех»", money(numbers["saving"]))
+    columns[0].metric(*saving_card(numbers["saving"]),
+                      help="Разница потерь между предоплатой со всех броней и предоплатой по модели.")
     columns[1].metric("Задето надёжных гостей", percent(numbers["touched_reliable"]),
                       help="Доля гостей, которые и так бы приехали, но с них по модели взяли бы предоплату.")
     st.caption(f"Модель берёт предоплату с броней, у которых риск отмены не ниже {comma(numbers['threshold'])} "
-               f"({percent(numbers['prepay_share'])} выбранных броней). Порог зависит от допущений слева.")
+               f"({percent(numbers['prepay_share'])} выбранных броней). Порог зависит от допущений слева.\n\n"
+               "На всех бронях теста главный выигрыш против «без предоплаты» даёт сама предоплата: «со всех» "
+               "теряет почти столько же, сколько «по модели». Заслуга модели — чуть меньше потерь и меньше задетых "
+               "надёжных гостей.")
 
 
 def tab_rules(frame: pd.DataFrame, assumptions: Assumptions) -> None:
@@ -79,7 +83,7 @@ def tab_rules(frame: pd.DataFrame, assumptions: Assumptions) -> None:
     st.plotly_chart(fig_share_curves(curves, share), width="stretch")
     lead_days = lead_days_for(assumptions.unsold_share, assumptions.loss_prob)
     table = rules_table(frame, lead_days, share, assumptions)
-    top = table.iloc[-1]
+    top = top_share_row(table)
     by_lead = lead_total_at_share(curves, share)
     st.markdown(
         f"При предоплате с {percent(share)} самых рискованных броней потери — {money(top['total'])}, задето "
@@ -88,7 +92,8 @@ def tab_rules(frame: pd.DataFrame, assumptions: Assumptions) -> None:
            if by_lead is not None else ""))
     st.subheader("Пять правил для выбранных броней")
     st.dataframe(display_rules(table), hide_index=True, width="stretch")
-    st.caption(f"N для правила по сроку подобран на валидации при текущих допущениях: {lead_days} дн. Порог модели "
+    st.caption(f"N для правила по сроку подобран на всех бронях валидации при текущих допущениях, а не на "
+               f"выбранном срезе (на малом срезе подбор случаен): {lead_days} дн. Порог модели "
                "считается по формуле «доля ушедших гостей / (доля потерь при отмене + доля ушедших гостей)».")
 
 
@@ -110,13 +115,21 @@ def tab_overbooking(dates: pd.DataFrame, filters: dict) -> None:
     columns[0].metric("Перепродано номеров", count(model["resold"]))
     columns[1].metric("Дат, где номера не хватило", count(model["short_dates"]))
     columns[2].metric("Гостей без номера", count(model["walked"]))
-    columns[3].metric("Итог в деньгах", money(model["net"]))
+    columns[3].metric("Итог в деньгах (верхняя оценка)", money(model["net"]),
+                      help="Выручка от перепроданных номеров минус стоимость гостей без номера, если каждый "
+                           "перепроданный номер удастся продать.")
     st.markdown(
         f"Осторожная оценка — число отмен, которое наступит с вероятностью не ниже {percent(OVERBOOK_CONFIDENCE)}. "
         f"Если продавать столько номеров сверх броней, модель перепродаёт {count(model['resold'])} номеров, "
         f"бенчмарк — {count(bench['resold'])}.\n\n"
-        "Гость без номера стоит отелю одну стоимость его брони. Отмены в группах происходят вместе, поэтому на деле "
-        "номера не хватает чаще, чем обещает оценка: овербукировать стоит осторожно и по каждому отелю отдельно.")
+        "Итог в деньгах — верхняя оценка: считаем, что на каждый перепроданный номер найдётся покупатель. Если "
+        "часть отменённых номеров отель и так перепродаёт, реальная добавка может быть примерно вдвое меньше.\n\n"
+        "Сравнение с бенчмарком не вполне равное: бенчмарк берёт доли отмен с более ранних броней, когда отмен было "
+        "меньше, поэтому часть разрыва объясняется этим, а не только моделью.\n\n"
+        "Гость без номера стоит отелю одну стоимость его брони. Оценка считает отмены независимыми, но в группах они "
+        "происходят вместе, поэтому на деле номера не хватает чаще, чем обещает оценка. Вместимости отелей в данных "
+        "нет: перепродажа считается сверх забронированного, а не сверх свободных номеров. Овербукировать стоит "
+        "осторожно и по каждому отелю отдельно.")
 
 
 def tab_risk(frame: pd.DataFrame) -> None:
@@ -139,7 +152,8 @@ def tab_model() -> None:
     """Вкладка «Как собрана модель»: схемы 20 и 19."""
     st.markdown(
         "Путь модели от исходных данных до порога предоплаты: очистка, признаки, известные при бронировании, "
-        "деление по датам, выбор модели на валидации и одна проверка на тесте.")
+        "деление по датам, выбор модели на валидации и одна проверка на тесте.\n\n"
+        "Схемы широкие: чтобы рассмотреть, откройте картинку на весь экран значком в её правом верхнем углу.")
     st.image(str(FIGURES_DIR / "20_model_full_pipeline.png"))
     st.markdown(
         "Как правило работает для одной брони: модель оценивает риск отмены, и если он не ниже порога, отель берёт "

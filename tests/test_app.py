@@ -67,3 +67,14 @@ def test_empty_months_show_messages(app):
     assert not app.exception
     assert app.warning and "нет броней" in app.warning[0].value
     assert any("Нет дат заезда" in info.value for info in app.info)
+
+
+def test_small_slice_readable_money(app):
+    """Малый срез (городской, Aviation): деньги в тысячах евро, без «0,00» и «-0»; овербукинг — верхняя оценка."""
+    app.sidebar.radio(key="hotel").set_value("городской").run()
+    app.sidebar.multiselect(key="segments").set_value(["Aviation"]).run()
+    assert not app.exception
+    values = {metric.label: metric.value for metric in app.metric}
+    assert values["Без предоплаты"].endswith("тыс. €")
+    assert not any(value.startswith(("-0", "0,00")) for value in values.values())
+    assert "Итог в деньгах (верхняя оценка)" in values
