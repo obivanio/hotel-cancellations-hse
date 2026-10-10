@@ -20,7 +20,8 @@ src/          код: загрузка (data), очистка (cleaning, cleanin
               разведочный анализ (eda), статистика (stats), гипотезы (hypotheses), графики (plots),
               модель: сплит (split), признаки модели (model_features), правила (baselines), модели (models),
               оценка и порог (evaluation); экономика: правила предоплаты (policies), овербукинг (overbooking),
-              интерактивный отчёт (report)
+              интерактивный отчёт (report), расчёты дашборда (dashboard)
+app.py        дашборд Streamlit для бизнеса
 tests/        тесты pytest
 notebooks/    ноутбуки с ходом работы и выводами (01 — загрузка и очистка, 02 — анализ и гипотезы, 03 — модель,
               04 — экономика предоплаты и овербукинга)
@@ -28,7 +29,8 @@ data/raw/     исходные данные (скачиваются автома
 data/processed/  очищенный датасет (создаётся ноутбуком, не хранится в git)
 models/       обученная модель CatBoost
 reports/      артефакты: журнал очистки, таблица гипотез, метрики моделей, таблицы правил и овербукинга,
-              интерактивный отчёт report.html (открывается в браузере без Python), графики и схемы (figures/)
+              интерактивный отчёт report.html (открывается в браузере без Python), вероятности броней для
+              дашборда (scored_test.csv, scored_valid.csv), графики и схемы (figures/)
 ```
 
 ## Запуск
@@ -39,12 +41,35 @@ pip install -r requirements.txt && pip install -e .
 jupyter notebook notebooks/
 ```
 
+## Дашборд
+
+Интерактивный дашборд для бизнеса: слева фильтры (отель, сегмент продаж, месяц заезда) и ползунки допущений о
+деньгах, сверху ключевые цифры, ниже вкладки — правила предоплаты, овербукинг, риск по сегментам, схема модели,
+допущения. Всё пересчитывается сразу при смене фильтров.
+
+Модель и исходные данные дашборду не нужны: он читает готовые таблицы из `reports/`, поэтому работает без
+интернета и без обучения.
+
+На чистом компьютере:
+
+```bash
+git clone <адрес репозитория> && cd hotel-booking-cancellations
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Дашборд откроется в браузере по адресу http://localhost:8501. Посмотреть результаты без Python можно в
+`reports/report.html`.
+
+![Дашборд: фильтры, ключевые цифры и правила предоплаты](reports/figures/21_dashboard.png)
+
 ## Проверка кода
 
 ```bash
 pytest
-flake8 src tests
-pylint src tests
+flake8 src tests app.py
+pylint src tests app.py
 nbqa flake8 notebooks/
 ```
 
