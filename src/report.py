@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from src.evaluation import DEFAULT_ASSUMPTIONS
-from src.overbooking import OVERBOOK_CONFIDENCE, OVERBOOKING_PATH, WALK_COSTS, outcome_table
+from src.overbooking import OVERBOOK_CONFIDENCE, OVERBOOKING_PATH, WALK_COSTS, outcome_table, week_labels, weekly_table
 from src.policies import ALL_HOTELS, BASELINE, CURVES_PATH, POLICIES_PATH, REPORTS_DIR
 
 REPORT_PATH = REPORTS_DIR / "report.html"
@@ -43,6 +43,10 @@ def _mln(value: float) -> str:
 def _num(value: float) -> str:
     """Число с одним знаком после запятой и десятичной запятой: 4,2."""
     return f"{value:.1f}".replace(".", ",")
+
+
+def _pct1(share: float) -> str:
+    return f"{share * 100:.1f}".replace(".", ",") + " %"
 
 
 def _int(value: float) -> str:
@@ -156,20 +160,23 @@ def fig_top_share(curves: pd.DataFrame) -> go.Figure:
 
 
 def fig_overbooking(dates: pd.DataFrame) -> go.Figure:
-    """График 3: по датам теста — факт отмен, ожидание и осторожная оценка модели, ожидание бенчмарка."""
+    """График 3: по неделям заезда — столбики фактических отмен, линии ожидания модели и бенчмарка."""
     fig = go.Figure()
     hotels = _hotels(dates)
-    series = [("actual", "факт отмен", "markers", None), ("expected", "ожидание модели", "lines", "solid"),
-              ("cautious", f"осторожная оценка ({_pct(OVERBOOK_CONFIDENCE)})", "lines", "dash"),
-              ("bench_expected", "бенчмарк «месяц × день недели»", "lines", "dot")]
     for i, hotel in enumerate(hotels):
-        part = dates[dates["hotel"] == hotel]
-        for column, name, mode, dash in series:
-            fig.add_trace(go.Scatter(
-                x=part["arrival_date"], y=part[column], mode=mode, name=name, visible=i == 0,
-                line={"dash": dash} if dash else None, hovertemplate="%{x|%d.%m.%Y}: %{y:.0f}<extra></extra>"))
-    fig.update_layout(**LAYOUT, updatemenus=_hotel_menu(hotels, len(series)),
-                      xaxis_title="дата заезда", xaxis_tickformat="%d.%m", yaxis_title="число отмен")
+        weeks = weekly_table(dates, hotel)
+        x, show = week_labels(weeks), i == 0
+        fig.add_trace(go.Bar(x=x, y=weeks["actual"], name="сколько отмен было", marker_color="lightgrey",
+                             visible=show, hovertemplate="%{x}<br>было отмен: %{y:.0f}<extra></extra>"))
+        fig.add_trace(go.Scatter(x=x, y=weeks["expected"], mode="lines+markers", name="сколько ждала модель",
+                                 line={"color": "#1f77b4", "width": 3}, visible=show,
+                                 hovertemplate="%{x}<br>ждала модель: %{y:.0f}<extra></extra>"))
+        fig.add_trace(go.Scatter(x=x, y=weeks["bench_expected"], mode="lines+markers",
+                                 name="сколько ждал бенчмарк «месяц × день недели»",
+                                 line={"color": "#2ca02c", "width": 2, "dash": "dash"}, visible=show,
+                                 hovertemplate="%{x}<br>ждал бенчмарк: %{y:.0f}<extra></extra>"))
+    fig.update_layout(**LAYOUT, updatemenus=_hotel_menu(hotels, 3), xaxis_title="неделя заезда",
+                      yaxis_title="отмен за неделю", xaxis_tickangle=-45, legend={"orientation": "h", "y": -0.35})
     return fig
 
 
@@ -249,10 +256,23 @@ def _risk_text(risk: pd.DataFrame, min_bookings: int = MIN_BOOKINGS) -> str:
             f"учтены группы от {min_bookings} броней.")
 
 
+def _overbooking_text(dates: pd.DataFrame, plans: pd.DataFrame) -> str:
+    """Вывод к графику 3: средняя недельная ошибка модели и бенчмарка и итог осторожной оценки."""
+    weeks = weekly_table(dates)
+    model_err, bench_err = (weeks[c] - weeks["actual"] for c in ("expected", "bench_expected"))
+    total = weeks["actual"].sum()
+    return (f"За неделю в среднем отменялось {_num(weeks['actual'].mean())} броней. Модель в среднем ошибалась на "
+            f"{_num(model_err.abs().mean())} отмены за неделю ({_pct1(model_err.abs().sum() / total)} от фактических), "
+            f"бенчмарк — на {_num(bench_err.abs().mean())} ({_pct1(bench_err.abs().sum() / total)}).\n\n"
+            f"Осторожная оценка модели перепродаёт {_int(plans.loc['модель', 'resold'])} номеров "
+            f"(бенчмарк — {_int(plans.loc['бенчмарк', 'resold'])}), но в "
+            f"{_int(plans.loc['модель', 'short_dates'])} парах «отель × дата» гостям не хватило бы "
+            f"номера ({_int(plans.loc['модель', 'walked'])} гостей).")
+
+
 def _texts(summary: dict, dates: pd.DataFrame, curves: pd.DataFrame, risk: pd.DataFrame) -> dict[str, str]:
     """Короткие выводы под графиками (абзацы через пустую строку); числа берутся из таблиц, а не пишутся руками."""
     total, rule, at_share, plans = summary["total"], summary["rule"], summary["at_share"], summary["plans"]
-    pooled = dates[dates["hotel"] == ALL_HOTELS]
     everyone = total.loc["со всех"]
     return {
         "curve": (f"Рабочее правило — «{rule.name}» (порог подобран на валидации): потери "
@@ -264,12 +284,7 @@ def _texts(summary: dict, dates: pd.DataFrame, curves: pd.DataFrame, risk: pd.Da
                   f"выбор по модели теряет {_mln(at_share['модель'])}, по сроку брони — "
                   f"{_mln(at_share['срок брони'])}."),
         "slider": _slider_text(curves),
-        "overbooking": (f"В среднем на дату ожидалось {_num(pooled['expected'].mean())} отмен, "
-                        f"случилось {_num(pooled['actual'].mean())}. "
-                        f"Осторожная оценка модели перепродаёт {_int(plans.loc['модель', 'resold'])} номеров "
-                        f"(бенчмарк — {_int(plans.loc['бенчмарк', 'resold'])}), но в "
-                        f"{_int(plans.loc['модель', 'short_dates'])} парах «отель × дата» гостям не хватило бы "
-                        f"номера ({_int(plans.loc['модель', 'walked'])} гостей)."),
+        "overbooking": _overbooking_text(dates, plans),
         "risk": _risk_text(risk) + " Сегменты включаются щелчком по легенде. Это связь, а не причина.",
     }
 

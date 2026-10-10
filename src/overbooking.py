@@ -103,3 +103,17 @@ def weekly_table(dates: pd.DataFrame, hotel: str = ALL_HOTELS) -> pd.DataFrame:
     return (part.groupby("week").agg(week_start=("arrival_date", "min"), week_end=("arrival_date", "max"),
                                      actual=("actual", "sum"), expected=("expected", "sum"),
                                      bench_expected=("bench_expected", "sum")).reset_index(drop=True))
+
+
+MONTHS_GEN = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"]
+
+
+def week_labels(weeks: pd.DataFrame) -> list[str]:
+    """Подписи недель из `weekly_table`: «3–7 мая» или «29 мая – 4 июн»."""
+    labels = []
+    for start, end in zip(weeks["week_start"], weeks["week_end"]):
+        if start.month == end.month:
+            labels.append(f"{start.day}–{end.day} {MONTHS_GEN[end.month - 1]}")
+        else:
+            labels.append(f"{start.day} {MONTHS_GEN[start.month - 1]} – {end.day} {MONTHS_GEN[end.month - 1]}")
+    return labels

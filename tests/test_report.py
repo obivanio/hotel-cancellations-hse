@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import pytest
 
-from src.overbooking import WALK_COSTS, date_table, outcome_table
+from src.overbooking import WALK_COSTS, date_table, outcome_table, week_labels, weekly_table
 from src.policies import equal_share_curves, policy_table, scored
 from src.report import (MONTH_NAMES, SECTIONS, _assumptions_html, _int, _key_numbers, _risk_text, _slider_text,
                         _summary, _texts, build_report, fig_overbooking, fig_risk, fig_share_curve, fig_top_share,
@@ -182,7 +182,18 @@ def test_overbooking_text_decimal_comma_only_in_numbers(tables):
     """Десятичная запятая только в числах: конец предложения остаётся точкой, а не «, »."""
     summary = _summary(tables["policies"], tables["curves"], outcome_table(tables["dates"]))
     text = _texts(summary, tables["dates"], tables["curves"], tables["risk"])["overbooking"]
-    pooled = tables["dates"][tables["dates"]["hotel"] == "все отели"]
-    mean_expected = f"{pooled['expected'].mean():.1f}".replace(".", ",")
-    mean_actual = f"{pooled['actual'].mean():.1f}".replace(".", ",")
-    assert text.startswith(f"В среднем на дату ожидалось {mean_expected} отмен, случилось {mean_actual}. Осторожная")
+    weeks = weekly_table(tables["dates"])
+    error = f"{(weeks['expected'] - weeks['actual']).abs().mean():.1f}".replace(".", ",")
+    assert f"Модель в среднем ошибалась на {error} отмены за неделю" in text
+    assert "\n\nОсторожная оценка модели перепродаёт" in text and "отель × дата" in text
+    assert "по каждому дню" not in text and ", ." not in text
+
+
+def test_overbooking_chart_is_weekly(tables):
+    """График 3: на отель столбики фактов и две линии; подписи оси — недели вроде «3–7 мая»."""
+    fig = fig_overbooking(tables["dates"])
+    assert [type(t).__name__ for t in fig.data] == ["Bar", "Scatter", "Scatter"] * 3
+    assert list(fig.data[0].x) == week_labels(weekly_table(tables["dates"]))
+    assert all("–" in label for label in fig.data[0].x)
+    assert fig.layout.xaxis.title.text == "неделя заезда" and fig.layout.yaxis.title.text == "отмен за неделю"
+    assert len(fig.layout.updatemenus[0].buttons) == 3
