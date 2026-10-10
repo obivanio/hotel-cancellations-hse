@@ -1,2 +1,26 @@
 [client]
 toolbarMode = "viewer"
+
+[server]
+# Без вопроса про e-mail при первом запуске; браузер сам не открывается — адрес http://localhost:8501.
+headless = true
+# Раздача папки static/: оттуда берётся шрифт Golos Text, поэтому дашборд работает без интернета.
+enableStaticServing = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
+primaryColor = "#1F4E9C"
+backgroundColor = "#F6F8FB"
+secondaryBackgroundColor = "#E9EEF5"
+textColor = "#1B2433"
+font = "Golos Text, sans-serif"
+baseRadius = "small"
+
+[[theme.fontFaces]]
+family = "Golos Text"
+url = "app/static/fonts/GolosText-Variable.ttf"
+weight = "400 900"
+style = "normal"

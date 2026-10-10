@@ -6,7 +6,8 @@ import plotly.graph_objects as go
 from src.evaluation import DEFAULT_ASSUMPTIONS, Assumptions, value_at_risk
 from src.overbooking import overbooking_outcome, weekly_table
 from src.policies import ALL_HOTELS, BASELINE, REPORTS_DIR, SHARES, Scored, policy_masks, policy_metrics, share_curve
-from src.report import LAYOUT, MONTH_NAMES, week_traces
+from src.report import MONTH_NAMES, week_traces
+from src.theme import COBALT, HOTEL_COLORS, INK, LAYOUT, OCHRE, STONE, one_color_scale
 
 SCORED_TEST_PATH = REPORTS_DIR / "scored_test.csv"
 SCORED_VALID_PATH = REPORTS_DIR / "scored_valid.csv"
@@ -18,6 +19,12 @@ RULE_COLUMNS = {
     "caught_cancels": "поймано отмен, %",
 }
 SMALL_MONEY = 100_000
+WALL_KINDS = {
+    "caught": "отменят, но предоплата уже взята",
+    "touched": "приедут, но с них взяли предоплату",
+    "missed": "отменят, а предоплаты нет",
+    "reliable": "приедут, предоплату не брали",
+}
 
 
 def scored_frame(df: pd.DataFrame, proba: np.ndarray) -> pd.DataFrame:
@@ -72,6 +79,55 @@ def key_numbers(frame: pd.DataFrame, assumptions: Assumptions = DEFAULT_ASSUMPTI
         "everyone": everyone["total"], "model": model["total"], "saving": everyone["total"] - model["total"],
         "touched_reliable": model["touched_reliable"], "prepay_share": model["prepay_share"],
     }
+
+
+def hundred(counts: dict[str, float]) -> dict[str, int]:
+    """Разложить количества на 100 плиток методом наибольших остатков: сумма ровно 100, доли сохраняются.
+
+    Сначала каждой группе — целая часть её доли от 100, оставшиеся плитки — группам с наибольшими остатками
+    (при равных остатках — в порядке ключей). Пустой вход (сумма 0) — нули.
+    """
+    total = sum(counts.values())
+    if total <= 0:
+        return {key: 0 for key in counts}
+    exact = {key: value * 100 / total for key, value in counts.items()}
+    tiles = {key: int(np.floor(value)) for key, value in exact.items()}
+    for key in sorted(exact, key=lambda k: exact[k] - tiles[k], reverse=True)[:100 - sum(tiles.values())]:
+        tiles[key] += 1
+    return tiles
+
+
+def wall_counts(frame: pd.DataFrame, assumptions: Assumptions = DEFAULT_ASSUMPTIONS) -> dict[str, int]:
+    """«Стена из 100 плиток»: сколько из 100 типичных броней среза попадает в каждую из четырёх групп.
+
+    Модель берёт предоплату при риске не ниже порога по формуле; группы — WALL_KINDS: предоплата взята и бронь
+    отменят (поймана), взята и гость приедет (задет), не взята и отменят (пропущена), не взята и приедет.
+    Считаются все брони среза. Пустой срез — пустой словарь (стену не показываем).
+    """
+    if frame.empty:
+        return {}
+    prepay = frame["proba"].to_numpy(dtype=float) >= model_threshold(assumptions)
+    canceled = frame["is_canceled"].to_numpy() == 1
+    return hundred({"caught": float((prepay & canceled).sum()), "touched": float((prepay & ~canceled).sum()),
+                    "missed": float((~prepay & canceled).sum()), "reliable": float((~prepay & ~canceled).sum())})
+
+
+def wall_html(counts: dict[str, int], hotel: str = ALL_HOTELS) -> str:
+    """HTML стены: сетка 10×10 плиток по группам из wall_counts, отметка отеля его цветом и легенда с числами.
+
+    Для экранных читалок у сетки есть role="img" и подпись с теми же числами, что в легенде.
+    """
+    names = {"City Hotel": "городской отель", "Resort Hotel": "курортный отель"}
+    shown = list(names) if hotel == ALL_HOTELS else [hotel]
+    marks = "".join(f'<span class="hotel-mark" style="background:{HOTEL_COLORS[name]}"></span>' for name in shown)
+    where = "оба отеля" if hotel == ALL_HOTELS else names[hotel]
+    label = "Из 100 типичных броней: " + "; ".join(f"{counts[kind]} {text}" for kind, text in WALL_KINDS.items())
+    tiles = "".join(f'<span class="tile tile-{kind}"></span>' * counts[kind] for kind in WALL_KINDS)
+    legend = "".join(f'<li><span class="tile tile-{kind}"></span><b>{counts[kind]}</b><span>{text}</span></li>'
+                     for kind, text in WALL_KINDS.items())
+    return (f'<div class="wall-block"><p class="wall-title">Из 100 типичных броней: {marks}{where}</p>'
+            f'<div class="wall" role="img" aria-label="{label}" title="{label}">{tiles}</div>'
+            f'<ul class="wall-legend">{legend}</ul></div>')
 
 
 def rules_table(frame: pd.DataFrame, lead_days: int, share: float,
@@ -207,15 +263,16 @@ def display_rules(table: pd.DataFrame) -> pd.DataFrame:
 def fig_share_curves(curves: pd.DataFrame, share: float) -> go.Figure:
     """Кривые «доля броней с предоплатой → потери» для модели и срока брони и отметка выбранной доли."""
     fig = go.Figure()
-    scale, unit, _ = money_unit(curves["total"])
-    for method, dash in (("модель", "solid"), ("срок брони", "dash")):
+    divisor, unit, _ = money_unit(curves["total"])
+    for method, dash, color in (("модель", "solid", COBALT), ("срок брони", "dash", STONE)):
         line = curves[curves["method"] == method]
         fig.add_trace(go.Scatter(
-            x=line["share"] * 100, y=line["total"] / scale, mode="lines+markers", name=f"брони выбирает {method}",
-            line={"dash": dash}, customdata=line["touched_reliable"] * 100,
+            x=line["share"] * 100, y=line["total"] / divisor, mode="lines+markers", name=f"брони выбирает {method}",
+            line={"dash": dash, "color": color, "width": 2.5}, marker={"size": 6, "color": color},
+            customdata=line["touched_reliable"] * 100,
             hovertemplate=f"предоплата с %{{x:.0f}} % броней<br>потери %{{y:.2f}} {unit}"
                           "<br>задето надёжных %{customdata:.0f} %<extra></extra>"))
-    fig.add_vline(x=share * 100, line={"color": "grey", "dash": "dot"},
+    fig.add_vline(x=share * 100, line={"color": INK, "dash": "dot", "width": 1},
                   annotation_text=f"выбрано: {percent(share)}")
     fig.update_layout(**LAYOUT, xaxis_title="доля броней с предоплатой, %", yaxis_title=f"потери, {unit}",
                       legend={"orientation": "h", "y": -0.25})
@@ -225,21 +282,26 @@ def fig_share_curves(curves: pd.DataFrame, share: float) -> go.Figure:
 def fig_weeks(dates: pd.DataFrame, hotel: str) -> go.Figure:
     """По неделям заезда для одного отеля: столбики фактических отмен, линии ожидания модели и бенчмарка."""
     fig = go.Figure(week_traces(weekly_table(dates, hotel)))
+    fig.update_traces(marker_color=OCHRE, opacity=0.75, selector={"type": "bar"})
+    fig.update_traces(line_color=COBALT, marker_color=COBALT, selector={"name": "сколько ждала модель"})
+    fig.update_traces(line_color=STONE, marker_color=STONE, selector={"mode": "lines+markers", "line.dash": "dash"})
     fig.update_layout(**LAYOUT, xaxis_title="неделя заезда", yaxis_title="отмен за неделю", xaxis_tickangle=-45,
-                      legend={"orientation": "h", "y": -0.45})
+                      legend={"orientation": "h", "x": 0, "y": 1.02, "yanchor": "bottom"})
     return fig
 
 
-def fig_heatmap(pivot: pd.DataFrame, counts: pd.DataFrame, title: str) -> go.Figure:
-    """Тепловая карта «сегмент × месяц» в процентах; в подсказке — число броней в клетке.
+def fig_heatmap(pivot: pd.DataFrame, counts: pd.DataFrame, title: str, color: str = COBALT) -> go.Figure:
+    """Тепловая карта «сегмент × месяц» в процентах, от белого к color; в подсказке — число броней в клетке.
 
     Клетка без броней остаётся пустой: без текста и без подсказки.
     """
     fig = go.Figure(go.Heatmap(
-        z=pivot.to_numpy(), x=list(pivot.columns), y=list(pivot.index), colorscale="Blues", zmin=0, zmax=100,
+        z=pivot.to_numpy(), x=list(pivot.columns), y=list(pivot.index), colorscale=one_color_scale(color),
+        zmin=0, zmax=100,
         text=pivot.map(lambda value: "" if pd.isna(value) else f"{value:.0f}").to_numpy(), texttemplate="%{text}",
         customdata=counts.fillna(0).to_numpy(), hoverongaps=False,
         hovertemplate="%{y}, %{x}: %{z:.0f} %<br>броней: %{customdata:.0f}<extra></extra>",
         colorbar={"title": "%"}))
-    fig.update_layout(**LAYOUT, title=title, xaxis_title="месяц заезда", yaxis_title="сегмент")
+    fig.update_layout(**LAYOUT, title=title, xaxis_title="месяц заезда",
+                      yaxis_title={"text": "сегмент", "standoff": 12})
     return fig

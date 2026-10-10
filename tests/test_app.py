@@ -41,6 +41,22 @@ def test_hotel_filter_changes_key_number(app):
     assert _baseline(app) == before
 
 
+def _wall(app: AppTest) -> str:
+    """HTML стены из 100 плиток в заголовке (пустая строка, если стены нет)."""
+    return next((block.value for block in app.markdown if 'class="wall"' in block.value), "")
+
+
+def test_wall_renders_and_follows_hotel(app):
+    """Стена из 100 плиток в заголовке: 100 плиток, подпись с числами; смена отеля перестраивает её."""
+    before = _wall(app)
+    assert before.count('class="tile ') == 104
+    assert "Из 100 типичных броней: " in before
+    app.sidebar.radio(key="hotel").set_value("курортный").run()
+    assert not app.exception
+    after = _wall(app)
+    assert "курортный отель" in after and after != before
+
+
 def test_empty_slice_shows_message(app):
     """Сегмента Aviation нет в курортном отеле: предупреждение вместо ключевых цифр, без ошибок.
 
@@ -50,6 +66,7 @@ def test_empty_slice_shows_message(app):
     app.sidebar.multiselect(key="segments").set_value(["Aviation"]).run()
     assert not app.exception
     assert "Без предоплаты" not in [metric.label for metric in app.metric]
+    assert not _wall(app)
     assert app.warning and "нет броней" in app.warning[0].value
 
 

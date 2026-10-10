@@ -5,8 +5,8 @@ import pytest
 
 from src.dashboard import (
     SCORED_COLUMNS, SCORED_TEST_PATH, comma, count, dates_slice, display_rules, fig_heatmap, fig_share_curves,
-    fig_weeks, filter_frame, key_numbers, lead_total_at_share, model_threshold, money, overbooking_summary,
-    risk_tables, rules_table, saving_card, scored_frame, share_curves, to_scored, top_share_row,
+    fig_weeks, filter_frame, hundred, key_numbers, lead_total_at_share, model_threshold, money, overbooking_summary,
+    risk_tables, rules_table, saving_card, scored_frame, share_curves, to_scored, top_share_row, wall_counts, wall_html,
 )
 from src.evaluation import Assumptions
 from src.policies import ALL_HOTELS, policy_metrics
@@ -196,3 +196,43 @@ def test_lead_total_at_share():
     curves = share_curves(FRAME, shares=np.array([0.0, 1.0]))
     assert lead_total_at_share(curves, 1.0) == pytest.approx(40.0)
     assert lead_total_at_share(curves, 0.5) is None
+
+
+def test_hundred_sums_to_100():
+    """Наибольшие остатки: сумма ровно 100 и при неровных долях (три трети — 34, 33, 33), нули остаются нулями."""
+    assert hundred({"a": 1, "b": 1, "c": 1}) == {"a": 34, "b": 33, "c": 33}
+    assert sum(hundred({"a": 7, "b": 13, "c": 29, "d": 0}).values()) == 100
+    assert hundred({"a": 7, "b": 13, "c": 29, "d": 0})["d"] == 0
+    assert hundred({"a": 0, "b": 0}) == {"a": 0, "b": 0}
+
+
+def test_hundred_keeps_proportions():
+    """Каждая группа отличается от точной доли меньше чем на одну плитку."""
+    counts = {"a": 3311, "b": 4876, "c": 512, "d": 8652}
+    tiles = hundred(counts)
+    total = sum(counts.values())
+    assert all(abs(tiles[key] - value * 100 / total) < 1 for key, value in counts.items())
+
+
+def test_wall_counts():
+    """Порог 1/6: из шести броней три отменённые с предоплатой, одна надёжная с предоплатой, две без предоплаты.
+
+    При пороге 0,4 надёжная бронь с риском 0,3 уходит из-под предоплаты.
+    """
+    assert wall_counts(FRAME) == {"caught": 50, "touched": 17, "missed": 0, "reliable": 33}
+    assert wall_counts(FRAME, Assumptions(0.3, 0.2)) == {"caught": 50, "touched": 0, "missed": 0, "reliable": 50}
+
+
+def test_wall_counts_empty_slice():
+    """Пустой срез — пустой словарь: стену не показываем."""
+    assert not wall_counts(filter_frame(FRAME, "Resort Hotel", ["Aviation"], MONTHS))
+
+
+def test_wall_html():
+    """Сто плиток в сетке, четыре в легенде; подпись для экранных читалок с числами; отметка выбранного отеля."""
+    counts = wall_counts(FRAME)
+    html = wall_html(counts, "Resort Hotel")
+    assert html.count('class="tile ') == 104
+    assert 'aria-label="Из 100 типичных броней: 50 отменят' in html
+    assert "курортный отель" in html and html.count("hotel-mark") == 1
+    assert wall_html(counts).count("hotel-mark") == 2
