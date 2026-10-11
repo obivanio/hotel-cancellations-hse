@@ -347,6 +347,7 @@ if (typeof document !== "undefined") {
     }
 
     // Вид «Дашборд»: первые пять показателей — от фильтров, допущений и черты; последние три — только от отеля.
+    const SAVE_LABEL = "Экономия против правила по сроку брони";
     function drawDashboard(key, res, curves, a) {
       const t = DATA.obTotals[state.hotel];
       const set = (id, text) => { $(id).textContent = tight(text); };
@@ -367,8 +368,10 @@ if (typeof document !== "undefined") {
       setEmpty($("dSegments"), empty);
       if (empty) {
         ["kLoss", "kPct", "kCaught", "kTouched", "kSave"].forEach((id) => set(id, "—"));
-        ["kLossUnit", "kLossNote", "kPctUnit", "kPctNote", "kCaughtNote", "kTouchedNote", "kSaveUnit",
+        ["kLossUnit", "kLossNote", "kPctUnit", "kPctNote", "kCaughtNote", "kTouchedNote", "kSaveUnit", "kSaveNote",
           "dSegmentsSub"].forEach((id) => set(id, ""));
+        $("kSaveLabel").textContent = SAVE_LABEL;
+        document.querySelectorAll("#viewDashboard .unit").forEach((el) => { el.textContent = ""; });
         $("dTable").innerHTML = `<tr><td class="none" colspan="6">В этом срезе нет броней. Выберите другой сегмент
           или месяц.</td></tr>`;
         return;
@@ -384,9 +387,15 @@ if (typeof document !== "undefined") {
       set("kCaughtNote", `${Calc.count(res.caught)} ${plural(res.caught, ["бронь", "брони", "броней"])}`);
       set("kTouched", Calc.percent(res.touched_share));
       set("kTouchedNote", `${Calc.count(res.touched)} ${plural(res.touched, ["бронь", "брони", "броней"])}`);
-      const [save, saveUnit] = moneyParts(curves["срок брони"][state.pct].total - curves["модель"][state.pct].total);
+      // Как подпись на кривых: если модель теряет больше правила, показываем, на сколько она дороже.
+      const diff = curves["срок брони"][state.pct].total - curves["модель"][state.pct].total;
+      const worse = diff < 0 && Calc.money(-diff) !== Calc.money(0);
+      const [save, saveUnit] = moneyParts(Math.abs(diff));
+      $("kSaveLabel").textContent = worse ? "Модель дороже правила по сроку брони" : SAVE_LABEL;
       set("kSave", save);
       set("kSaveUnit", saveUnit);
+      set("kSaveNote", worse ? "модель дороже при той же доле предоплаты"
+        : Calc.money(Math.abs(diff)) === Calc.money(0) ? "почти без разницы" : "");
       $("dShare").value = state.pct;
       $("dShare").setAttribute("aria-valuetext", `предоплата с ${state.pct} % броней`);
       $("dShare").style.setProperty("--p", `${state.pct}%`);
@@ -597,7 +606,10 @@ if (typeof document !== "undefined") {
       setView(name);
       if (push) history.replaceState(null, "", name === "dashboard" ? "#dashboard" : location.pathname + location.search);
       redrawAll();
-      views[name].querySelectorAll(".plot").forEach((el) => { if (el.data) Plotly.Plots.resize(el); });
+      // Plotly.Plots.resize принимает только видимый график: пустые (скрытые setEmpty) пропускаем.
+      views[name].querySelectorAll(".plot").forEach((el) => {
+        if (el.data && !el.hidden && el.offsetParent) Plotly.Plots.resize(el);
+      });
     }
     viewTabs.forEach((tab, i) => {
       tab.addEventListener("click", () => showView(tab.dataset.view, true));
