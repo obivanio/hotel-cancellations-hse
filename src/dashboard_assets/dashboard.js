@@ -179,6 +179,7 @@ if (typeof document !== "undefined") {
       if (b === 1) return forms[0];
       return b > 1 && b < 5 ? forms[1] : forms[2];
     };
+    const rooms = (n) => `${Calc.count(n)} ${plural(Math.round(n), ["номер", "номера", "номеров"])}`;
     const moneyParts = (value) => {
       const text = Calc.money(value);
       const cut = text.indexOf(" ");
@@ -402,6 +403,15 @@ if (typeof document !== "undefined") {
       s += `<text class="t" x="40" y="64">пунктир — та же оценка без модели</text>`;
       $("weeks").innerHTML = s;
       const both = state.hotel === "все отели" ? "два отеля, каждый считает сам; " : "";
+      const split = state.hotel === "все отели"
+        ? `<p>Городской — ${rooms(DATA.obTotals["City Hotel"].per_day)}, курортный —
+          ${rooms(DATA.obTotals["Resort Hotel"].per_day)}. По датам — от ${Calc.count(t.per_day_min)}
+          до ${Calc.count(t.per_day_max)}, смотря сколько на дату броней и насколько они рискованны.</p>`
+        : `<p>Это в среднем на дату заезда. По датам — от ${Calc.count(t.per_day_min)}
+          до ${Calc.count(t.per_day_max)}, смотря сколько на дату броней и насколько они рискованны.</p>`;
+      $("obAnswer").innerHTML = nb(`<div class="n">≈&nbsp;${Calc.count(t.per_day)}
+        <small>${plural(Math.round(t.per_day), ["номер", "номера", "номеров"])} в день сверх брони</small></div>
+        ${split}`);
       $("obTotals").innerHTML = nb(`<li><b>${Calc.count(t.resold)}</b>номеров перепродано</li>
         <li><b>${Calc.count(t.walked)}</b>${plural(t.walked, ["гостю", "гостям", "гостям"])} не хватило номера</li>
         <li><b>${pct1(t.covered)}</b>дат, когда номера хватило всем (${both}без модели —
@@ -507,7 +517,9 @@ if (typeof document !== "undefined") {
         <div class="cap">дат, когда номера хватило всем, — в среднем по двум отелям</div></div>
         <div><h3>Продавать сверх брони по осторожной оценке, в городском отеле — меньше</h3>
         <p>Каждый отель решает сам: на каждую дату продаёт столько лишних номеров, сколько отмен случится
-          с вероятностью 90 %.</p>
+          с вероятностью 90 %. В среднем это ${rooms(DATA.obTotals["все отели"].per_day)} в день
+          на два отеля: ${Calc.count(DATA.obTotals["City Hotel"].per_day)} в городском
+          и ${Calc.count(DATA.obTotals["Resort Hotel"].per_day)} в курортном.</p>
         <p>В курортном отеле номера хватило в ${pct1(v.covered_resort)} дат, в городском — только
           в ${pct1(v.covered_city)}: там отменяют группами, разом. В городском отеле стоит продавать меньше
           лишних номеров, чем советует оценка.</p></div></div>`);

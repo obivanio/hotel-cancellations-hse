@@ -153,13 +153,16 @@ def test_weekly_overbooking():
 
 
 def test_overbooking_totals():
-    """«Все отели» — шесть строк двух отелей: без нехватки 3 из 6, перепродано 12, без номера 4; сводные не в счёт."""
+    """«Все отели» — шесть строк двух отелей: без нехватки 3 из 6, перепродано 12, без номера 4, на дату 3–8 номеров;
+    сводные не в счёт."""
     totals = overbooking_totals(DATES, ALL_HOTELS)
     assert totals["dates"] == 6
     assert totals["covered"] == pytest.approx(0.5)
     assert totals["walked"] == 4.0 and totals["resold"] == 12.0
     assert totals["covered_bench"] == pytest.approx(5 / 6)
+    assert (totals["per_day"], totals["per_day_min"], totals["per_day_max"]) == pytest.approx((16 / 3, 3.0, 8.0))
     single = overbooking_totals(DATES, "A")
+    assert (single["per_day"], single["per_day_min"], single["per_day_max"]) == pytest.approx((8 / 3, 1.0, 5.0))
     assert (single["dates"], single["resold"], single["walked"]) == (3, 6.0, 2.0)
     assert single["covered"] == pytest.approx(2 / 3)
     assert overbooking_totals(DATES, "нет такого")["covered"] == 0.0

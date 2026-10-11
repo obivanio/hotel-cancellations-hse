@@ -211,12 +211,17 @@ def overbooking_totals(dates: pd.DataFrame, hotel: str) -> dict[str, float]:
 
     «Все отели» — сумма решений двух отелей (как в ноутбуке 04), сводные строки таблицы не используются; dates —
     число строк «отель × дата». Дата без нехватки — осторожная оценка не больше отмен на деле; covered_bench —
-    то же у бенчмарка.
+    то же у бенчмарка. per_day — сколько номеров продаём сверх брони на одну дату заезда в среднем (у «все отели» —
+    сумма двух отелей на дату), per_day_min и per_day_max — меньше и больше всего по датам.
     """
     rows = _hotel_rows(dates, hotel)
     outcome = overbooking_outcome(rows, "cautious")
+    per_day = rows.groupby("arrival_date")["cautious"].sum()
     return {
         "dates": len(rows), "resold": outcome["resold"], "walked": outcome["walked"],
+        "per_day": float(per_day.mean()) if len(per_day) else 0.0,
+        "per_day_min": float(per_day.min()) if len(per_day) else 0.0,
+        "per_day_max": float(per_day.max()) if len(per_day) else 0.0,
         "covered": float((rows["cautious"] <= rows["actual"]).mean()) if len(rows) else 0.0,
         "covered_bench": float((rows["bench_cautious"] <= rows["actual"]).mean()) if len(rows) else 0.0,
     }

@@ -103,6 +103,11 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
   letter-spacing: -0.025em; margin: 0 0 14px; }
 .part .take, .schemes .take { font-size: 17px; line-height: 1.6; margin: 0; max-width: 34ch; }
 .part .take b { font-weight: 650; }
+.ob-answer { margin: 18px 0 22px; }
+.ob-answer .n { font-family: var(--display); font-weight: 800; font-size: clamp(44px, 4.5vw, 64px); line-height: .95;
+  letter-spacing: -0.04em; color: var(--cobalt); white-space: nowrap; }
+.ob-answer .n small { font-size: .32em; letter-spacing: 0; color: var(--ink); font-weight: 600; white-space: normal; }
+.ob-answer p { margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: var(--ink-2); max-width: 46ch; }
 .mini { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 10px; }
 .mini li { font-size: 16px; line-height: 1.4; }
 .mini b { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.02em; margin-right: 6px; }
