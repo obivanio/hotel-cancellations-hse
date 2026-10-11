@@ -115,7 +115,7 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 .ob-answer { margin: 18px 0 22px; }
 .ob-answer .n { font-family: var(--display); font-weight: 800; font-size: clamp(44px, 4.5vw, 64px); line-height: .95;
   letter-spacing: -0.04em; color: var(--cobalt); white-space: nowrap; }
-.ob-answer .n small { font-size: .32em; letter-spacing: 0; color: var(--ink); font-weight: 600; white-space: normal; }
+.ob-answer .n small { display: block; margin-top: 10px; font-size: 18px; letter-spacing: 0; color: var(--ink); font-weight: 600; }
 .ob-answer p { margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: var(--ink-2); max-width: 46ch; }
 .mini { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 10px; }
 .mini li { font-size: 16px; line-height: 1.4; }
@@ -169,12 +169,10 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
   .hero .lede { margin-bottom: 0; }
   .outcome { margin-top: 0; grid-template-columns: repeat(3, auto); justify-content: start; gap: 28px 48px; }
   .outcome .loss { grid-column: 1 / -1; }
-  .parts { display: grid; grid-template-columns: 1fr 1fr; gap: 0 48px; }
-  .parts .part { grid-template-columns: 1fr; gap: 20px; border-top: 0; padding: 48px 0; }
-  .parts .part:nth-child(-n+2) { grid-row: span 3; grid-template-rows: subgrid; }
-  .part > .chart-note { margin-top: -8px; }
-  .parts .part:nth-child(3) { grid-column: 1 / -1; grid-template-columns: 340px 1fr; gap: 56px; border-top: 1px solid var(--rule); }
-  .part .take { max-width: 60ch; }
+  .part { grid-template-columns: minmax(360px, 1fr) minmax(0, 980px); gap: 16px 64px; align-items: start; }
+  .part > div:first-child { grid-row: 1 / span 2; }
+  .part > .chart { grid-column: 2; grid-row: 1; }
+  .part > .chart-note { grid-column: 2; grid-row: 2; margin-top: 0; }
   .recs-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 40px; }
   .recs-row .rec { grid-template-columns: 1fr; gap: 16px; align-content: start; }
 }
@@ -184,10 +182,6 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 }
 @media (min-width: 1800px) {
   .t { font-size: 15px; }
-  .parts { grid-template-columns: repeat(3, 1fr); }
-  .parts .part:nth-child(3) { grid-column: auto; grid-template-columns: 1fr; gap: 20px; border-top: 0;
-    grid-row: span 3; grid-template-rows: subgrid; }
-  .parts .part:nth-child(3) .chart { grid-row: 2 / span 2; align-self: start; }
 }
 @media (max-width: 900px) {
   .wrap { padding: 0 16px; }
