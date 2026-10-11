@@ -1,8 +1,9 @@
 """Пояснения простыми словами в паспорте шага схем archify (reports/figures/19_…html, 20_…html).
 
-Скрипт в HTML схемы следит за открытым паспортом (адрес #focus=<id шага>) и дописывает под названием шага абзац
-из diagrams/explanations.json. Стиль блока ещё держит метку направления связи («ВЫХ →») в одну строку, чтобы она
-не наезжала на название соседнего шага. Повторная вставка заменяет прежнюю, а не дублирует её.
+Скрипт в HTML схемы следит за открытым паспортом шага и дописывает под названием шага абзац
+из diagrams/explanations.json на всю ширину паспорта. Id шага берётся из самого паспорта (поле #focus-id), а не из
+адреса: при выбранной связи (#relation=…) паспорт шага открыт, и пояснение остаётся. Следим только за паспортом:
+archify не пересоздаёт его, а лишь меняет содержимое. Повторная вставка заменяет прежнюю, а не дублирует её.
 Запуск: python -m src.archify_explain
 """
 import json
@@ -13,18 +14,21 @@ from src.plots import FIGURES_DIR
 
 EXPLANATIONS_PATH = ROOT / "diagrams" / "explanations.json"
 START, END = "<!-- hse-explain:start -->", "<!-- hse-explain:end -->"
-SCRIPT = """<style>.hse-explain{margin:.5rem 0 .45rem;font-size:.75rem;line-height:1.5;white-space:normal;
-color:var(--text)}
-.relationship-lens-row{grid-template-columns:2.7rem minmax(0,1fr)}
-.relationship-lens-direction{white-space:nowrap}</style>
-<script>(function(){var EX=__EXPLANATIONS__;
-function apply(){var chip=document.getElementById('focus-chip');if(!chip)return;
-var m=location.hash.match(/focus=([^&]+)/);var text=m&&EX[decodeURIComponent(m[1])];
+SCRIPT = """<style>.relationship-lens-head{row-gap:0;grid-template-rows:auto auto 1fr}
+.relationship-lens-copy{display:contents}.relationship-lens-copy>*{grid-column:1/-1}
+.relationship-lens-copy>.relationship-lens-eyebrow,.relationship-lens-copy>.relationship-lens-title,
+.relationship-lens-copy>.semantic-passport-detail{grid-column:1}.relationship-lens-actions{grid-column:2;grid-row:1/4}
+.hse-explain{margin:.5rem 0 0;font-size:.75rem;line-height:1.5;white-space:normal;color:var(--text)}</style>
+<script>(function(){var EX=__EXPLANATIONS__;var chip=document.getElementById('focus-chip');
+function stepId(){var code=chip.querySelector('#focus-id');if(code)return code.textContent.trim();
+var m=location.hash.match(/focus=([^&]+)/);return m?decodeURIComponent(m[1]):'';}
+function apply(){var id=stepId();var text=Object.prototype.hasOwnProperty.call(EX,id)&&EX[id];
 var p=chip.querySelector('.hse-explain');if(!text){if(p)p.remove();return;}
 if(!p){var title=chip.querySelector('.semantic-passport-detail')||chip.querySelector('.relationship-lens-title');
 if(!title)return;p=document.createElement('p');p.className='hse-explain';title.after(p);}
 if(p.textContent!==text)p.textContent=text;}
-new MutationObserver(apply).observe(document.documentElement,{subtree:true,childList:true});
+if(!chip)return;apply();
+new MutationObserver(apply).observe(chip,{subtree:true,childList:true,characterData:true});
 window.addEventListener('hashchange',apply);})();</script>"""
 
 

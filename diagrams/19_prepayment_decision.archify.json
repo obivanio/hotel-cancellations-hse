@@ -4,7 +4,7 @@
   "meta": {
     "title": "Решение о предоплате: от риска брони до потерь на тесте",
     "subtitle": "Решение о предоплате по модели риска отмены",
-    "output": ".archify/ru-19/prepayment-decision.html",
+    "output": ".archify/ru-19b/prepayment-decision.html",
     "locale": "ru",
     "quality_profile": "showcase",
     "translations": {
@@ -281,8 +281,8 @@
       "viewer.passport.relationship.group.in": "Входящие",
       "viewer.passport.relationship.group.loop": "Петли",
       "viewer.passport.relationship.row": "{group}: {relationship}, {neighbor}",
-      "viewer.passport.relationship.direction.out": "ВЫХ →",
-      "viewer.passport.relationship.direction.in": "← ВХ",
+      "viewer.passport.relationship.direction.out": "→",
+      "viewer.passport.relationship.direction.in": "←",
       "viewer.passport.relationship.direction.loop": "ПЕТЛЯ",
       "viewer.passport.sourceCount.one": "Проверенных ссылок на код: {count}",
       "viewer.passport.sourceCount.other": "Проверенных ссылок на код: {count}",

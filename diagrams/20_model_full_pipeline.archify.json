@@ -3,7 +3,7 @@
   "diagram_type": "workflow",
   "meta": {
     "title": "Как собрана модель, по которой выбран порог 0,17",
-    "output": ".archify/ru-20/model-full-pipeline.html",
+    "output": ".archify/ru-20b/model-full-pipeline.html",
     "locale": "ru",
     "quality_profile": "showcase",
     "translations": {
@@ -280,8 +280,8 @@
       "viewer.passport.relationship.group.in": "Входящие",
       "viewer.passport.relationship.group.loop": "Петли",
       "viewer.passport.relationship.row": "{group}: {relationship}, {neighbor}",
-      "viewer.passport.relationship.direction.out": "ВЫХ →",
-      "viewer.passport.relationship.direction.in": "← ВХ",
+      "viewer.passport.relationship.direction.out": "→",
+      "viewer.passport.relationship.direction.in": "←",
       "viewer.passport.relationship.direction.loop": "ПЕТЛЯ",
       "viewer.passport.sourceCount.one": "Проверенных ссылок на код: {count}",
       "viewer.passport.sourceCount.other": "Проверенных ссылок на код: {count}",
