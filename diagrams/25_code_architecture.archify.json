@@ -449,29 +449,27 @@
   "legend": {
    "mode": "auto",
    "entries": {
-    "frontend": {
-     "label": "Дашборд"
-    },
     "backend": {
      "label": "Данные и очистка"
     },
-    "database": {
-     "label": "Журнал очистки"
+    "security": {
+     "label": "Анализ и гипотезы"
     },
     "cloud": {
      "label": "Модель"
     },
-    "security": {
-     "label": "Анализ"
-    },
     "messagebus": {
      "label": "Экономика"
+    },
+    "frontend": {
+     "label": "Дашборд"
     },
     "external": {
      "label": "Файлы и папки"
     }
    }
-  }
+  },
+  "subtitle": "Стрелка: кто чьи функции использует"
  },
  "components": [
   {
@@ -480,484 +478,248 @@
    "label": "data/raw/",
    "sublabel": "исходная таблица броней",
    "pos": [
-    728,
-    40
+    100,
+    30
    ],
    "size": [
-    148,
-    58
+    210,
+    62
    ]
   },
   {
-   "id": "cleaning_log",
-   "type": "database",
-   "label": "cleaning_log",
-   "sublabel": "журнал очистки",
-   "pos": [
-    40,
-    175
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "cleaning",
+   "id": "D",
    "type": "backend",
-   "label": "cleaning",
-   "sublabel": "правила очистки",
+   "label": "Данные и очистка (ноутбук 01)",
+   "sublabel": "data, cleaning, cleaning_log, features, pipeline",
    "pos": [
-    212,
-    175
+    100,
+    140
    ],
    "size": [
-    148,
-    58
+    420,
+    62
    ]
   },
   {
-   "id": "pipeline",
-   "type": "backend",
-   "label": "pipeline",
-   "sublabel": "собирает чистую таблицу",
-   "pos": [
-    384,
-    175
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "features",
-   "type": "backend",
-   "label": "features",
-   "sublabel": "новые признаки",
-   "pos": [
-    556,
-    175
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "data",
-   "type": "backend",
-   "label": "data",
-   "sublabel": "загрузка таблицы",
-   "pos": [
-    728,
-    175
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "eda",
+   "id": "A",
    "type": "security",
-   "label": "eda",
-   "sublabel": "доли отмен по группам",
+   "label": "Анализ и гипотезы (ноутбук 02)",
+   "sublabel": "eda, stats, hypotheses, plots",
    "pos": [
-    40,
-    310
+    100,
+    280
    ],
    "size": [
-    148,
-    58
+    420,
+    62
    ]
   },
   {
-   "id": "hypotheses",
-   "type": "security",
-   "label": "hypotheses",
-   "sublabel": "проверка гипотез",
-   "pos": [
-    212,
-    310
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "stats",
-   "type": "security",
-   "label": "stats",
-   "sublabel": "статистические тесты",
-   "pos": [
-    384,
-    310
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "plots",
-   "type": "security",
-   "label": "plots",
-   "sublabel": "графики и оформление",
-   "pos": [
-    728,
-    310
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "baselines",
+   "id": "M",
    "type": "cloud",
-   "label": "baselines",
-   "sublabel": "простые правила-ориентиры",
+   "label": "Модель (ноутбук 03)",
+   "sublabel": "split, model_features, baselines, models, evaluation",
    "pos": [
-    40,
-    445
+    100,
+    420
    ],
    "size": [
-    148,
-    58
+    420,
+    62
    ]
   },
   {
-   "id": "split",
-   "type": "cloud",
-   "label": "split",
-   "sublabel": "деление по времени",
-   "pos": [
-    212,
-    445
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "models",
-   "type": "cloud",
-   "label": "models",
-   "sublabel": "обучение моделей",
-   "pos": [
-    384,
-    445
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "model_features",
-   "type": "cloud",
-   "label": "model_features",
-   "sublabel": "признаки без утечек",
-   "pos": [
-    556,
-    445
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "evaluation",
-   "type": "cloud",
-   "label": "evaluation",
-   "sublabel": "метрики и потери в €",
-   "pos": [
-    728,
-    445
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "report",
+   "id": "E",
    "type": "messagebus",
-   "label": "report",
-   "sublabel": "итоговый отчёт",
+   "label": "Экономика (ноутбук 04)",
+   "sublabel": "policies, overbooking, report",
    "pos": [
-    384,
-    580
+    100,
+    560
    ],
    "size": [
-    148,
-    58
+    420,
+    62
    ]
   },
   {
-   "id": "overbooking",
-   "type": "messagebus",
-   "label": "overbooking",
-   "sublabel": "овербукинг",
-   "pos": [
-    556,
-    580
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "policies",
-   "type": "messagebus",
-   "label": "policies",
-   "sublabel": "правила предоплаты",
-   "pos": [
-    728,
-    580
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "archify_explain",
+   "id": "B",
    "type": "frontend",
-   "label": "archify_explain",
-   "sublabel": "пояснения к схемам",
+   "label": "Дашборд (ноутбук 04)",
+   "sublabel": "dashboard, dashboard_figures, html_dashboard, archify_explain, dashboard_assets/",
    "pos": [
-    40,
-    715
+    100,
+    700
    ],
    "size": [
-    148,
-    58
+    530,
+    62
    ]
   },
   {
-   "id": "assets",
-   "type": "frontend",
-   "label": "dashboard_assets/",
-   "sublabel": "оформление страницы",
-   "pos": [
-    212,
-    715
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "html_dashboard",
-   "type": "frontend",
-   "label": "html_dashboard",
-   "sublabel": "собирает страницу",
-   "pos": [
-    384,
-    715
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "dashboard_figures",
-   "type": "frontend",
-   "label": "dashboard_figures",
-   "sublabel": "графики дашборда",
-   "pos": [
-    556,
-    715
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "dashboard",
-   "type": "frontend",
-   "label": "dashboard",
-   "sublabel": "расчёты дашборда",
-   "pos": [
-    728,
-    715
-   ],
-   "size": [
-    148,
-    58
-   ]
-  },
-  {
-   "id": "reports",
+   "id": "R",
    "type": "external",
    "label": "reports/",
-   "sublabel": "CSV, отчёт, дашборд, схемы",
+   "sublabel": "CSV, report.html, dashboard.html, figures/",
    "pos": [
-    384,
-    850
+    660,
+    140
    ],
    "size": [
-    148,
-    58
+    190,
+    622
    ]
   }
  ],
- "boundaries": [
-  {
-   "kind": "region",
-   "label": "Шаг 1. Данные и очистка (ноутбук 01)",
-   "wraps": [
-    "cleaning_log",
-    "cleaning",
-    "pipeline",
-    "features",
-    "data"
-   ],
-   "pad": 22
-  },
-  {
-   "kind": "region",
-   "label": "Шаг 2. Анализ и гипотезы (ноутбук 02)",
-   "wraps": [
-    "eda",
-    "hypotheses",
-    "stats",
-    "plots"
-   ],
-   "pad": 22
-  },
-  {
-   "kind": "region",
-   "label": "Шаг 3. Модель (ноутбук 03)",
-   "wraps": [
-    "baselines",
-    "split",
-    "models",
-    "model_features",
-    "evaluation"
-   ],
-   "pad": 22
-  },
-  {
-   "kind": "region",
-   "label": "Шаг 4. Экономика (ноутбук 04)",
-   "wraps": [
-    "report",
-    "overbooking",
-    "policies"
-   ],
-   "pad": 22
-  },
-  {
-   "kind": "region",
-   "label": "Шаг 5. Дашборд (ноутбук 04, раздел 12)",
-   "wraps": [
-    "archify_explain",
-    "assets",
-    "html_dashboard",
-    "dashboard_figures",
-    "dashboard"
-   ],
-   "pad": 22
-  }
- ],
+ "boundaries": [],
  "connections": [
   {
-   "id": "raw-data",
+   "id": "B-D",
+   "from": "B",
+   "to": "D",
+   "fromSide": "left",
+   "toSide": "left",
+   "via": [
+    [
+     42,
+     731
+    ],
+    [
+     42,
+     171
+    ]
+   ]
+  },
+  {
+   "id": "B-A",
+   "from": "B",
+   "to": "A",
+   "fromSide": "left",
+   "toSide": "left",
+   "via": [
+    [
+     28,
+     731
+    ],
+    [
+     28,
+     311
+    ]
+   ]
+  },
+  {
+   "id": "B-M",
+   "from": "B",
+   "to": "M",
+   "fromSide": "left",
+   "toSide": "left",
+   "via": [
+    [
+     84,
+     731
+    ],
+    [
+     84,
+     451
+    ]
+   ]
+  },
+  {
+   "id": "B-E",
+   "from": "B",
+   "to": "E"
+  },
+  {
+   "id": "E-M",
+   "from": "E",
+   "to": "M"
+  },
+  {
+   "id": "E-D",
+   "from": "E",
+   "to": "D",
+   "fromSide": "left",
+   "toSide": "left",
+   "via": [
+    [
+     56,
+     591
+    ],
+    [
+     56,
+     171
+    ]
+   ]
+  },
+  {
+   "id": "M-A",
+   "from": "M",
+   "to": "A"
+  },
+  {
+   "id": "M-D",
+   "from": "M",
+   "to": "D",
+   "fromSide": "left",
+   "toSide": "left",
+   "via": [
+    [
+     70,
+     451
+    ],
+    [
+     70,
+     171
+    ]
+   ]
+  },
+  {
+   "id": "A-D",
+   "from": "A",
+   "to": "D"
+  },
+  {
+   "id": "raw-D",
    "from": "raw",
-   "to": "data",
-   "label": "читает"
-  },
-  {
-   "id": "pipeline-cleaning",
-   "from": "pipeline",
-   "to": "cleaning"
-  },
-  {
-   "id": "cleaning-cleaning_log",
-   "from": "cleaning",
-   "to": "cleaning_log"
-  },
-  {
-   "id": "pipeline-features",
-   "from": "pipeline",
-   "to": "features"
-  },
-  {
-   "id": "hypotheses-eda",
-   "from": "hypotheses",
-   "to": "eda"
-  },
-  {
-   "id": "hypotheses-stats",
-   "from": "hypotheses",
-   "to": "stats"
-  },
-  {
-   "id": "hypotheses-pipeline",
-   "from": "hypotheses",
-   "to": "pipeline"
-  },
-  {
-   "id": "baselines-eda",
-   "from": "baselines",
-   "to": "eda"
-  },
-  {
-   "id": "model_features-features",
-   "from": "model_features",
-   "to": "features"
-  },
-  {
-   "id": "models-model_features",
-   "from": "models",
-   "to": "model_features"
-  },
-  {
-   "id": "policies-evaluation",
-   "from": "policies",
-   "to": "evaluation"
-  },
-  {
-   "id": "overbooking-policies",
-   "from": "overbooking",
-   "to": "policies"
-  },
-  {
-   "id": "report-overbooking",
-   "from": "report",
-   "to": "overbooking"
-  },
-  {
-   "id": "dashboard-overbooking",
-   "from": "dashboard",
-   "to": "overbooking"
-  },
-  {
-   "id": "dashboard_figures-dashboard",
-   "from": "dashboard_figures",
-   "to": "dashboard"
-  },
-  {
-   "id": "html_dashboard-dashboard_figures",
-   "from": "html_dashboard",
-   "to": "dashboard_figures"
-  },
-  {
-   "id": "html_dashboard-reports",
-   "from": "html_dashboard",
-   "to": "reports",
-   "label": "пишет",
+   "to": "D",
+   "label": "читает",
    "variant": "dashed"
+  },
+  {
+   "id": "D-R",
+   "from": "D",
+   "to": "R",
+   "label": "пишет",
+   "variant": "dashed",
+   "fromSide": "right",
+   "toSide": "left"
+  },
+  {
+   "id": "A-R",
+   "from": "A",
+   "to": "R",
+   "label": "пишет",
+   "variant": "dashed",
+   "fromSide": "right",
+   "toSide": "left"
+  },
+  {
+   "id": "E-R",
+   "from": "E",
+   "to": "R",
+   "label": "пишет",
+   "variant": "dashed",
+   "fromSide": "right",
+   "toSide": "left"
+  },
+  {
+   "id": "B-R",
+   "from": "B",
+   "to": "R",
+   "label": "пишет",
+   "variant": "dashed",
+   "fromSide": "right",
+   "toSide": "left"
   }
  ]
 }

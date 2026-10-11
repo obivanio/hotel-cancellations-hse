@@ -4980,6 +4980,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <div class="pulse-dot"></div>
         <h1>Как устроен код: модули src/ по шагам работы</h1>
       </div>
+      <p class="subtitle">Стрелка: кто чьи функции использует</p>
     </div>
 
 
@@ -4987,9 +4988,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     <!-- Main Diagram -->
     <div class="diagram-container" data-detail-level="read"
          data-preset-badge-editorial-plate="ARCHIFY / ЛИСТ 04">
-      <svg viewBox="0 0 938 976" role="img" lang="ru" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase" data-reader-fit="intrinsic-height" data-reader-min-text="7.5" data-reader-primary-text="14">
+      <svg viewBox="0 0 890 830" role="img" lang="ru" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="standard" data-reader-fit="intrinsic-height" data-reader-min-text="7.5" data-reader-primary-text="14">
         <title id="archify-diagram-title">Как устроен код: модули src/ по шагам работы</title>
-        <desc id="archify-diagram-description">Схема архитектуры, построенная в Archify.</desc>
+        <desc id="archify-diagram-description">Стрелка: кто чьи функции использует</desc>
         <!-- Definitions -->
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
@@ -5013,463 +5014,198 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <rect width="100%" height="100%" fill="url(#grid)" />
 
         <!-- Boundaries (behind everything) -->
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="Шаг 1. Данные и очистка (ноутбук 01)" x="18" y="151" width="880" height="102" rx="12" class="c-region" stroke-width="1"/>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="Шаг 2. Анализ и гипотезы (ноутбук 02)" x="18" y="286" width="880" height="102" rx="12" class="c-region" stroke-width="1"/>
-
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="2" data-composition-frame-label="Шаг 3. Модель (ноутбук 03)" x="18" y="421" width="880" height="102" rx="12" class="c-region" stroke-width="1"/>
-
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="3" data-composition-frame-label="Шаг 4. Экономика (ноутбук 04)" x="362" y="556" width="536" height="102" rx="12" class="c-region" stroke-width="1"/>
-
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="4" data-composition-frame-label="Шаг 5. Дашборд (ноутбук 04, раздел 12)" x="18" y="691" width="880" height="102" rx="12" class="c-region" stroke-width="1"/>
 
         <!-- Connection paths (before components for correct z-order) -->
-        <g data-graph-role="automatic-crossover" style="--step:0">
-          <path data-graph-role="automatic-crossover-underlay" d="M 802 98 L 802 175" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="raw" data-edge-to="data" data-edge-label="читает" data-edge-key="0" data-edge-id="raw-data" data-composition-points="802,98;802,175" data-composition-crossover="halo" data-composition-independent="true" d="M 802 98 L 802 175" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        </g>
-        <g data-graph-role="automatic-crossover" style="--step:1">
-          <path data-graph-role="automatic-crossover-underlay" d="M 384 197 L 360 197" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="pipeline" data-edge-to="cleaning" data-edge-key="1" data-edge-id="pipeline-cleaning" data-composition-points="384,197;360,197" data-composition-crossover="halo" data-composition-independent="true" d="M 384 197 L 360 197" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        </g>
-        <g data-graph-role="automatic-crossover" style="--step:2">
-          <path data-graph-role="automatic-crossover-underlay" d="M 212 204 L 188 204" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="cleaning" data-edge-to="cleaning_log" data-edge-key="2" data-edge-id="cleaning-cleaning_log" data-composition-points="212,204;188,204" data-composition-crossover="halo" data-composition-independent="true" d="M 212 204 L 188 204" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        </g>
+        <path data-edge-from="B" data-edge-to="D" data-edge-key="0" data-edge-id="B-D" data-composition-points="100,731;42,731;42,171;100,171" d="M 100 731 L 50 731 Q 42 731 42 723 L 42 179 Q 42 171 50 171 L 100 171" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="B" data-edge-to="A" data-edge-key="1" data-edge-id="B-A" data-composition-points="100,731;28,731;28,311;100,311" d="M 100 731 L 36 731 Q 28 731 28 723 L 28 319 Q 28 311 36 311 L 100 311" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="B" data-edge-to="M" data-edge-key="2" data-edge-id="B-M" data-composition-points="100,731;84,731;84,451;100,451" d="M 100 731 L 92 731 Q 84 731 84 723 L 84 459 Q 84 451 92 451 L 100 451" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <g data-graph-role="automatic-crossover" style="--step:3">
-          <path data-graph-role="automatic-crossover-underlay" d="M 532 204 L 556 204" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="pipeline" data-edge-to="features" data-edge-key="3" data-edge-id="pipeline-features" data-composition-points="532,204;556,204" data-composition-crossover="halo" data-composition-independent="true" d="M 532 204 L 556 204" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 365 700 L 365 669 Q 365 661 357 661 L 318 661 Q 310 661 310 653 L 310 622" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="B" data-edge-to="E" data-edge-key="3" data-edge-id="B-E" data-composition-points="365,700;365,661;310,661;310,622" data-composition-crossover="halo" data-composition-independent="true" d="M 365 700 L 365 669 Q 365 661 357 661 L 318 661 Q 310 661 310 653 L 310 622" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:4">
-          <path data-graph-role="automatic-crossover-underlay" d="M 212 339 L 188 339" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="hypotheses" data-edge-to="eda" data-edge-key="4" data-edge-id="hypotheses-eda" data-composition-points="212,339;188,339" data-composition-crossover="halo" data-composition-independent="true" d="M 212 339 L 188 339" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 310 560 L 310 482" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="E" data-edge-to="M" data-edge-key="4" data-edge-id="E-M" data-composition-points="310,560;310,482" data-composition-crossover="halo" data-composition-independent="true" d="M 310 560 L 310 482" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </g>
-        <g data-graph-role="automatic-crossover" style="--step:5">
-          <path data-graph-role="automatic-crossover-underlay" d="M 360 346 L 384 346" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="hypotheses" data-edge-to="stats" data-edge-key="5" data-edge-id="hypotheses-stats" data-composition-points="360,346;384,346" data-composition-crossover="halo" data-composition-independent="true" d="M 360 346 L 384 346" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        </g>
+        <path data-edge-from="E" data-edge-to="D" data-edge-key="5" data-edge-id="E-D" data-composition-points="100,591;56,591;56,171;100,171" d="M 100 591 L 64 591 Q 56 591 56 583 L 56 179 Q 56 171 64 171 L 100 171" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <g data-graph-role="automatic-crossover" style="--step:6">
-          <path data-graph-role="automatic-crossover-underlay" d="M 360 332 L 366 332 Q 372 332 372 326 L 372 217 Q 372 211 378 211 L 384 211" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="hypotheses" data-edge-to="pipeline" data-edge-key="6" data-edge-id="hypotheses-pipeline" data-composition-points="360,332;372,332;372,211;384,211" data-composition-crossover="halo" data-composition-independent="true" d="M 360 332 L 366 332 Q 372 332 372 326 L 372 217 Q 372 211 378 211 L 384 211" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 310 420 L 310 342" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="M" data-edge-to="A" data-edge-key="6" data-edge-id="M-A" data-composition-points="310,420;310,342" data-composition-crossover="halo" data-composition-independent="true" d="M 310 420 L 310 342" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </g>
-        <g data-graph-role="automatic-crossover" style="--step:7">
-          <path data-graph-role="automatic-crossover-underlay" d="M 114 445 L 114 368" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="baselines" data-edge-to="eda" data-edge-key="7" data-edge-id="baselines-eda" data-composition-points="114,445;114,368" data-composition-crossover="halo" data-composition-independent="true" d="M 114 445 L 114 368" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        </g>
+        <path data-edge-from="M" data-edge-to="D" data-edge-key="7" data-edge-id="M-D" data-composition-points="100,451;70,451;70,171;100,171" d="M 100 451 L 78 451 Q 70 451 70 443 L 70 179 Q 70 171 78 171 L 100 171" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <g data-graph-role="automatic-crossover" style="--step:8">
-          <path data-graph-role="automatic-crossover-underlay" d="M 630 445 L 630 233" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="model_features" data-edge-to="features" data-edge-key="8" data-edge-id="model_features-features" data-composition-points="630,445;630,233" data-composition-crossover="halo" data-composition-independent="true" d="M 630 445 L 630 233" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 310 280 L 310 202" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="A" data-edge-to="D" data-edge-key="8" data-edge-id="A-D" data-composition-points="310,280;310,202" data-composition-crossover="halo" data-composition-independent="true" d="M 310 280 L 310 202" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:9">
-          <path data-graph-role="automatic-crossover-underlay" d="M 532 474 L 556 474" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="models" data-edge-to="model_features" data-edge-key="9" data-edge-id="models-model_features" data-composition-points="532,474;556,474" data-composition-crossover="halo" data-composition-independent="true" d="M 532 474 L 556 474" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 205 92 L 205 108 Q 205 116 213 116 L 302 116 Q 310 116 310 124 L 310 140" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="raw" data-edge-to="D" data-edge-label="читает" data-edge-key="9" data-edge-id="raw-D" data-composition-points="205,92;205,116;310,116;310,140" data-composition-crossover="halo" data-composition-independent="true" d="M 205 92 L 205 108 Q 205 116 213 116 L 302 116 Q 310 116 310 124 L 310 140" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:10">
-          <path data-graph-role="automatic-crossover-underlay" d="M 802 580 L 802 503" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="policies" data-edge-to="evaluation" data-edge-key="10" data-edge-id="policies-evaluation" data-composition-points="802,580;802,503" data-composition-crossover="halo" data-composition-independent="true" d="M 802 580 L 802 503" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 520 171 L 628 171 Q 636 171 636 179 L 636 422 Q 636 430 644 430 L 660 430" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="D" data-edge-to="R" data-edge-label="пишет" data-edge-key="10" data-edge-id="D-R" data-composition-points="520,171;636,171;636,430;660,430" data-composition-crossover="halo" data-composition-independent="true" d="M 520 171 L 628 171 Q 636 171 636 179 L 636 422 Q 636 430 644 430 L 660 430" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:11">
-          <path data-graph-role="automatic-crossover-underlay" d="M 704 602 L 728 602" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="overbooking" data-edge-to="policies" data-edge-key="11" data-edge-id="overbooking-policies" data-composition-points="704,602;728,602" data-composition-crossover="halo" data-composition-independent="true" d="M 704 602 L 728 602" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 520 311 L 582 311 Q 590 311 590 319 L 590 436 Q 590 444 598 444 L 660 444" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="A" data-edge-to="R" data-edge-label="пишет" data-edge-key="11" data-edge-id="A-R" data-composition-points="520,311;590,311;590,444;660,444" data-composition-crossover="halo" data-composition-independent="true" d="M 520 311 L 582 311 Q 590 311 590 319 L 590 436 Q 590 444 598 444 L 660 444" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:12">
-          <path data-graph-role="automatic-crossover-underlay" d="M 532 609 L 556 609" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="report" data-edge-to="overbooking" data-edge-key="12" data-edge-id="report-overbooking" data-composition-points="532,609;556,609" data-composition-crossover="halo" data-composition-independent="true" d="M 532 609 L 556 609" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 520 591 L 582 591 Q 590 591 590 583 L 590 466 Q 590 458 598 458 L 660 458" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="E" data-edge-to="R" data-edge-label="пишет" data-edge-key="12" data-edge-id="E-R" data-composition-points="520,591;590,591;590,458;660,458" data-composition-crossover="halo" data-composition-independent="true" d="M 520 591 L 582 591 Q 590 591 590 583 L 590 466 Q 590 458 598 458 L 660 458" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:13">
-          <path data-graph-role="automatic-crossover-underlay" d="M 728 737 L 722 737 Q 716 737 716 731 L 716 622 Q 716 616 710 616 L 704 616" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="dashboard" data-edge-to="overbooking" data-edge-key="13" data-edge-id="dashboard-overbooking" data-composition-points="728,737;716,737;716,616;704,616" data-composition-crossover="halo" data-composition-independent="true" d="M 728 737 L 722 737 Q 716 737 716 731 L 716 622 Q 716 616 710 616 L 704 616" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        </g>
-        <g data-graph-role="automatic-crossover" style="--step:14">
-          <path data-graph-role="automatic-crossover-underlay" d="M 704 751 L 728 751" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="dashboard_figures" data-edge-to="dashboard" data-edge-key="14" data-edge-id="dashboard_figures-dashboard" data-composition-points="704,751;728,751" data-composition-crossover="halo" data-composition-independent="true" d="M 704 751 L 728 751" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        </g>
-        <g data-graph-role="automatic-crossover" style="--step:15">
-          <path data-graph-role="automatic-crossover-underlay" d="M 532 744 L 556 744" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="html_dashboard" data-edge-to="dashboard_figures" data-edge-key="15" data-edge-id="html_dashboard-dashboard_figures" data-composition-points="532,744;556,744" data-composition-crossover="halo" data-composition-independent="true" d="M 532 744 L 556 744" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        </g>
-        <g data-graph-role="automatic-crossover" style="--step:16">
-          <path data-graph-role="automatic-crossover-underlay" d="M 458 773 L 458 850" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="html_dashboard" data-edge-to="reports" data-edge-label="пишет" data-edge-key="16" data-edge-id="html_dashboard-reports" data-composition-points="458,773;458,850" data-composition-crossover="halo" data-composition-independent="true" d="M 458 773 L 458 850" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 630 731 L 637.5 731 Q 645 731 645 723.5 L 645 479.5 Q 645 472 652.5 472 L 660 472" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="B" data-edge-to="R" data-edge-label="пишет" data-edge-key="13" data-edge-id="B-R" data-composition-points="630,731;645,731;645,472;660,472" data-composition-crossover="halo" data-composition-independent="true" d="M 630 731 L 637.5 731 Q 645 731 645 723.5 L 645 479.5 Q 645 472 652.5 472 L 660 472" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
         </g>
 
         <!-- Components -->
         <g id="node-raw" data-node-id="raw" data-node-label="data/raw/" tabindex="0" role="button" aria-label="Показать шаг «data/raw/», исходная таблица броней, Компонент архитектуры" aria-pressed="false" data-node-kind="external" data-node-sublabel="исходная таблица броней" data-node-context="Компонент архитектуры">
           <title>data/raw/ · исходная таблица броней · Компонент архитектуры</title>
-          <rect x="728" y="40" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="728" y="40" width="148" height="58" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(734 46) scale(0.6875)">
+          <rect x="100" y="30" width="210" height="62" rx="6" class="c-mask"/>
+          <rect x="100" y="30" width="210" height="62" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(106 36) scale(0.6875)">
             <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="802" y="67" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">data/raw/</text>
-        <text data-detail="context" x="802" y="83" class="t-muted" font-size="9" text-anchor="middle">исходная таблица броней</text>
+          <text data-node-label="" data-detail-anchor="" x="205" y="59" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">data/raw/</text>
+        <text data-detail="context" x="205" y="75" class="t-muted" font-size="9" text-anchor="middle">исходная таблица броней</text>
         </g>
 
-        <g id="node-cleaning_log" data-node-id="cleaning_log" data-node-label="cleaning_log" tabindex="0" role="button" aria-label="Показать шаг «cleaning_log», журнал очистки, Шаг 1. Данные и очистка (ноутбук 01)" aria-pressed="false" data-node-kind="database" data-node-sublabel="журнал очистки" data-node-context="Шаг 1. Данные и очистка (ноутбук 01)">
-          <title>cleaning_log · журнал очистки · Шаг 1. Данные и очистка (ноутбук 01)</title>
-          <rect x="40" y="175" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="40" y="175" width="148" height="58" rx="6" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(46 181) scale(0.6875)">
-            <ellipse cx="8" cy="4" rx="5" ry="2"/>
-            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="114" y="202" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">cleaning_log</text>
-        <text data-detail="context" x="114" y="218" class="t-muted" font-size="9" text-anchor="middle">журнал очистки</text>
-        </g>
-
-        <g id="node-cleaning" data-node-id="cleaning" data-node-label="cleaning" tabindex="0" role="button" aria-label="Показать шаг «cleaning», правила очистки, Шаг 1. Данные и очистка (ноутбук 01)" aria-pressed="false" data-node-kind="backend" data-node-sublabel="правила очистки" data-node-context="Шаг 1. Данные и очистка (ноутбук 01)">
-          <title>cleaning · правила очистки · Шаг 1. Данные и очистка (ноутбук 01)</title>
-          <rect x="212" y="175" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="212" y="175" width="148" height="58" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(218 181) scale(0.6875)">
+        <g id="node-D" data-node-id="D" data-node-label="Данные и очистка (ноутбук 01)" tabindex="0" role="button" aria-label="Показать шаг «Данные и очистка (ноутбук 01)», data, cleaning, cleaning_log, features, pipeline, Компонент архитектуры" aria-pressed="false" data-node-kind="backend" data-node-sublabel="data, cleaning, cleaning_log, features, pipeline" data-node-context="Компонент архитектуры">
+          <title>Данные и очистка (ноутбук 01) · data, cleaning, cleaning_log, features, pipeline · Компонент архитектуры</title>
+          <rect x="100" y="140" width="420" height="62" rx="6" class="c-mask"/>
+          <rect x="100" y="140" width="420" height="62" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(106 146) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="286" y="202" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">cleaning</text>
-        <text data-detail="context" x="286" y="218" class="t-muted" font-size="9" text-anchor="middle">правила очистки</text>
+          <text data-node-label="" data-detail-anchor="" x="310" y="169" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Данные и очистка (ноутбук 01)</text>
+        <text data-detail="context" x="310" y="185" class="t-muted" font-size="9" text-anchor="middle">data, cleaning, cleaning_log, features, pipeline</text>
         </g>
 
-        <g id="node-pipeline" data-node-id="pipeline" data-node-label="pipeline" tabindex="0" role="button" aria-label="Показать шаг «pipeline», собирает чистую таблицу, Шаг 1. Данные и очистка (ноутбук 01)" aria-pressed="false" data-node-kind="backend" data-node-sublabel="собирает чистую таблицу" data-node-context="Шаг 1. Данные и очистка (ноутбук 01)">
-          <title>pipeline · собирает чистую таблицу · Шаг 1. Данные и очистка (ноутбук 01)</title>
-          <rect x="384" y="175" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="384" y="175" width="148" height="58" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(390 181) scale(0.6875)">
-            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="458" y="202" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">pipeline</text>
-        <text data-detail="context" x="458" y="218" class="t-muted" font-size="9" text-anchor="middle">собирает чистую таблицу</text>
-        </g>
-
-        <g id="node-features" data-node-id="features" data-node-label="features" tabindex="0" role="button" aria-label="Показать шаг «features», новые признаки, Шаг 1. Данные и очистка (ноутбук 01)" aria-pressed="false" data-node-kind="backend" data-node-sublabel="новые признаки" data-node-context="Шаг 1. Данные и очистка (ноутбук 01)">
-          <title>features · новые признаки · Шаг 1. Данные и очистка (ноутбук 01)</title>
-          <rect x="556" y="175" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="556" y="175" width="148" height="58" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(562 181) scale(0.6875)">
-            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="630" y="202" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">features</text>
-        <text data-detail="context" x="630" y="218" class="t-muted" font-size="9" text-anchor="middle">новые признаки</text>
-        </g>
-
-        <g id="node-data" data-node-id="data" data-node-label="data" tabindex="0" role="button" aria-label="Показать шаг «data», загрузка таблицы, Шаг 1. Данные и очистка (ноутбук 01)" aria-pressed="false" data-node-kind="backend" data-node-sublabel="загрузка таблицы" data-node-context="Шаг 1. Данные и очистка (ноутбук 01)">
-          <title>data · загрузка таблицы · Шаг 1. Данные и очистка (ноутбук 01)</title>
-          <rect x="728" y="175" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="728" y="175" width="148" height="58" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(734 181) scale(0.6875)">
-            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="802" y="202" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">data</text>
-        <text data-detail="context" x="802" y="218" class="t-muted" font-size="9" text-anchor="middle">загрузка таблицы</text>
-        </g>
-
-        <g id="node-eda" data-node-id="eda" data-node-label="eda" tabindex="0" role="button" aria-label="Показать шаг «eda», доли отмен по группам, Шаг 2. Анализ и гипотезы (ноутбук 02)" aria-pressed="false" data-node-kind="security" data-node-sublabel="доли отмен по группам" data-node-context="Шаг 2. Анализ и гипотезы (ноутбук 02)">
-          <title>eda · доли отмен по группам · Шаг 2. Анализ и гипотезы (ноутбук 02)</title>
-          <rect x="40" y="310" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="40" y="310" width="148" height="58" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(46 316) scale(0.6875)">
+        <g id="node-A" data-node-id="A" data-node-label="Анализ и гипотезы (ноутбук 02)" tabindex="0" role="button" aria-label="Показать шаг «Анализ и гипотезы (ноутбук 02)», eda, stats, hypotheses, plots, Компонент архитектуры" aria-pressed="false" data-node-kind="security" data-node-sublabel="eda, stats, hypotheses, plots" data-node-context="Компонент архитектуры">
+          <title>Анализ и гипотезы (ноутбук 02) · eda, stats, hypotheses, plots · Компонент архитектуры</title>
+          <rect x="100" y="280" width="420" height="62" rx="6" class="c-mask"/>
+          <rect x="100" y="280" width="420" height="62" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(106 286) scale(0.6875)">
             <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
             <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="114" y="337" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">eda</text>
-        <text data-detail="context" x="114" y="353" class="t-muted" font-size="9" text-anchor="middle">доли отмен по группам</text>
+          <text data-node-label="" data-detail-anchor="" x="310" y="309" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Анализ и гипотезы (ноутбук 02)</text>
+        <text data-detail="context" x="310" y="325" class="t-muted" font-size="9" text-anchor="middle">eda, stats, hypotheses, plots</text>
         </g>
 
-        <g id="node-hypotheses" data-node-id="hypotheses" data-node-label="hypotheses" tabindex="0" role="button" aria-label="Показать шаг «hypotheses», проверка гипотез, Шаг 2. Анализ и гипотезы (ноутбук 02)" aria-pressed="false" data-node-kind="security" data-node-sublabel="проверка гипотез" data-node-context="Шаг 2. Анализ и гипотезы (ноутбук 02)">
-          <title>hypotheses · проверка гипотез · Шаг 2. Анализ и гипотезы (ноутбук 02)</title>
-          <rect x="212" y="310" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="212" y="310" width="148" height="58" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(218 316) scale(0.6875)">
-            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
-            <path d="m5.8 8 1.5 1.5 3-3"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="286" y="337" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">hypotheses</text>
-        <text data-detail="context" x="286" y="353" class="t-muted" font-size="9" text-anchor="middle">проверка гипотез</text>
-        </g>
-
-        <g id="node-stats" data-node-id="stats" data-node-label="stats" tabindex="0" role="button" aria-label="Показать шаг «stats», статистические тесты, Шаг 2. Анализ и гипотезы (ноутбук 02)" aria-pressed="false" data-node-kind="security" data-node-sublabel="статистические тесты" data-node-context="Шаг 2. Анализ и гипотезы (ноутбук 02)">
-          <title>stats · статистические тесты · Шаг 2. Анализ и гипотезы (ноутбук 02)</title>
-          <rect x="384" y="310" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="384" y="310" width="148" height="58" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(390 316) scale(0.6875)">
-            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
-            <path d="m5.8 8 1.5 1.5 3-3"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="458" y="337" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">stats</text>
-        <text data-detail="context" x="458" y="353" class="t-muted" font-size="9" text-anchor="middle">статистические тесты</text>
-        </g>
-
-        <g id="node-plots" data-node-id="plots" data-node-label="plots" tabindex="0" role="button" aria-label="Показать шаг «plots», графики и оформление, Шаг 2. Анализ и гипотезы (ноутбук 02)" aria-pressed="false" data-node-kind="security" data-node-sublabel="графики и оформление" data-node-context="Шаг 2. Анализ и гипотезы (ноутбук 02)">
-          <title>plots · графики и оформление · Шаг 2. Анализ и гипотезы (ноутбук 02)</title>
-          <rect x="728" y="310" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="728" y="310" width="148" height="58" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(734 316) scale(0.6875)">
-            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
-            <path d="m5.8 8 1.5 1.5 3-3"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="802" y="337" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">plots</text>
-        <text data-detail="context" x="802" y="353" class="t-muted" font-size="9" text-anchor="middle">графики и оформление</text>
-        </g>
-
-        <g id="node-baselines" data-node-id="baselines" data-node-label="baselines" tabindex="0" role="button" aria-label="Показать шаг «baselines», простые правила-ориентиры, Шаг 3. Модель (ноутбук 03)" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="простые правила-ориентиры" data-node-context="Шаг 3. Модель (ноутбук 03)">
-          <title>baselines · простые правила-ориентиры · Шаг 3. Модель (ноутбук 03)</title>
-          <rect x="40" y="445" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="40" y="445" width="148" height="58" rx="6" class="c-cloud" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(46 451) scale(0.6875)">
+        <g id="node-M" data-node-id="M" data-node-label="Модель (ноутбук 03)" tabindex="0" role="button" aria-label="Показать шаг «Модель (ноутбук 03)», split, model_features, baselines, models, evaluation, Компонент архитектуры" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="split, model_features, baselines, models, evaluation" data-node-context="Компонент архитектуры">
+          <title>Модель (ноутбук 03) · split, model_features, baselines, models, evaluation · Компонент архитектуры</title>
+          <rect x="100" y="420" width="420" height="62" rx="6" class="c-mask"/>
+          <rect x="100" y="420" width="420" height="62" rx="6" class="c-cloud" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(106 426) scale(0.6875)">
             <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="114" y="472" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">baselines</text>
-        <text data-detail="context" x="114" y="488" class="t-muted" font-size="9" text-anchor="middle">простые правила-ориентиры</text>
+          <text data-node-label="" data-detail-anchor="" x="310" y="449" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Модель (ноутбук 03)</text>
+        <text data-detail="context" x="310" y="465" class="t-muted" font-size="9" text-anchor="middle">split, model_features, baselines, models, evaluation</text>
         </g>
 
-        <g id="node-split" data-node-id="split" data-node-label="split" tabindex="0" role="button" aria-label="Показать шаг «split», деление по времени, Шаг 3. Модель (ноутбук 03)" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="деление по времени" data-node-context="Шаг 3. Модель (ноутбук 03)">
-          <title>split · деление по времени · Шаг 3. Модель (ноутбук 03)</title>
-          <rect x="212" y="445" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="212" y="445" width="148" height="58" rx="6" class="c-cloud" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(218 451) scale(0.6875)">
-            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="286" y="472" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">split</text>
-        <text data-detail="context" x="286" y="488" class="t-muted" font-size="9" text-anchor="middle">деление по времени</text>
-        </g>
-
-        <g id="node-models" data-node-id="models" data-node-label="models" tabindex="0" role="button" aria-label="Показать шаг «models», обучение моделей, Шаг 3. Модель (ноутбук 03)" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="обучение моделей" data-node-context="Шаг 3. Модель (ноутбук 03)">
-          <title>models · обучение моделей · Шаг 3. Модель (ноутбук 03)</title>
-          <rect x="384" y="445" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="384" y="445" width="148" height="58" rx="6" class="c-cloud" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(390 451) scale(0.6875)">
-            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="458" y="472" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">models</text>
-        <text data-detail="context" x="458" y="488" class="t-muted" font-size="9" text-anchor="middle">обучение моделей</text>
-        </g>
-
-        <g id="node-model_features" data-node-id="model_features" data-node-label="model_features" tabindex="0" role="button" aria-label="Показать шаг «model_features», признаки без утечек, Шаг 3. Модель (ноутбук 03)" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="признаки без утечек" data-node-context="Шаг 3. Модель (ноутбук 03)">
-          <title>model_features · признаки без утечек · Шаг 3. Модель (ноутбук 03)</title>
-          <rect x="556" y="445" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="556" y="445" width="148" height="58" rx="6" class="c-cloud" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(562 451) scale(0.6875)">
-            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="630" y="472" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">model_features</text>
-        <text data-detail="context" x="630" y="488" class="t-muted" font-size="9" text-anchor="middle">признаки без утечек</text>
-        </g>
-
-        <g id="node-evaluation" data-node-id="evaluation" data-node-label="evaluation" tabindex="0" role="button" aria-label="Показать шаг «evaluation», метрики и потери в €, Шаг 3. Модель (ноутбук 03)" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="метрики и потери в €" data-node-context="Шаг 3. Модель (ноутбук 03)">
-          <title>evaluation · метрики и потери в € · Шаг 3. Модель (ноутбук 03)</title>
-          <rect x="728" y="445" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="728" y="445" width="148" height="58" rx="6" class="c-cloud" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(734 451) scale(0.6875)">
-            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="802" y="472" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">evaluation</text>
-        <text data-detail="context" x="802" y="488" class="t-muted" font-size="9" text-anchor="middle">метрики и потери в €</text>
-        </g>
-
-        <g id="node-report" data-node-id="report" data-node-label="report" tabindex="0" role="button" aria-label="Показать шаг «report», итоговый отчёт, Шаг 4. Экономика (ноутбук 04)" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="итоговый отчёт" data-node-context="Шаг 4. Экономика (ноутбук 04)">
-          <title>report · итоговый отчёт · Шаг 4. Экономика (ноутбук 04)</title>
-          <rect x="384" y="580" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="384" y="580" width="148" height="58" rx="6" class="c-messagebus" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(390 586) scale(0.6875)">
+        <g id="node-E" data-node-id="E" data-node-label="Экономика (ноутбук 04)" tabindex="0" role="button" aria-label="Показать шаг «Экономика (ноутбук 04)», policies, overbooking, report, Компонент архитектуры" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="policies, overbooking, report" data-node-context="Компонент архитектуры">
+          <title>Экономика (ноутбук 04) · policies, overbooking, report · Компонент архитектуры</title>
+          <rect x="100" y="560" width="420" height="62" rx="6" class="c-mask"/>
+          <rect x="100" y="560" width="420" height="62" rx="6" class="c-messagebus" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(106 566) scale(0.6875)">
             <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
             <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
             <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
             <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="458" y="607" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">report</text>
-        <text data-detail="context" x="458" y="623" class="t-muted" font-size="9" text-anchor="middle">итоговый отчёт</text>
+          <text data-node-label="" data-detail-anchor="" x="310" y="589" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Экономика (ноутбук 04)</text>
+        <text data-detail="context" x="310" y="605" class="t-muted" font-size="9" text-anchor="middle">policies, overbooking, report</text>
         </g>
 
-        <g id="node-overbooking" data-node-id="overbooking" data-node-label="overbooking" tabindex="0" role="button" aria-label="Показать шаг «overbooking», овербукинг, Шаг 4. Экономика (ноутбук 04)" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="овербукинг" data-node-context="Шаг 4. Экономика (ноутбук 04)">
-          <title>overbooking · овербукинг · Шаг 4. Экономика (ноутбук 04)</title>
-          <rect x="556" y="580" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="556" y="580" width="148" height="58" rx="6" class="c-messagebus" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(562 586) scale(0.6875)">
-            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
-            <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
-            <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
-            <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="630" y="607" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">overbooking</text>
-        <text data-detail="context" x="630" y="623" class="t-muted" font-size="9" text-anchor="middle">овербукинг</text>
-        </g>
-
-        <g id="node-policies" data-node-id="policies" data-node-label="policies" tabindex="0" role="button" aria-label="Показать шаг «policies», правила предоплаты, Шаг 4. Экономика (ноутбук 04)" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="правила предоплаты" data-node-context="Шаг 4. Экономика (ноутбук 04)">
-          <title>policies · правила предоплаты · Шаг 4. Экономика (ноутбук 04)</title>
-          <rect x="728" y="580" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="728" y="580" width="148" height="58" rx="6" class="c-messagebus" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(734 586) scale(0.6875)">
-            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
-            <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
-            <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
-            <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="802" y="607" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">policies</text>
-        <text data-detail="context" x="802" y="623" class="t-muted" font-size="9" text-anchor="middle">правила предоплаты</text>
-        </g>
-
-        <g id="node-archify_explain" data-node-id="archify_explain" data-node-label="archify_explain" tabindex="0" role="button" aria-label="Показать шаг «archify_explain», пояснения к схемам, Шаг 5. Дашборд (ноутбук 04, раздел 12)" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="пояснения к схемам" data-node-context="Шаг 5. Дашборд (ноутбук 04, раздел 12)">
-          <title>archify_explain · пояснения к схемам · Шаг 5. Дашборд (ноутбук 04, раздел 12)</title>
-          <rect x="40" y="715" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="40" y="715" width="148" height="58" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(46 721) scale(0.6875)">
+        <g id="node-B" data-node-id="B" data-node-label="Дашборд (ноутбук 04)" tabindex="0" role="button" aria-label="Показать шаг «Дашборд (ноутбук 04)», dashboard, dashboard_figures, html_dashboard, archify_explain, dashboard_assets/, Компонент архитектуры" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="dashboard, dashboard_figures, html_dashboard, archify_explain, dashboard_assets/" data-node-context="Компонент архитектуры">
+          <title>Дашборд (ноутбук 04) · dashboard, dashboard_figures, html_dashboard, archify_explain, dashboard_assets/ · Компонент архитектуры</title>
+          <rect x="100" y="700" width="530" height="62" rx="6" class="c-mask"/>
+          <rect x="100" y="700" width="530" height="62" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(106 706) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="114" y="742" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">archify_explain</text>
-        <text data-detail="context" x="114" y="758" class="t-muted" font-size="9" text-anchor="middle">пояснения к схемам</text>
+          <text data-node-label="" data-detail-anchor="" x="365" y="729" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Дашборд (ноутбук 04)</text>
+        <text data-detail="context" x="365" y="745" class="t-muted" font-size="9" text-anchor="middle">dashboard, dashboard_figures, html_dashboard, archify_explain, dashboard_assets/</text>
         </g>
 
-        <g id="node-assets" data-node-id="assets" data-node-label="dashboard_assets/" tabindex="0" role="button" aria-label="Показать шаг «dashboard_assets/», оформление страницы, Шаг 5. Дашборд (ноутбук 04, раздел 12)" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="оформление страницы" data-node-context="Шаг 5. Дашборд (ноутбук 04, раздел 12)">
-          <title>dashboard_assets/ · оформление страницы · Шаг 5. Дашборд (ноутбук 04, раздел 12)</title>
-          <rect x="212" y="715" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="212" y="715" width="148" height="58" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(218 721) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="286" y="742" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">dashboard_assets/</text>
-        <text data-detail="context" x="286" y="758" class="t-muted" font-size="9" text-anchor="middle">оформление страницы</text>
-        </g>
-
-        <g id="node-html_dashboard" data-node-id="html_dashboard" data-node-label="html_dashboard" tabindex="0" role="button" aria-label="Показать шаг «html_dashboard», собирает страницу, Шаг 5. Дашборд (ноутбук 04, раздел 12)" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="собирает страницу" data-node-context="Шаг 5. Дашборд (ноутбук 04, раздел 12)">
-          <title>html_dashboard · собирает страницу · Шаг 5. Дашборд (ноутбук 04, раздел 12)</title>
-          <rect x="384" y="715" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="384" y="715" width="148" height="58" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(390 721) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="458" y="742" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">html_dashboard</text>
-        <text data-detail="context" x="458" y="758" class="t-muted" font-size="9" text-anchor="middle">собирает страницу</text>
-        </g>
-
-        <g id="node-dashboard_figures" data-node-id="dashboard_figures" data-node-label="dashboard_figures" tabindex="0" role="button" aria-label="Показать шаг «dashboard_figures», графики дашборда, Шаг 5. Дашборд (ноутбук 04, раздел 12)" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="графики дашборда" data-node-context="Шаг 5. Дашборд (ноутбук 04, раздел 12)">
-          <title>dashboard_figures · графики дашборда · Шаг 5. Дашборд (ноутбук 04, раздел 12)</title>
-          <rect x="556" y="715" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="556" y="715" width="148" height="58" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(562 721) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="630" y="742" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">dashboard_figures</text>
-        <text data-detail="context" x="630" y="758" class="t-muted" font-size="9" text-anchor="middle">графики дашборда</text>
-        </g>
-
-        <g id="node-dashboard" data-node-id="dashboard" data-node-label="dashboard" tabindex="0" role="button" aria-label="Показать шаг «dashboard», расчёты дашборда, Шаг 5. Дашборд (ноутбук 04, раздел 12)" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="расчёты дашборда" data-node-context="Шаг 5. Дашборд (ноутбук 04, раздел 12)">
-          <title>dashboard · расчёты дашборда · Шаг 5. Дашборд (ноутбук 04, раздел 12)</title>
-          <rect x="728" y="715" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="728" y="715" width="148" height="58" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(734 721) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="802" y="742" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">dashboard</text>
-        <text data-detail="context" x="802" y="758" class="t-muted" font-size="9" text-anchor="middle">расчёты дашборда</text>
-        </g>
-
-        <g id="node-reports" data-node-id="reports" data-node-label="reports/" tabindex="0" role="button" aria-label="Показать шаг «reports/», CSV, отчёт, дашборд, схемы, Компонент архитектуры" aria-pressed="false" data-node-kind="external" data-node-sublabel="CSV, отчёт, дашборд, схемы" data-node-context="Компонент архитектуры">
-          <title>reports/ · CSV, отчёт, дашборд, схемы · Компонент архитектуры</title>
-          <rect x="384" y="850" width="148" height="58" rx="6" class="c-mask"/>
-          <rect x="384" y="850" width="148" height="58" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(390 856) scale(0.6875)">
+        <g id="node-R" data-node-id="R" data-node-label="reports/" tabindex="0" role="button" aria-label="Показать шаг «reports/», CSV, report.html, dashboard.html, figures/, Компонент архитектуры" aria-pressed="false" data-node-kind="external" data-node-sublabel="CSV, report.html, dashboard.html, figures/" data-node-context="Компонент архитектуры">
+          <title>reports/ · CSV, report.html, dashboard.html, figures/ · Компонент архитектуры</title>
+          <rect x="660" y="140" width="190" height="622" rx="6" class="c-mask"/>
+          <rect x="660" y="140" width="190" height="622" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(666 146) scale(0.6875)">
             <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="458" y="877" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">reports/</text>
-        <text data-detail="context" x="458" y="893" class="t-muted" font-size="8.9" text-anchor="middle">CSV, отчёт, дашборд, схемы</text>
+          <text data-node-label="" data-detail-anchor="" x="755" y="449" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">reports/</text>
+        <text data-detail="context" x="755" y="465" class="t-muted" font-size="7.2" text-anchor="middle">CSV, report.html, dashboard.html, figures/</text>
         </g>
 
         <!-- Connection labels -->
-        <g data-detail="context" data-edge-from="raw" data-edge-to="data" data-edge-label="читает" data-edge-key="0" data-edge-id="raw-data">
-          <rect x="757.2" y="129.5" width="38.8" height="14" rx="3" class="c-mask"/>
-          <text x="776.6" y="139.5" class="t-edge-default" font-size="8" text-anchor="middle">читает</text>
+
+
+
+
+
+
+
+
+
+        <g data-detail="context" data-edge-from="raw" data-edge-to="D" data-edge-label="читает" data-edge-key="9" data-edge-id="raw-D">
+          <rect x="238.1" y="96" width="38.8" height="14" rx="3" class="c-mask"/>
+          <text x="257.5" y="106" class="t-edge-dashed" font-size="8" text-anchor="middle">читает</text>
         </g>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        <g data-detail="context" data-edge-from="html_dashboard" data-edge-to="reports" data-edge-label="пишет" data-edge-key="16" data-edge-id="html_dashboard-reports">
-          <rect x="418" y="804.5" width="34" height="14" rx="3" class="c-mask"/>
-          <text x="435" y="814.5" class="t-edge-dashed" font-size="8" text-anchor="middle">пишет</text>
+        <g data-detail="context" data-edge-from="D" data-edge-to="R" data-edge-label="пишет" data-edge-key="10" data-edge-id="D-R">
+          <rect x="619" y="280.5" width="34" height="14" rx="3" class="c-mask"/>
+          <text x="636" y="290.5" class="t-edge-dashed" font-size="8" text-anchor="middle">пишет</text>
+        </g>
+        <g data-detail="context" data-edge-from="A" data-edge-to="R" data-edge-label="пишет" data-edge-key="11" data-edge-id="A-R">
+          <rect x="573" y="357.5" width="34" height="14" rx="3" class="c-mask"/>
+          <text x="590" y="367.5" class="t-edge-dashed" font-size="8" text-anchor="middle">пишет</text>
+        </g>
+        <g data-detail="context" data-edge-from="E" data-edge-to="R" data-edge-label="пишет" data-edge-key="12" data-edge-id="E-R">
+          <rect x="573" y="504.5" width="34" height="14" rx="3" class="c-mask"/>
+          <text x="590" y="514.5" class="t-edge-dashed" font-size="8" text-anchor="middle">пишет</text>
+        </g>
+        <g data-detail="context" data-edge-from="B" data-edge-to="R" data-edge-label="пишет" data-edge-key="13" data-edge-id="B-R">
+          <rect x="628" y="581.5" width="34" height="14" rx="3" class="c-mask"/>
+          <text x="645" y="591.5" class="t-edge-dashed" font-size="8" text-anchor="middle">пишет</text>
         </g>
 
         <!-- Boundary labels (foreground masks keep routes out of titles) -->
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="0" data-composition-frame-kind="region" data-composition-frame-label="Шаг 1. Данные и очистка (ноутбук 01)">
-          <rect data-graph-role="structural-frame-label-mask" x="22" y="155" width="204.4" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" x="26" y="168" class="t-cloud" font-size="9" font-weight="600">Шаг 1. Данные и очистка (ноутбук 01)</text>
-        </g>
 
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="Шаг 2. Анализ и гипотезы (ноутбук 02)">
-          <rect data-graph-role="structural-frame-label-mask" x="22" y="290" width="209.79999999999998" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" x="26" y="303" class="t-cloud" font-size="9" font-weight="600">Шаг 2. Анализ и гипотезы (ноутбук 02)</text>
-        </g>
-
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="2" data-composition-frame-kind="region" data-composition-frame-label="Шаг 3. Модель (ноутбук 03)">
-          <rect data-graph-role="structural-frame-label-mask" x="22" y="425" width="150.4" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" x="26" y="438" class="t-cloud" font-size="9" font-weight="600">Шаг 3. Модель (ноутбук 03)</text>
-        </g>
-
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="3" data-composition-frame-kind="region" data-composition-frame-label="Шаг 4. Экономика (ноутбук 04)">
-          <rect data-graph-role="structural-frame-label-mask" x="366" y="560" width="166.6" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" x="370" y="573" class="t-cloud" font-size="9" font-weight="600">Шаг 4. Экономика (ноутбук 04)</text>
-        </g>
-
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="4" data-composition-frame-kind="region" data-composition-frame-label="Шаг 5. Дашборд (ноутбук 04, раздел 12)">
-          <rect data-graph-role="structural-frame-label-mask" x="22" y="695" width="215.2" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" x="26" y="708" class="t-cloud" font-size="9" font-weight="600">Шаг 5. Дашборд (ноутбук 04, раздел 12)</text>
-        </g>
 
         <!-- Legend -->
         <g data-legend="" data-legend-bridge="">
-          <text x="40" y="940" class="t-primary" font-size="12" font-weight="650">Условные обозначения</text>
-          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="Дашборд" data-legend-x="40" data-legend-baseline="960" data-legend-width="78">
-            <rect x="40" y="951" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
-            <text x="62" y="960" class="t-muted" font-size="10" font-weight="500">Дашборд</text>
+          <text x="40" y="794" class="t-primary" font-size="12" font-weight="650">Условные обозначения</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="Дашборд" data-legend-x="40" data-legend-baseline="814" data-legend-width="78">
+            <rect x="40" y="805" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
+            <text x="62" y="814" class="t-muted" font-size="10" font-weight="500">Дашборд</text>
           </g>
-          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Данные и очистка" data-legend-x="140" data-legend-baseline="960" data-legend-width="123">
-            <rect x="140" y="951" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
-            <text x="162" y="960" class="t-muted" font-size="10" font-weight="500">Данные и очистка</text>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Данные и очистка" data-legend-x="140" data-legend-baseline="814" data-legend-width="123">
+            <rect x="140" y="805" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
+            <text x="162" y="814" class="t-muted" font-size="10" font-weight="500">Данные и очистка</text>
           </g>
-          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Журнал очистки" data-legend-x="285" data-legend-baseline="960" data-legend-width="113">
-            <rect x="285" y="951" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
-            <text x="307" y="960" class="t-muted" font-size="10" font-weight="500">Журнал очистки</text>
+          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="Модель" data-legend-x="285" data-legend-baseline="814" data-legend-width="73">
+            <rect x="285" y="805" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
+            <text x="307" y="814" class="t-muted" font-size="10" font-weight="500">Модель</text>
           </g>
-          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="Модель" data-legend-x="420" data-legend-baseline="960" data-legend-width="73">
-            <rect x="420" y="951" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
-            <text x="442" y="960" class="t-muted" font-size="10" font-weight="500">Модель</text>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Анализ и гипотезы" data-legend-x="380" data-legend-baseline="814" data-legend-width="128">
+            <rect x="380" y="805" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
+            <text x="402" y="814" class="t-muted" font-size="10" font-weight="500">Анализ и гипотезы</text>
           </g>
-          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Анализ" data-legend-x="515" data-legend-baseline="960" data-legend-width="73">
-            <rect x="515" y="951" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
-            <text x="537" y="960" class="t-muted" font-size="10" font-weight="500">Анализ</text>
+          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="Экономика" data-legend-x="530" data-legend-baseline="814" data-legend-width="88">
+            <rect x="530" y="805" width="16" height="10" rx="2.5" class="c-messagebus" stroke-width="1"/>
+            <text x="552" y="814" class="t-muted" font-size="10" font-weight="500">Экономика</text>
           </g>
-          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="Экономика" data-legend-x="610" data-legend-baseline="960" data-legend-width="88">
-            <rect x="610" y="951" width="16" height="10" rx="2.5" class="c-messagebus" stroke-width="1"/>
-            <text x="632" y="960" class="t-muted" font-size="10" font-weight="500">Экономика</text>
-          </g>
-          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="Файлы и папки" data-legend-x="720" data-legend-baseline="960" data-legend-width="108">
-            <rect x="720" y="951" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
-            <text x="742" y="960" class="t-muted" font-size="10" font-weight="500">Файлы и папки</text>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="Файлы и папки" data-legend-x="640" data-legend-baseline="814" data-legend-width="108">
+            <rect x="640" y="805" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
+            <text x="662" y="814" class="t-muted" font-size="10" font-weight="500">Файлы и папки</text>
           </g>
         </g>
       </svg>
