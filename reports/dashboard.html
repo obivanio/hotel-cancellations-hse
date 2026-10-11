@@ -55,8 +55,8 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 .hero { padding: 56px 0 72px; }
 .hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 5.4vw, 68px); line-height: 1.02;
   letter-spacing: -0.035em; margin: 0; max-width: 15ch; }
-.hero .lede { font-size: 19px; line-height: 1.55; color: var(--ink-2); max-width: 56ch; margin: 22px 0 64px; }
-.hero-head { display: grid; gap: 40px; }
+.hero .lede { font-size: 19px; line-height: 1.55; color: var(--ink-2); max-width: 56ch; margin: 22px 0 0; }
+.hero-head { display: grid; gap: 40px; margin-bottom: 24px; }
 .empty { font-size: 22px; line-height: 1.4; font-weight: 600; margin: 0; max-width: 32ch; align-self: end; }
 
 .queue-box { position: relative; padding-top: 44px; }
@@ -86,7 +86,7 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 .ends { display: flex; justify-content: space-between; margin-top: 8px; font-size: 15px; color: var(--ink-2); }
 .hint { font-size: 15px; color: var(--ink-2); margin: 6px 0 0; }
 
-.outcome { display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr; gap: 40px; margin-top: 56px; align-items: end; }
+.outcome { display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr; gap: 40px; align-items: end; }
 .loss .n { white-space: nowrap; font-family: var(--display); font-weight: 800; font-size: clamp(52px, 7vw, 96px); line-height: .9;
   letter-spacing: -0.045em; color: var(--cobalt); }
 .loss .n small { font-size: .3em; letter-spacing: 0; color: var(--ink); font-weight: 600; }
@@ -112,9 +112,12 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 .mini li { font-size: 16px; line-height: 1.4; }
 .mini b { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.02em; margin-right: 6px; }
 .chart { background: var(--tile); border-radius: 20px; padding: 24px 28px 18px; }
-.chart svg { display: block; width: 100%; height: clamp(240px, 21vw, 320px); overflow: visible; }
-.chart svg#heat { height: auto; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart-note { font-size: 14px; line-height: 1.5; color: var(--ink-2); margin: 12px 0 0; }
+.part > .chart-note { grid-column: -2 / -1; margin-top: -44px; }
+.chart-empty { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px;
+  min-height: 200px; margin: 0; padding: 0 16px; font-size: 17px; line-height: 1.5; color: var(--ink-2); text-align: center; }
+.chart-empty b { color: var(--ink); font-weight: 650; }
 .t { font-family: var(--body); font-size: 13px; fill: var(--ink-2); }
 .t.strong { fill: var(--ink); font-weight: 650; }
 .t.cob { fill: var(--cobalt); font-weight: 650; }
@@ -153,6 +156,8 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
   .outcome .loss { grid-column: 1 / -1; }
   .parts { display: grid; grid-template-columns: 1fr 1fr; gap: 0 48px; }
   .parts .part { grid-template-columns: 1fr; gap: 20px; border-top: 0; padding: 48px 0; }
+  .parts .part:nth-child(-n+2) { grid-row: span 3; grid-template-rows: subgrid; }
+  .part > .chart-note { margin-top: -8px; }
   .parts .part:nth-child(3) { grid-column: 1 / -1; grid-template-columns: 340px 1fr; gap: 56px; border-top: 1px solid var(--rule); }
   .part .take { max-width: 60ch; }
   .recs-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 40px; }
@@ -165,15 +170,16 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 @media (min-width: 1800px) {
   .t { font-size: 15px; }
   .parts { grid-template-columns: repeat(3, 1fr); }
-  .parts .part:nth-child(3) { grid-column: auto; grid-template-columns: 1fr; gap: 20px; border-top: 0; }
+  .parts .part:nth-child(3) { grid-column: auto; grid-template-columns: 1fr; gap: 20px; border-top: 0;
+    grid-row: span 3; grid-template-rows: subgrid; }
+  .parts .part:nth-child(3) .chart { grid-row: 2 / span 2; align-self: start; }
 }
 @media (max-width: 900px) {
   .wrap { padding: 0 16px; }
-  .hero .lede { margin-bottom: 0; }
-  .outcome { margin-top: 0; }
   .outcome { grid-template-columns: 1fr 1fr; gap: 28px; }
   .outcome .loss { grid-column: 1 / -1; }
   .part, .rec { grid-template-columns: 1fr; gap: 20px; }
+  .part > .chart-note { margin-top: -8px; }
   .verdict { padding: 40px 22px; }
   .queue { gap: 2px; height: 130px; }
   .chart { padding: 16px 12px 12px; }
@@ -213,11 +219,11 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
       <summary class="select">Допущения</summary>
       <div class="pop wide">
         <label class="slider" for="unsold"><span>Теряем при пропущенной отмене</span><output id="unsoldOut"
-          for="unsold">50 %</output></label>
+          for="unsold">50&nbsp;%</output></label>
         <input type="range" id="unsold" min="30" max="70" step="5" value="50">
         <p class="note">Какая часть цены брони пропадает, если гость отменил, а номер не успели продать заново.</p>
         <label class="slider" for="loss"><span>Уходит гостей из-за предоплаты</span><output id="lossOut"
-          for="loss">10 %</output></label>
+          for="loss">10&nbsp;%</output></label>
         <input type="range" id="loss" min="5" max="20" step="1" value="10">
         <p class="note">Какая часть надёжных гостей откажется от брони, если попросить предоплату.</p>
         <button type="button" class="reset" id="reset">Вернуть как было</button>
@@ -229,7 +235,7 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
     <div class="hero-head">
       <div>
         <h1>С кого брать предоплату, чтобы терять меньше</h1>
-        <p class="lede">Каждая полоска — 1 % броней. Модель выстроила их по риску отмены: слева самые рискованные.
+        <p class="lede">Каждая полоска — 1&nbsp;% броней. Модель выстроила их по риску отмены: слева самые рискованные.
           Шафрановая часть полоски — брони, которые на деле отменили. Потяните черту, чтобы выбрать, с какой доли
           брать предоплату.</p>
       </div>
@@ -261,7 +267,8 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
         <p class="take">Если брать предоплату с одинаковой доли броней, выбор по модели теряет меньше денег, чем
           выбор самых ранних броней. Точка — ваш выбор на черте выше.</p></div>
       <div class="chart"><svg viewBox="0 0 640 300" id="curve" role="img"
-        aria-label="Потери при выборе броней по модели и по сроку брони"></svg></div>
+        aria-label="Потери при выборе броней по модели и по сроку брони"></svg>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p></div>
     </section>
 
     <section class="part">
@@ -270,18 +277,19 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
           ту, что сбывается в 9 случаях из 10, — и продаём столько лишних номеров.</p>
         <ul class="mini" id="obTotals"></ul></div>
       <div class="chart"><svg viewBox="0 0 640 300" id="weeks" role="img"
-        aria-label="Отмены по неделям заезда и сколько номеров продаём сверх брони"></svg>
-        <p class="chart-note">Считается по датам заезда для всего отеля, поэтому меняется только от выбора отеля:
-          сегмент и месяц на график не влияют.</p></div>
+        aria-label="Отмены по неделям заезда и сколько номеров продаём сверх брони"></svg></div>
+      <p class="chart-note">Считается по датам заезда для всего отеля, поэтому меняется только от выбора отеля:
+        сегмент и месяц на график не влияют.</p>
     </section>
 
     <section class="part">
       <div><h2>Где отменяют чаще</h2>
-        <p class="take">Онлайн-агентства отменяют больше 40 % броней в каждом из четырёх месяцев, группы — от 21
-          до 48 %. Прямые и корпоративные гости отменяют примерно каждую пятую бронь. Цифра в клетке — доля
+        <p class="take">Онлайн-агентства отменяют больше 40&nbsp;% броней в каждом из четырёх месяцев, группы — от 21
+          до 48&nbsp;%. Прямые и корпоративные гости отменяют примерно каждую пятую бронь. Цифра в клетке — доля
           отмен, число броней — при наведении.</p></div>
       <div class="chart"><svg viewBox="0 0 640 380" id="heat" role="img"
-        aria-label="Доля отмен по сегментам и месяцам заезда"></svg></div>
+        aria-label="Доля отмен по сегментам и месяцам заезда"></svg>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p></div>
     </section>
   </div>
 
@@ -304,7 +312,7 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
   <section class="verdict">
     <h2>Что делать бизнесу</h2>
     <p class="lead">Модель не принимает решения, она показывает, где риск отмены выше. Из этого следуют три действия.
-      Цифры — для обоих отелей за май–август 2017 при допущениях по умолчанию (50 % и 10 %); фильтры выше на них
+      Цифры — для обоих отелей за май–август 2017 при допущениях по умолчанию (50&nbsp;% и 10&nbsp;%); фильтры выше на них
       не влияют.</p>
     <div class="recs-row" id="recs"></div>
     <p class="caveat">Это связь, а не причина: модель видела только прошлые брони двух португальских отелей. Перед
@@ -501,12 +509,14 @@ if (typeof document !== "undefined") {
       return [text.slice(0, cut), text.slice(cut + 1)];
     };
     const pct1 = (share) => `${Calc.comma(share * 100, 1)} %`;
+    // Неразрывный пробел между числом и единицей: «0,64 млн €» и «90 %» не разрываются при переносе строки.
+    const nb = (text) => text.replace(/ (?=млн|тыс|%|€)/g, "\u00A0");
     const unitOf = (max) => (max < 100000 ? { div: 1e3, name: "тыс. €" } : { div: 1e6, name: "млн €" });
 
     // Подсказка при наведении
     const tip = $("tip");
     const showTip = (html, x, y) => {
-      tip.innerHTML = html;
+      tip.innerHTML = nb(html);
       tip.hidden = false;
       const w = tip.offsetWidth;
       const h = tip.offsetHeight;
@@ -619,7 +629,8 @@ if (typeof document !== "undefined") {
       const empty = !slice.idx.length;
       document.querySelectorAll("#outcome, #queueBox, .marks, .ends, .hint").forEach((el) => { el.hidden = empty; });
       $("emptyHero").hidden = !empty;
-      if (empty) { drawEmpty($("curve")); return; }
+      setEmpty($("curve"), empty);
+      if (empty) return;
       const key = Calc.keyNumbers(B, slice.idx, a);
       if (state.follow) state.pct = key.threshold_pct;
       $("share").value = state.pct;
@@ -628,15 +639,15 @@ if (typeof document !== "undefined") {
       const [value, unit] = moneyParts(res.total);
       $("lossValue").textContent = value;
       $("lossUnit").textContent = unit;
-      $("lossNote").textContent = `потерь за май–август 2017 в срезе из ${Calc.count(key.bookings)} ${plural(
+      $("lossNote").textContent = nb(`потерь за май–август 2017 в срезе из ${Calc.count(key.bookings)} ${plural(
         key.bookings, ["брони", "броней", "броней"])}. Без предоплаты — ${Calc.money(key.baseline)}, с предоплатой
-        со всех — ${Calc.money(key.everyone)}.`.replace(/\s+/g, " ");
+        со всех — ${Calc.money(key.everyone)}.`.replace(/\s+/g, " "));
       $("caught").textContent = Calc.count(res.caught);
-      $("caughtShare").textContent = Calc.percent(res.caught_share);
+      $("caughtShare").textContent = nb(Calc.percent(res.caught_share));
       $("touched").textContent = Calc.count(res.touched);
-      $("touchedShare").textContent = Calc.percent(res.touched_share);
+      $("touchedShare").textContent = nb(Calc.percent(res.touched_share));
       $("missed").textContent = Calc.count(res.missed_cancels);
-      $("missedShare").textContent = Calc.percent(res.missed_share);
+      $("missedShare").textContent = nb(Calc.percent(res.missed_share));
       bars.forEach((bar, n) => bar.classList.toggle("off", n >= state.pct));
       const cut = $("cut");
       cut.style.left = `calc(${state.pct}% - 1px)`;
@@ -652,9 +663,9 @@ if (typeof document !== "undefined") {
     }
 
     // Графики
-    const drawEmpty = (svg) => {
-      svg.innerHTML = `<text class="t big" x="0" y="40">В этом срезе нет броней.</text>
-        <text class="t" x="0" y="66">Выберите другой сегмент или месяц.</text>`;
+    const setEmpty = (svg, empty) => {
+      svg.toggleAttribute("hidden", empty);
+      svg.parentElement.querySelector(".chart-empty").hidden = !empty;
     };
 
     function drawCurve(curves) {
@@ -711,10 +722,11 @@ if (typeof document !== "undefined") {
       s += `<text class="t cob" x="40" y="40">линия — сколько номеров продаём сверх брони</text>`;
       s += `<text class="t" x="40" y="64">пунктир — та же оценка без модели</text>`;
       $("weeks").innerHTML = s;
-      $("obTotals").innerHTML = `<li><b>${Calc.count(t.resold)}</b>номеров перепродано</li>
+      const both = state.hotel === "все отели" ? "два отеля, каждый считает сам; " : "";
+      $("obTotals").innerHTML = nb(`<li><b>${Calc.count(t.resold)}</b>номеров перепродано</li>
         <li><b>${Calc.count(t.walked)}</b>${plural(t.walked, ["гостю", "гостям", "гостям"])} не хватило номера</li>
-        <li><b>${pct1(t.covered)}</b>дат, когда номера хватило всем${state.hotel === "все отели" ? " в двух отелях" : ""} (без модели —
-          ${pct1(t.covered_bench)})</li>`;
+        <li><b>${pct1(t.covered)}</b>дат, когда номера хватило всем (${both}без модели —
+          ${pct1(t.covered_bench)})</li>`);
     }
     $("weeks").addEventListener("pointermove", (event) => {
       const i = event.target.dataset && event.target.dataset.i;
@@ -734,11 +746,9 @@ if (typeof document !== "undefined") {
       const svg = $("heat");
       const segs = DATA.segmentOrder.filter((seg) => state.segments.includes(seg));
       const months = DATA.months.filter((m) => state.months.includes(m));
-      if (!slice || !slice.idx.length || !segs.length || !months.length) {
-        svg.setAttribute("viewBox", "0 0 640 90");
-        drawEmpty(svg);
-        return;
-      }
+      const empty = !slice || !slice.idx.length || !segs.length || !months.length;
+      setEmpty(svg, empty);
+      if (empty) return;
       const cells = Calc.heatCells(B, slice.idx);
       const colW = Math.min(110, 456 / months.length);
       svg.setAttribute("viewBox", `0 0 640 ${segs.length * 46 + 30}`);
@@ -800,7 +810,7 @@ if (typeof document !== "undefined") {
     // Что делать бизнесу: цифры шага 4 при допущениях по умолчанию
     const v = DATA.verdict;
     const mln = (x) => Calc.comma(x / 1e6);
-    $("recs").innerHTML = `
+    $("recs").innerHTML = nb(`
       <div class="rec"><div><div class="n">${mln(v.model)} <small>млн €</small></div>
         <div class="cap">потерь вместо ${mln(v.baseline)}</div></div>
         <div><h3>Брать предоплату с броней, где риск отмены выше ${Calc.comma(Calc.modelThreshold(DEFAULTS))}</h3>
@@ -819,7 +829,7 @@ if (typeof document !== "undefined") {
           с вероятностью 90 %.</p>
         <p>В курортном отеле номера хватило в ${pct1(v.covered_resort)} дат, в городском — только
           в ${pct1(v.covered_city)}: там отменяют группами, разом. В городском отеле стоит продавать меньше
-          лишних номеров, чем советует оценка.</p></div></div>`;
+          лишних номеров, чем советует оценка.</p></div></div>`);
 
     refilter();
     drawWeeks();

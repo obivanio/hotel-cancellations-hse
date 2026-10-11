@@ -185,12 +185,14 @@ if (typeof document !== "undefined") {
       return [text.slice(0, cut), text.slice(cut + 1)];
     };
     const pct1 = (share) => `${Calc.comma(share * 100, 1)} %`;
+    // Неразрывный пробел между числом и единицей: «0,64 млн €» и «90 %» не разрываются при переносе строки.
+    const nb = (text) => text.replace(/ (?=млн|тыс|%|€)/g, "\u00A0");
     const unitOf = (max) => (max < 100000 ? { div: 1e3, name: "тыс. €" } : { div: 1e6, name: "млн €" });
 
     // Подсказка при наведении
     const tip = $("tip");
     const showTip = (html, x, y) => {
-      tip.innerHTML = html;
+      tip.innerHTML = nb(html);
       tip.hidden = false;
       const w = tip.offsetWidth;
       const h = tip.offsetHeight;
@@ -303,7 +305,8 @@ if (typeof document !== "undefined") {
       const empty = !slice.idx.length;
       document.querySelectorAll("#outcome, #queueBox, .marks, .ends, .hint").forEach((el) => { el.hidden = empty; });
       $("emptyHero").hidden = !empty;
-      if (empty) { drawEmpty($("curve")); return; }
+      setEmpty($("curve"), empty);
+      if (empty) return;
       const key = Calc.keyNumbers(B, slice.idx, a);
       if (state.follow) state.pct = key.threshold_pct;
       $("share").value = state.pct;
@@ -312,15 +315,15 @@ if (typeof document !== "undefined") {
       const [value, unit] = moneyParts(res.total);
       $("lossValue").textContent = value;
       $("lossUnit").textContent = unit;
-      $("lossNote").textContent = `потерь за май–август 2017 в срезе из ${Calc.count(key.bookings)} ${plural(
+      $("lossNote").textContent = nb(`потерь за май–август 2017 в срезе из ${Calc.count(key.bookings)} ${plural(
         key.bookings, ["брони", "броней", "броней"])}. Без предоплаты — ${Calc.money(key.baseline)}, с предоплатой
-        со всех — ${Calc.money(key.everyone)}.`.replace(/\s+/g, " ");
+        со всех — ${Calc.money(key.everyone)}.`.replace(/\s+/g, " "));
       $("caught").textContent = Calc.count(res.caught);
-      $("caughtShare").textContent = Calc.percent(res.caught_share);
+      $("caughtShare").textContent = nb(Calc.percent(res.caught_share));
       $("touched").textContent = Calc.count(res.touched);
-      $("touchedShare").textContent = Calc.percent(res.touched_share);
+      $("touchedShare").textContent = nb(Calc.percent(res.touched_share));
       $("missed").textContent = Calc.count(res.missed_cancels);
-      $("missedShare").textContent = Calc.percent(res.missed_share);
+      $("missedShare").textContent = nb(Calc.percent(res.missed_share));
       bars.forEach((bar, n) => bar.classList.toggle("off", n >= state.pct));
       const cut = $("cut");
       cut.style.left = `calc(${state.pct}% - 1px)`;
@@ -336,9 +339,9 @@ if (typeof document !== "undefined") {
     }
 
     // Графики
-    const drawEmpty = (svg) => {
-      svg.innerHTML = `<text class="t big" x="0" y="40">В этом срезе нет броней.</text>
-        <text class="t" x="0" y="66">Выберите другой сегмент или месяц.</text>`;
+    const setEmpty = (svg, empty) => {
+      svg.toggleAttribute("hidden", empty);
+      svg.parentElement.querySelector(".chart-empty").hidden = !empty;
     };
 
     function drawCurve(curves) {
@@ -395,10 +398,11 @@ if (typeof document !== "undefined") {
       s += `<text class="t cob" x="40" y="40">линия — сколько номеров продаём сверх брони</text>`;
       s += `<text class="t" x="40" y="64">пунктир — та же оценка без модели</text>`;
       $("weeks").innerHTML = s;
-      $("obTotals").innerHTML = `<li><b>${Calc.count(t.resold)}</b>номеров перепродано</li>
+      const both = state.hotel === "все отели" ? "два отеля, каждый считает сам; " : "";
+      $("obTotals").innerHTML = nb(`<li><b>${Calc.count(t.resold)}</b>номеров перепродано</li>
         <li><b>${Calc.count(t.walked)}</b>${plural(t.walked, ["гостю", "гостям", "гостям"])} не хватило номера</li>
-        <li><b>${pct1(t.covered)}</b>дат, когда номера хватило всем${state.hotel === "все отели" ? " в двух отелях" : ""} (без модели —
-          ${pct1(t.covered_bench)})</li>`;
+        <li><b>${pct1(t.covered)}</b>дат, когда номера хватило всем (${both}без модели —
+          ${pct1(t.covered_bench)})</li>`);
     }
     $("weeks").addEventListener("pointermove", (event) => {
       const i = event.target.dataset && event.target.dataset.i;
@@ -418,11 +422,9 @@ if (typeof document !== "undefined") {
       const svg = $("heat");
       const segs = DATA.segmentOrder.filter((seg) => state.segments.includes(seg));
       const months = DATA.months.filter((m) => state.months.includes(m));
-      if (!slice || !slice.idx.length || !segs.length || !months.length) {
-        svg.setAttribute("viewBox", "0 0 640 90");
-        drawEmpty(svg);
-        return;
-      }
+      const empty = !slice || !slice.idx.length || !segs.length || !months.length;
+      setEmpty(svg, empty);
+      if (empty) return;
       const cells = Calc.heatCells(B, slice.idx);
       const colW = Math.min(110, 456 / months.length);
       svg.setAttribute("viewBox", `0 0 640 ${segs.length * 46 + 30}`);
@@ -484,7 +486,7 @@ if (typeof document !== "undefined") {
     // Что делать бизнесу: цифры шага 4 при допущениях по умолчанию
     const v = DATA.verdict;
     const mln = (x) => Calc.comma(x / 1e6);
-    $("recs").innerHTML = `
+    $("recs").innerHTML = nb(`
       <div class="rec"><div><div class="n">${mln(v.model)} <small>млн €</small></div>
         <div class="cap">потерь вместо ${mln(v.baseline)}</div></div>
         <div><h3>Брать предоплату с броней, где риск отмены выше ${Calc.comma(Calc.modelThreshold(DEFAULTS))}</h3>
@@ -503,7 +505,7 @@ if (typeof document !== "undefined") {
           с вероятностью 90 %.</p>
         <p>В курортном отеле номера хватило в ${pct1(v.covered_resort)} дат, в городском — только
           в ${pct1(v.covered_city)}: там отменяют группами, разом. В городском отеле стоит продавать меньше
-          лишних номеров, чем советует оценка.</p></div></div>`;
+          лишних номеров, чем советует оценка.</p></div></div>`);
 
     refilter();
     drawWeeks();
