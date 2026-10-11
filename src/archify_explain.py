@@ -3,7 +3,8 @@
 Скрипт в HTML схемы следит за открытым паспортом шага и дописывает под названием шага абзац
 из diagrams/explanations.json на всю ширину паспорта. Id шага берётся из самого паспорта (поле #focus-id), а не из
 адреса: при выбранной связи (#relation=…) паспорт шага открыт, и пояснение остаётся. Следим только за паспортом:
-archify не пересоздаёт его, а лишь меняет содержимое. Повторная вставка заменяет прежнюю, а не дублирует её.
+archify не пересоздаёт его, а лишь меняет содержимое. Внутри дашборда (схема открыта во фрейме) список шагов
+под схемой скрыт: он повторяет схему и не помещается в окно. Повторная вставка заменяет прежнюю, а не дублирует её.
 Запуск: python -m src.archify_explain
 """
 import json
@@ -18,8 +19,10 @@ SCRIPT = """<style>.relationship-lens-head{row-gap:0;grid-template-rows:auto aut
 .relationship-lens-copy{display:contents}.relationship-lens-copy>*{grid-column:1/-1}
 .relationship-lens-copy>.relationship-lens-eyebrow,.relationship-lens-copy>.relationship-lens-title,
 .relationship-lens-copy>.semantic-passport-detail{grid-column:1}.relationship-lens-actions{grid-column:2;grid-row:1/4}
-.hse-explain{margin:.5rem 0 0;font-size:.75rem;line-height:1.5;white-space:normal;color:var(--text)}</style>
-<script>(function(){var EX=__EXPLANATIONS__;var chip=document.getElementById('focus-chip');
+.hse-explain{margin:.5rem 0 0;font-size:.75rem;line-height:1.5;white-space:normal;color:var(--text)}
+html.hse-in-frame .reader-rail{display:none}</style>
+<script>(function(){if(window.self!==window.top)document.documentElement.classList.add('hse-in-frame');
+var EX=__EXPLANATIONS__;var chip=document.getElementById('focus-chip');
 function stepId(){var code=chip.querySelector('#focus-id');if(code)return code.textContent.trim();
 var m=location.hash.match(/focus=([^&]+)/);return m?decodeURIComponent(m[1]):'';}
 function apply(){var id=stepId();var text=Object.prototype.hasOwnProperty.call(EX,id)&&EX[id];

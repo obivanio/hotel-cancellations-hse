@@ -131,7 +131,13 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 .schemes { padding: 56px 0; border-top: 1px solid var(--rule); }
 .schemes-head { display: flex; justify-content: space-between; align-items: end; gap: 32px; flex-wrap: wrap; margin-bottom: 24px; }
 .schemes .take { max-width: 60ch; }
-.schemes iframe { width: 100%; height: 1080px; border: 0; border-radius: 20px; background: var(--tile); display: block; }
+/* Схема archify подстраивает масштаб под ширину окна, поэтому окно сужаем так, чтобы схема с панелью сверху
+   помещалась в экран по высоте. Высота схемы ≈ k × ширина + pad, у каждой вкладки свои k и pad (замер по archify). */
+.scheme-box { container-type: inline-size; }
+.schemes iframe { --k: 0.53; --pad: 150px;
+  --w: max(720px, min(100cqw, (100svh - 48px - var(--pad)) / var(--k)));
+  width: min(100%, var(--w)); height: calc(var(--w) * var(--k) + var(--pad));
+  border: 0; border-radius: 20px; background: var(--tile); display: block; }
 
 /* Решения */
 .verdict { background: var(--ink); color: #fff; border-radius: 28px; padding: 64px 56px; margin: 24px 0 80px; }
@@ -189,7 +195,7 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
   .chart { padding: 16px 12px 12px; }
   .t { font-size: 22px; }
   .t.row { font-size: 18px; }
-  .schemes iframe { height: 720px; }
+  .schemes iframe { width: 100%; height: 720px; }
   .pick { position: static; }
   .pop, .pop.wide { left: 0; right: 0; width: auto; min-width: 0; }
 }
@@ -305,13 +311,13 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
           словами. Колесом мыши схему можно приблизить.</p></div>
       <div class="seg" role="tablist" aria-label="Схема" id="schemeTabs">
         <button type="button" role="tab" id="tab20" aria-selected="true" aria-controls="scheme"
-          data-src="figures/20_model_full_pipeline.html">Как собрана модель</button><button type="button"
+          data-src="figures/20_model_full_pipeline.html" data-k="0.53" data-pad="150">Как собрана модель</button><button type="button"
           role="tab" id="tab19" aria-selected="false" aria-controls="scheme" tabindex="-1"
-          data-src="figures/19_prepayment_decision.html">Как принимается решение</button>
+          data-src="figures/19_prepayment_decision.html" data-k="0.44" data-pad="170">Как принимается решение</button>
       </div>
     </div>
-    <iframe id="scheme" role="tabpanel" aria-labelledby="tab20" title="Схема: как собрана модель"
-      src="figures/20_model_full_pipeline.html?theme=light"></iframe>
+    <div class="scheme-box"><iframe id="scheme" role="tabpanel" aria-labelledby="tab20" title="Схема: как собрана модель"
+      src="figures/20_model_full_pipeline.html?theme=light"></iframe></div>
   </section>
 
   <section class="verdict">
@@ -802,6 +808,8 @@ if (typeof document !== "undefined") {
       });
       const frame = $("scheme");
       frame.src = `${tab.dataset.src}?theme=light`;
+      frame.style.setProperty("--k", tab.dataset.k);
+      frame.style.setProperty("--pad", `${tab.dataset.pad}px`);
       frame.title = `Схема: ${tab.textContent.toLowerCase()}`;
       frame.setAttribute("aria-labelledby", tab.id);
     };

@@ -473,6 +473,8 @@ if (typeof document !== "undefined") {
       });
       const frame = $("scheme");
       frame.src = `${tab.dataset.src}?theme=light`;
+      frame.style.setProperty("--k", tab.dataset.k);
+      frame.style.setProperty("--pad", `${tab.dataset.pad}px`);
       frame.title = `Схема: ${tab.textContent.toLowerCase()}`;
       frame.setAttribute("aria-labelledby", tab.id);
     };
