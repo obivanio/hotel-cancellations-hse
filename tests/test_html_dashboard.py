@@ -24,24 +24,27 @@ def test_dashboard_has_sections_and_data(page):
     """Все разделы на месте, шаблон заполнен, данные — все 17 351 бронь теста и цифры рекомендаций."""
     _, html = page
     assert all(section in html for section in SECTIONS)
-    assert "{{" not in html
+    assert not re.search(r"\{\{(fonts|css|data|js|plotly)\}\}", html)
     data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', html, re.S).group(1))
     assert len(data["bookings"]["h"]) == 17351
     assert data["verdict"]["covered_city"] == pytest.approx(0.7273, abs=1e-4)
     assert data["verdict"]["covered_all"] == pytest.approx(0.851, abs=1e-3)
     assert data["obTotals"]["все отели"]["resold"] == 4898
     assert set(data["weeks"]) == {"все отели", "City Hotel", "Resort Hotel"}
+    assert set(data["figures"]) == {"queue", "curves", "weeks", "heatmap", "segments"}
     assert 'src="figures/20_model_full_pipeline.html?theme=light"' in html
 
 
 def test_dashboard_offline_and_small(page):
-    """Ни одного обращения к сети (src, href, url, @import), шрифты встроены, файл не больше 3 МБ."""
+    """Plotly.js встроен один раз; вне библиотеки — ни одного обращения к сети; шрифты встроены; файл ≤ 7 МБ."""
     path, html = page
-    assert not re.search(r"""(src|href)\s*=\s*["']?\s*(https?:)?//""", html)
-    assert not re.search(r"""url\(\s*["']?\s*(https?:)?//""", html)
-    assert "@import" not in html
-    assert html.count("url(data:font/ttf;base64,") == 2
-    assert path.stat().st_size <= MAX_BYTES
+    assert html.count('<script id="plotly-js">') == 1
+    own = re.sub(r'<script id="plotly-js">.*?</script>', "", html, flags=re.S)
+    assert not re.search(r"""(src|href)\s*=\s*["']?\s*(https?:)?//""", own)
+    assert not re.search(r"""url\(\s*["']?\s*(https?:)?//""", own)
+    assert "@import" not in own
+    assert own.count("url(data:font/ttf;base64,") == 2
+    assert path.stat().st_size <= MAX_BYTES == 7_000_000
 
 
 def test_pack_bookings_round_trip():

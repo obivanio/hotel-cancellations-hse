@@ -1,4 +1,5 @@
-"""Сборка дашборда reports/dashboard.html: один файл с данными, оформлением, логикой и шрифтами, без сети.
+"""Сборка дашборда reports/dashboard.html: один файл с данными, оформлением, логикой, шрифтами
+и библиотекой Plotly.js, без сети.
 
 Запуск: python -m src.html_dashboard
 """
@@ -7,10 +8,12 @@ import json
 
 import numpy as np
 import pandas as pd
+from plotly.offline import get_plotlyjs
 
 from src.dashboard import (
     HOTEL_NAMES, SCORED_TEST_PATH, SEGMENT_NAMES, overbooking_totals, verdict_numbers, weekly_overbooking,
 )
+from src.dashboard_figures import CONFIG, figure_specs
 from src.evaluation import DEFAULT_ASSUMPTIONS
 from src.overbooking import OVERBOOKING_PATH
 from src.pipeline import ROOT
@@ -22,7 +25,7 @@ DASHBOARD_PATH = REPORTS_DIR / "dashboard.html"
 FONTS = {"Golos Text": ("GolosText-Variable.ttf", "400 900"), "Unbounded": ("Unbounded-Variable.ttf", "200 900")}
 MONTH_FULL = {5: "май", 6: "июнь", 7: "июль", 8: "август"}
 MONTH_SHORT = {5: "май", 6: "июн", 7: "июл", 8: "авг"}
-MAX_BYTES = 3_000_000
+MAX_BYTES = 7_000_000
 
 
 def pack_bookings(frame: pd.DataFrame) -> dict:
@@ -60,6 +63,7 @@ def page_data(frame: pd.DataFrame, dates: pd.DataFrame, policies: pd.DataFrame) 
         "obTotals": {hotel: {key: float(value) for key, value in overbooking_totals(dates, hotel).items()}
                      for hotel in HOTEL_NAMES},
         "verdict": {key: float(value) for key, value in verdict_numbers(policies, dates).items()},
+        "figures": figure_specs(frame, dates), "plotlyConfig": CONFIG,
         "defaults": {"unsold": DEFAULT_ASSUMPTIONS.unsold_share, "loss": DEFAULT_ASSUMPTIONS.loss_prob},
     }
 
@@ -81,6 +85,7 @@ def render_page(data: dict) -> str:
     for key, value in (("{{fonts}}", font_faces()), ("{{css}}", (ASSETS_DIR / "dashboard.css").read_text("utf-8")),
                        ("{{data}}", payload), ("{{js}}", (ASSETS_DIR / "dashboard.js").read_text("utf-8"))):
         page = page.replace(key, value)
+    page = page.replace("{{plotly}}", get_plotlyjs())
     return page
 
 
