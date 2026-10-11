@@ -133,6 +133,25 @@ def key_numbers(frame: pd.DataFrame, assumptions: Assumptions = DEFAULT_ASSUMPTI
     }
 
 
+SEGMENT_COLUMNS = ["segment", "bookings", "cancel_share", "baseline", "model", "saving"]
+
+
+def segment_table(frame: pd.DataFrame, assumptions: Assumptions = DEFAULT_ASSUMPTIONS) -> pd.DataFrame:
+    """Сегменты среза: броней, доля отмен, потери без предоплаты и с предоплатой по порогу модели, экономия.
+
+    «С моделью» — правило «брать предоплату, когда риск не ниже порога» внутри сегмента (та же черта, что на очереди).
+    Строки по убыванию экономии, при равенстве — по коду сегмента. Пустой срез — пустая таблица.
+    """
+    rows = []
+    for segment, part in frame.groupby("market_segment", sort=True):
+        numbers = key_numbers(part, assumptions)
+        model = queue_outcome(part, numbers["threshold_pct"], assumptions)["total"]
+        rows.append({"segment": segment, "bookings": len(part), "cancel_share": float(part["is_canceled"].mean()),
+                     "baseline": numbers["baseline"], "model": model, "saving": numbers["baseline"] - model})
+    table = pd.DataFrame(rows, columns=SEGMENT_COLUMNS)
+    return table.sort_values(["saving", "segment"], ascending=[False, True], kind="stable").reset_index(drop=True)
+
+
 def queue_buckets(frame: pd.DataFrame) -> pd.DataFrame:
     """100 полосок очереди: каждая — 1 % броней среза по убыванию риска.
 

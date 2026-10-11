@@ -8,7 +8,7 @@ import pytest
 
 from src.dashboard import (
     SCORED_TEST_PATH, comma, count, filter_frame, key_numbers, money, percent, queue_buckets, queue_outcome,
-    risk_tables, share_curves,
+    risk_tables, segment_table, share_curves,
 )
 from src.evaluation import Assumptions
 from src.html_dashboard import ASSETS_DIR, pack_bookings
@@ -38,7 +38,7 @@ for (const [name, s] of Object.entries(input.slices)) {
   const key = Calc.keyNumbers(data, idx, a);
   const curves = Calc.shareCurves(data, idx, a);
   out.slices[name] = {
-    key, at_threshold: Calc.queueOutcome(data, idx, key.threshold_pct, a),
+    key, segments: Calc.segmentTable(data, idx, a), at_threshold: Calc.queueOutcome(data, idx, key.threshold_pct, a),
     at_30: Calc.queueOutcome(data, idx, 30, a),
     buckets: Calc.queueBuckets(data, Calc.queueOrder(data, idx, "proba")),
     model: curves["модель"].map((r) => r.total), lead: curves["срок брони"].map((r) => r.total),
@@ -118,3 +118,15 @@ def test_formats_match(browser):
     """Подписи чисел в браузере такие же, как у форматтеров Python: деньги, целые, проценты, запятая."""
     expected = [[money(v), count(v), percent(v / 3e6), comma(v / 1e6)] for v in FORMAT_VALUES]
     assert browser["formats"] == expected
+
+
+@pytest.mark.parametrize("name", list(SLICES))
+def test_segment_table_match(browser, name):
+    """Таблица по сегментам в браузере — те же строки, порядок и числа, что у Python."""
+    frame, assumptions = python_slice(name)
+    expected = segment_table(frame, assumptions)
+    js = pd.DataFrame(browser["slices"][name]["segments"], columns=expected.columns)
+    assert js["segment"].tolist() == expected["segment"].tolist()
+    numeric = ["bookings", "cancel_share", "baseline", "model", "saving"]
+    assert js[numeric].astype(float).to_dict("list") == pytest.approx(
+        expected[numeric].astype(float).to_dict("list"), rel=1e-9, abs=1e-6)

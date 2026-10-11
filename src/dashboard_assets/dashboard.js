@@ -84,6 +84,23 @@ const Calc = (() => {
     };
   }
 
+  function segmentTable(data, idx, a) {
+    const groups = new Map();
+    idx.forEach((i) => {
+      const code = data.segments[data.s[i]];
+      if (!groups.has(code)) groups.set(code, []);
+      groups.get(code).push(i);
+    });
+    const rows = [...groups.entries()].map(([segment, part]) => {
+      const key = keyNumbers(data, part, a);
+      const model = queueOutcome(data, part, key.threshold_pct, a).total;
+      const canceled = part.reduce((sum, i) => sum + data.cancel[i], 0);
+      return { segment, bookings: part.length, cancel_share: canceled / part.length, baseline: key.baseline, model,
+        saving: key.baseline - model };
+    });
+    return rows.sort((x, y) => (y.saving - x.saving) || (x.segment < y.segment ? -1 : x.segment > y.segment ? 1 : 0));
+  }
+
   function queueBuckets(data, order) {
     const n = order.length;
     const groupSize = new Map();
@@ -156,7 +173,7 @@ const Calc = (() => {
   }
 
   return { BUCKETS, cutSize, modelThreshold, filterIdx, queueOrder, prefix, outcome, queueOutcome, thresholdPct,
-    keyNumbers, queueBuckets, shareCurves, heatCells, comma, money, count, percent };
+    keyNumbers, segmentTable, queueBuckets, shareCurves, heatCells, comma, money, count, percent };
 })();
 
 if (typeof module !== "undefined") module.exports = Calc;

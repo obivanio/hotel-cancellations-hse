@@ -5,7 +5,7 @@ import pytest
 
 from src.dashboard import (
     SCORED_COLUMNS, SCORED_TEST_PATH, comma, count, cut_size, filter_frame, key_numbers, model_threshold, money,
-    overbooking_totals, percent, queue_buckets, queue_outcome, risk_tables, scored_frame, share_curves,
+    overbooking_totals, percent, queue_buckets, queue_outcome, risk_tables, scored_frame, segment_table, share_curves,
     threshold_pct, to_scored, verdict_numbers, weekly_overbooking,
 )
 from src.evaluation import Assumptions
@@ -203,3 +203,25 @@ def test_formatters():
     assert comma(0.1666) == "0,17"
     assert count(4898) == "4 898"
     assert percent(0.604) == "60 %"
+
+
+def test_segment_table():
+    """По сегментам: броней, доля отмен, потери без предоплаты и с моделью по порогу, экономия; по убыванию экономии."""
+    table = segment_table(FRAME)
+    assert table.columns.tolist() == ["segment", "bookings", "cancel_share", "baseline", "model", "saving"]
+    assert table["bookings"].sum() == len(FRAME)
+    assert table["saving"].tolist() == sorted(table["saving"], reverse=True)
+    for row in table.itertuples():
+        part = FRAME[FRAME["market_segment"] == row.segment]
+        numbers = key_numbers(part)
+        assert row.baseline == pytest.approx(numbers["baseline"])
+        assert row.model == pytest.approx(queue_outcome(part, numbers["threshold_pct"])["total"])
+        assert row.saving == pytest.approx(row.baseline - row.model)
+        assert row.cancel_share == pytest.approx(part["is_canceled"].mean())
+
+
+def test_segment_table_empty():
+    """Пустой срез — пустая таблица с нужными колонками, без исключений."""
+    table = segment_table(EMPTY)
+    assert table.empty
+    assert table.columns.tolist() == ["segment", "bookings", "cancel_share", "baseline", "model", "saving"]
