@@ -38,11 +38,13 @@ def test_dashboard_has_sections_and_data(page):
 
 
 def test_dashboard_has_two_views(page):
-    """Два вида и переключатель: презентация видна по умолчанию, дашборд — скрыт до выбора или #dashboard."""
+    """Два вида: дашборд первый и виден по умолчанию, презентация скрыта до выбора или #presentation."""
     _, html = page
     assert 'id="viewTabs"' in html
-    assert re.search(r'<main[^>]*id="viewPresentation"', html)
-    assert re.search(r'<main[^>]*id="viewDashboard"[^>]*hidden', html)
+    assert re.search(r'<main[^>]*id="viewDashboard">', html)
+    assert re.search(r'<main[^>]*id="viewPresentation"[^>]*hidden', html)
+    assert html.index('data-view="dashboard"') < html.index('data-view="presentation"')
+    assert html.index('id="viewDashboard"') < html.index('id="schemes"'), "схемы — последний раздел дашборда"
     for plot_id in ("dQueue", "dCurves", "dWeeks", "dHeat", "dSegments", "pQueue", "pCurves", "pWeeks", "pHeat"):
         assert f'id="{plot_id}"' in html
 

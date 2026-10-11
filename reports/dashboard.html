@@ -3858,9 +3858,9 @@ return Plotly;
   <header class="top">
     <span class="logo">Отмены броней</span>
     <div class="seg views" role="tablist" aria-label="Вид" id="viewTabs">
-      <button type="button" role="tab" data-view="presentation" aria-selected="true"
-        aria-controls="viewPresentation">Презентация</button><button type="button" role="tab" data-view="dashboard"
-        aria-selected="false" aria-controls="viewDashboard" tabindex="-1">Дашборд</button>
+      <button type="button" role="tab" data-view="dashboard" aria-selected="true"
+        aria-controls="viewDashboard">Дашборд</button><button type="button" role="tab" data-view="presentation"
+        aria-selected="false" aria-controls="viewPresentation" tabindex="-1">Презентация</button>
     </div>
     <div class="seg" role="group" aria-label="Отель" id="hotel">
       <button type="button" data-hotel="все отели" aria-pressed="true">Оба отеля</button><button type="button"
@@ -3897,7 +3897,7 @@ return Plotly;
     </details>
   </header>
 
-  <main id="viewPresentation">
+  <main id="viewPresentation" hidden>
   <section class="hero">
     <div class="hero-head">
       <div>
@@ -3965,21 +3965,7 @@ return Plotly;
     </section>
   </div>
 
-  <section class="schemes">
-    <div class="schemes-head">
-      <div><h2>Как это устроено</h2>
-        <p class="take">Интерактивные схемы. Нажмите на любой шаг — откроется паспорт шага с пояснением простыми
-          словами. Колесом мыши схему можно приблизить.</p></div>
-      <div class="seg" role="tablist" aria-label="Схема" id="schemeTabs">
-        <button type="button" role="tab" id="tab20" aria-selected="true" aria-controls="scheme"
-          data-src="figures/20_model_full_pipeline.html" data-k="0.53" data-pad="150">Как собрана модель</button><button type="button"
-          role="tab" id="tab19" aria-selected="false" aria-controls="scheme" tabindex="-1"
-          data-src="figures/19_prepayment_decision.html" data-k="0.44" data-pad="170">Как принимается решение</button>
-      </div>
-    </div>
-    <div class="scheme-box"><iframe id="scheme" role="tabpanel" aria-labelledby="tab20" title="Схема: как собрана модель"
-      src="figures/20_model_full_pipeline.html?theme=light"></iframe></div>
-  </section>
+  <div id="schemesSlotP"></div>
 
   <section class="verdict">
     <h2>Что делать бизнесу</h2>
@@ -3992,7 +3978,7 @@ return Plotly;
   </section>
   </main>
 
-  <main id="viewDashboard" hidden>
+  <main id="viewDashboard">
     <div class="kpis">
       <div class="kpi main"><p class="l">Потери с предоплатой по модели</p>
         <div class="v"><span id="kLoss"></span> <small id="kLossUnit"></small></div><p class="s" id="kLossNote"></p></div>
@@ -4057,6 +4043,23 @@ return Plotly;
           <tbody id="dTable"></tbody>
         </table></div>
       </section>
+    </div>
+    <div id="schemesSlotD">
+  <section class="schemes" id="schemes">
+    <div class="schemes-head">
+      <div><h2>Как это устроено</h2>
+        <p class="take">Интерактивные схемы. Нажмите на любой шаг — откроется паспорт шага с пояснением простыми
+          словами. Колесом мыши схему можно приблизить.</p></div>
+      <div class="seg" role="tablist" aria-label="Схема" id="schemeTabs">
+        <button type="button" role="tab" id="tab20" aria-selected="true" aria-controls="scheme"
+          data-src="figures/20_model_full_pipeline.html" data-k="0.53" data-pad="150">Как собрана модель</button><button type="button"
+          role="tab" id="tab19" aria-selected="false" aria-controls="scheme" tabindex="-1"
+          data-src="figures/19_prepayment_decision.html" data-k="0.44" data-pad="170">Как принимается решение</button>
+      </div>
+    </div>
+    <div class="scheme-box"><iframe id="scheme" role="tabpanel" aria-labelledby="tab20" title="Схема: как собрана модель"
+      src="figures/20_model_full_pipeline.html?theme=light"></iframe></div>
+  </section>
     </div>
   </main>
 </div>
@@ -4655,11 +4658,15 @@ if (typeof document !== "undefined") {
           в ${pct1(v.covered_city)}: там отменяют группами, разом. В городском отеле стоит продавать меньше
           лишних номеров, чем советует оценка.</p></div></div>`);
 
-    // Переключатель «Презентация / Дашборд»: мышь, стрелки, адрес #dashboard
+    // Переключатель «Дашборд / Презентация»: мышь, стрелки; по умолчанию дашборд, адрес #presentation — презентация
+    const viewFromHash = () => (location.hash === "#presentation" ? "presentation" : "dashboard");
     const views = { presentation: $("viewPresentation"), dashboard: $("viewDashboard") };
     const viewTabs = [...document.querySelectorAll("#viewTabs [role=tab]")];
+    // Схемы archify — одна на странице: блок переезжает в видимый вид (в дашборде — последним разделом).
+    const schemesSlots = { presentation: $("schemesSlotP"), dashboard: $("schemesSlotD") };
     const setView = (name) => {
       Object.entries(views).forEach(([view, el]) => { el.hidden = view !== name; });
+      if ($("schemes").parentElement !== schemesSlots[name]) schemesSlots[name].appendChild($("schemes"));
       viewTabs.forEach((tab) => {
         const on = tab.dataset.view === name;
         tab.setAttribute("aria-selected", String(on));
@@ -4668,7 +4675,7 @@ if (typeof document !== "undefined") {
     };
     function showView(name, push) {
       setView(name);
-      if (push) history.replaceState(null, "", name === "dashboard" ? "#dashboard" : location.pathname + location.search);
+      if (push) history.replaceState(null, "", name === "presentation" ? "#presentation" : location.pathname + location.search);
       redrawAll();
       // Plotly.Plots.resize принимает только видимый график: пустые (скрытые setEmpty) пропускаем.
       views[name].querySelectorAll(".plot").forEach((el) => {
@@ -4684,7 +4691,7 @@ if (typeof document !== "undefined") {
         showView(next.dataset.view, true);
       });
     });
-    window.addEventListener("hashchange", () => showView(location.hash === "#dashboard" ? "dashboard" : "presentation"));
+    window.addEventListener("hashchange", () => showView(viewFromHash()));
 
     // Подстройки под узкий экран считаются при отрисовке, поэтому после изменения размера окна вид перерисовывается.
     let resizeTimer = 0;
@@ -4692,7 +4699,7 @@ if (typeof document !== "undefined") {
     window.addEventListener("resize", redrawSoon);
     window.addEventListener("orientationchange", redrawSoon);
 
-    setView(location.hash === "#dashboard" ? "dashboard" : "presentation");
+    setView(viewFromHash());
     refilter();
   })();
 }

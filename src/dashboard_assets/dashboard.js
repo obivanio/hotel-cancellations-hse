@@ -591,11 +591,15 @@ if (typeof document !== "undefined") {
           в ${pct1(v.covered_city)}: там отменяют группами, разом. В городском отеле стоит продавать меньше
           лишних номеров, чем советует оценка.</p></div></div>`);
 
-    // Переключатель «Презентация / Дашборд»: мышь, стрелки, адрес #dashboard
+    // Переключатель «Дашборд / Презентация»: мышь, стрелки; по умолчанию дашборд, адрес #presentation — презентация
+    const viewFromHash = () => (location.hash === "#presentation" ? "presentation" : "dashboard");
     const views = { presentation: $("viewPresentation"), dashboard: $("viewDashboard") };
     const viewTabs = [...document.querySelectorAll("#viewTabs [role=tab]")];
+    // Схемы archify — одна на странице: блок переезжает в видимый вид (в дашборде — последним разделом).
+    const schemesSlots = { presentation: $("schemesSlotP"), dashboard: $("schemesSlotD") };
     const setView = (name) => {
       Object.entries(views).forEach(([view, el]) => { el.hidden = view !== name; });
+      if ($("schemes").parentElement !== schemesSlots[name]) schemesSlots[name].appendChild($("schemes"));
       viewTabs.forEach((tab) => {
         const on = tab.dataset.view === name;
         tab.setAttribute("aria-selected", String(on));
@@ -604,7 +608,7 @@ if (typeof document !== "undefined") {
     };
     function showView(name, push) {
       setView(name);
-      if (push) history.replaceState(null, "", name === "dashboard" ? "#dashboard" : location.pathname + location.search);
+      if (push) history.replaceState(null, "", name === "presentation" ? "#presentation" : location.pathname + location.search);
       redrawAll();
       // Plotly.Plots.resize принимает только видимый график: пустые (скрытые setEmpty) пропускаем.
       views[name].querySelectorAll(".plot").forEach((el) => {
@@ -620,7 +624,7 @@ if (typeof document !== "undefined") {
         showView(next.dataset.view, true);
       });
     });
-    window.addEventListener("hashchange", () => showView(location.hash === "#dashboard" ? "dashboard" : "presentation"));
+    window.addEventListener("hashchange", () => showView(viewFromHash()));
 
     // Подстройки под узкий экран считаются при отрисовке, поэтому после изменения размера окна вид перерисовывается.
     let resizeTimer = 0;
@@ -628,7 +632,7 @@ if (typeof document !== "undefined") {
     window.addEventListener("resize", redrawSoon);
     window.addEventListener("orientationchange", redrawSoon);
 
-    setView(location.hash === "#dashboard" ? "dashboard" : "presentation");
+    setView(viewFromHash());
     refilter();
   })();
 }
