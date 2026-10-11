@@ -50,25 +50,26 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 .hero-head { display: grid; gap: 40px; margin-bottom: 24px; }
 .empty { font-size: 22px; line-height: 1.4; font-weight: 600; margin: 0; max-width: 32ch; align-self: end; }
 
-.queue-box { position: relative; padding-top: 44px; }
-.queue { display: flex; align-items: flex-end; gap: 4px; height: 180px; }
-.queue i { flex: 1; height: var(--h); border-radius: 999px; transform-origin: bottom; transition: opacity .2s;
-  background: linear-gradient(to top, var(--saffron) 0 var(--c), var(--mist) var(--c) 100%); }
-.queue i.off { opacity: .28; }
-.queue i.none { background: var(--rule); }
-@media (prefers-reduced-motion: no-preference) {
-  .queue.intro i { animation: rise .7s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--n) * 9ms); }
-  @keyframes rise { from { transform: scaleY(0); } }
-}
-.cut { position: absolute; top: 0; bottom: -18px; width: 0; border-left: 3px solid var(--ink); pointer-events: none; }
-.cut b { position: absolute; top: 0; left: 0; transform: translateX(-50%); background: var(--ink); color: #fff;
-  font-family: var(--display); font-weight: 700; font-size: 15px; padding: 7px 12px; border-radius: 10px; white-space: nowrap; }
-.cut.near-start b { transform: none; left: -3px; }
-.cut.near-end b { transform: translateX(-100%); left: 3px; }
-.cut::after { content: ""; position: absolute; bottom: 0; left: -9px; width: 15px; height: 15px; border-radius: 50%; background: var(--ink); }
-.queue-box input { position: absolute; inset: 40px 0 -18px; width: 100%; height: auto; opacity: 0; cursor: ew-resize; margin: 0; }
-.queue-box:has(input:focus-visible) .queue { outline: 3px solid var(--cobalt); outline-offset: 8px; border-radius: 6px; }
-.marks { position: relative; height: 34px; margin-top: 26px; }
+/* Очередь: под графиком — ползунок черты. Поля .track равны полям графика в Python (l = 56, r = 16), поэтому
+   бегунок, кнопка порога и черта на графике стоят на одной вертикали. */
+.queue-box { background: var(--tile); border-radius: 20px; padding: 20px 20px 18px; margin-bottom: 16px; }
+.track { padding: 0 16px 0 56px; }
+.share { display: block; font-size: 15px; color: var(--ink-2); margin: 4px 0 2px; }
+.share b { font-family: var(--display); font-weight: 700; color: var(--ink); }
+#share { --p: 70%; -webkit-appearance: none; appearance: none; display: block; width: calc(100% + 22px); margin: 6px -11px 0;
+  height: 22px; background: transparent; cursor: ew-resize; }
+#share::-webkit-slider-runnable-track { height: 6px; border-radius: 3px;
+  background: linear-gradient(to right, var(--ink) 0 var(--p), var(--mist) var(--p) 100%); }
+#share::-moz-range-track { height: 6px; border-radius: 3px;
+  background: linear-gradient(to right, var(--ink) 0 var(--p), var(--mist) var(--p) 100%); }
+#share::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; margin-top: -8px; border-radius: 50%;
+  background: var(--ink); border: 3px solid var(--tile); box-shadow: 0 0 0 1px var(--ink); }
+#share::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--ink); border: 3px solid var(--tile);
+  box-shadow: 0 0 0 1px var(--ink); }
+#share:focus-visible { outline: none; }
+#share:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 1px var(--ink), 0 0 0 5px var(--cobalt); }
+#share:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 1px var(--ink), 0 0 0 5px var(--cobalt); }
+.marks { position: relative; height: 34px; margin-top: 14px; }
 .thr { position: absolute; top: 0; transform: translateX(-50%); font: inherit; font-size: 14px; font-weight: 600;
   color: var(--ink); background: var(--tile); border: 0; border-radius: 9px; padding: 6px 10px 6px 10px;
   box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; white-space: nowrap; }
@@ -78,7 +79,8 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 .thr.near-start::before { left: 0; }
 .thr.near-end { transform: translateX(-100%); }
 .thr.near-end::before { left: auto; right: 0; }
-.ends { display: flex; justify-content: space-between; margin-top: 8px; font-size: 15px; color: var(--ink-2); }
+.ends { display: flex; justify-content: space-between; margin-top: 8px; font-size: 15px; color: var(--ink-2); gap: 16px;
+  white-space: nowrap; }
 .hint { font-size: 15px; color: var(--ink-2); margin: 6px 0 0; }
 
 .outcome { display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr; gap: 40px; align-items: end; }
@@ -112,17 +114,12 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 .mini li { font-size: 16px; line-height: 1.4; }
 .mini b { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.02em; margin-right: 6px; }
 .chart { background: var(--tile); border-radius: 20px; padding: 24px 28px 18px; }
-.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.plot { width: 100%; min-width: 0; }
 .chart-note { font-size: 14px; line-height: 1.5; color: var(--ink-2); margin: 12px 0 0; }
 .part > .chart-note { grid-column: -2 / -1; margin-top: -44px; }
 .chart-empty { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px;
   min-height: 200px; margin: 0; padding: 0 16px; font-size: 17px; line-height: 1.5; color: var(--ink-2); text-align: center; }
 .chart-empty b { color: var(--ink); font-weight: 650; }
-.t { font-family: var(--body); font-size: 13px; fill: var(--ink-2); }
-.t.strong { fill: var(--ink); font-weight: 650; }
-.t.cob { fill: var(--cobalt); font-weight: 650; }
-.t.saf { fill: var(--saffron-ink); font-weight: 650; }
-.t.big { font-size: 16px; fill: var(--ink); }
 
 .schemes { padding: 56px 0; border-top: 1px solid var(--rule); }
 .schemes-head { display: flex; justify-content: space-between; align-items: end; gap: 32px; flex-wrap: wrap; margin-bottom: 24px; }
@@ -148,11 +145,6 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
 .verdict .caveat { margin: 10px 0 0; padding-top: 26px; border-top: 1px solid var(--night-rule); font-size: 15px; line-height: 1.6;
   color: var(--night-muted); max-width: 78ch; }
 
-/* Подсказка при наведении */
-.tip { position: fixed; z-index: 20; pointer-events: none; background: var(--ink); color: #fff; font-size: 14px; line-height: 1.45;
-  padding: 10px 12px; border-radius: 10px; max-width: 260px; }
-.tip b { font-weight: 650; }
-
 /* Широкий экран: больше в одном экране */
 @media (min-width: 1200px) {
   .hero { padding: 40px 0 56px; }
@@ -160,7 +152,8 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
   .hero .lede { margin-bottom: 0; }
   .outcome { margin-top: 0; grid-template-columns: repeat(3, auto); justify-content: start; gap: 28px 48px; }
   .outcome .loss { grid-column: 1 / -1; }
-  .part { grid-template-columns: minmax(360px, 1fr) minmax(0, 980px); gap: 16px 64px; align-items: start; }
+  .part { grid-template-columns: minmax(360px, 1fr) minmax(0, 980px); grid-template-rows: auto 1fr; gap: 16px 64px;
+    align-items: start; }
   .part > div:first-child { grid-row: 1 / span 2; }
   .part > .chart { grid-column: 2; grid-row: 1; }
   .part > .chart-note { grid-column: 2; grid-row: 2; margin-top: 0; }
@@ -171,9 +164,6 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
   .outcome { grid-template-columns: auto repeat(3, auto); gap: 48px; }
   .outcome .loss { grid-column: auto; }
 }
-@media (min-width: 1800px) {
-  .t { font-size: 15px; }
-}
 @media (max-width: 900px) {
   .wrap { padding: 0 16px; }
   .outcome { grid-template-columns: 1fr 1fr; gap: 28px; }
@@ -181,10 +171,9 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
   .part, .rec { grid-template-columns: 1fr; gap: 20px; }
   .part > .chart-note { margin-top: -8px; }
   .verdict { padding: 40px 22px; }
-  .queue { gap: 2px; height: 130px; }
   .chart { padding: 16px 12px 12px; }
-  .t { font-size: 22px; }
-  .t.row { font-size: 18px; }
+  .queue-box { padding: 16px 12px 14px; }
+  .ends { font-size: 14px; }
   .schemes iframe { width: 100%; height: 720px; }
   .pick { position: static; }
   .pop, .pop.wide { left: 0; right: 0; width: auto; min-width: 0; }

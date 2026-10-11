@@ -207,17 +207,19 @@ if (typeof document !== "undefined") {
     const nb = (text) => text.replace(/ (?=млн|тыс|%|€)/g, "\u00A0");
     const unitOf = (max) => (max < 100000 ? { div: 1e3, name: "тыс. €" } : { div: 1e6, name: "млн €" });
 
-    // Подсказка при наведении
-    const tip = $("tip");
-    const showTip = (html, x, y) => {
-      tip.innerHTML = nb(html);
-      tip.hidden = false;
-      const w = tip.offsetWidth;
-      const h = tip.offsetHeight;
-      tip.style.left = `${Math.min(Math.max(8, x + 14), window.innerWidth - w - 8)}px`;
-      tip.style.top = `${y - h - 14 < 8 ? y + 18 : y - h - 14}px`;
+    const clone = (value) => JSON.parse(JSON.stringify(value));
+
+    // Панель Plotly по-русски: свой словарь, без загрузки локалей из сети.
+    const RU = {
+      "Download plot as a PNG": "Скачать PNG", "Download plot": "Скачать", "Zoom": "Приблизить", "Pan": "Сдвинуть",
+      "Zoom in": "Крупнее", "Zoom out": "Мельче", "Reset axes": "Вернуть масштаб", "Reset": "Вернуть масштаб",
+      "Autoscale": "Вписать", "Double-click to zoom back out": "Двойной щелчок — вернуть масштаб",
+      "Double-click on legend to isolate one trace": "Двойной щелчок по легенде — оставить одну линию",
+      "Preparing image - this may take a few seconds": "Готовим картинку…",
+      "Image download succeeded": "Картинка сохранена",
+      "Sorry, there was a problem downloading your image!": "Не удалось сохранить картинку",
     };
-    const hideTip = () => { tip.hidden = true; };
+    Plotly.register({ moduleType: "locale", name: "ru", format: { decimal: ",", thousands: " " }, dictionary: RU });
 
     // Фильтры
     const fillChecks = (box, items, chosen, label) => {
@@ -250,7 +252,8 @@ if (typeof document !== "undefined") {
       document.querySelectorAll("#hotel button").forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
       state.hotel = button.dataset.hotel;
       refilter();
-      drawWeeks();
+      drawWeeks("pWeeks");
+      drawObText();
     }));
     const closePicks = (except) => document.querySelectorAll("details.pick[open]").forEach((d) => {
       if (d !== except) d.open = false;
@@ -278,58 +281,36 @@ if (typeof document !== "undefined") {
       setAssumptions();
     });
 
-    // Очередь броней
-    const queue = $("queue");
-    const bars = [];
-    for (let n = 0; n < Calc.BUCKETS; n += 1) {
-      const bar = document.createElement("i");
-      bar.style.setProperty("--h", `${100 - n * 0.45}%`);
-      bar.style.setProperty("--n", n);
-      queue.appendChild(bar);
-      bars.push(bar);
-    }
-    setTimeout(() => queue.classList.remove("intro"), 1800);
+    // Очередь броней: черту двигает ползунок под графиком (мышью или стрелками)
     $("share").addEventListener("input", (event) => {
       state.pct = Number(event.target.value);
       state.follow = false;
       update();
     });
     $("thr").addEventListener("click", () => { state.follow = true; update(); });
-    $("queueBox").addEventListener("pointermove", (event) => {
-      if (!slice || !slice.idx.length) return;
-      const rect = queue.getBoundingClientRect();
-      const i = Math.min(Calc.BUCKETS - 1, Math.max(0, Math.floor(((event.clientX - rect.left) / rect.width) * 100)));
-      const b = slice.buckets[i];
-      showTip(b.bookings ? `<b>${i + 1}-й процент очереди</b><br>${Calc.count(b.bookings)} ${plural(b.bookings,
-        ["бронь", "брони", "броней"])}<br>доля отмен: ${Calc.percent(b.cancel_share)}<br>средний риск по модели:
-        ${Calc.percent(b.mean_risk)}` : "В этом проценте нет броней", event.clientX, event.clientY);
-    });
-    $("queueBox").addEventListener("pointerleave", hideTip);
 
     function refilter() {
       summaries();
       const idx = Calc.filterIdx(B, state.hotel, state.segments, state.months);
       const order = Calc.queueOrder(B, idx, "proba");
       slice = { idx, prefix: Calc.prefix(B, order), buckets: Calc.queueBuckets(B, order) };
-      slice.buckets.forEach((b, n) => {
-        bars[n].style.setProperty("--c", `${(b.cancel_share * 100).toFixed(2)}%`);
-        bars[n].classList.toggle("none", !b.bookings);
-      });
-      drawHeat();
+      drawHeat("pHeat");
       update();
     }
 
     function update() {
       const a = { unsold: state.unsold, loss: state.loss };
       const empty = !slice.idx.length;
-      document.querySelectorAll("#outcome, #queueBox, .marks, .ends, .hint").forEach((el) => { el.hidden = empty; });
+      document.querySelectorAll("#outcome, #queueBox, .hint").forEach((el) => { el.hidden = empty; });
       $("emptyHero").hidden = !empty;
-      setEmpty($("curve"), empty);
+      setEmpty($("pCurves"), empty);
       if (empty) return;
       const key = Calc.keyNumbers(B, slice.idx, a);
       if (state.follow) state.pct = key.threshold_pct;
       $("share").value = state.pct;
       $("share").setAttribute("aria-valuetext", `предоплата с ${state.pct} % броней`);
+      $("share").style.setProperty("--p", `${state.pct}%`);
+      $("shareTxt").textContent = nb(`${state.pct} %`);
       const res = Calc.outcome(slice.prefix, Calc.cutSize(slice.idx.length, state.pct), a);
       const [value, unit] = moneyParts(res.total);
       $("lossValue").textContent = value;
@@ -343,12 +324,6 @@ if (typeof document !== "undefined") {
       $("touchedShare").textContent = nb(Calc.percent(res.touched_share));
       $("missed").textContent = Calc.count(res.missed_cancels);
       $("missedShare").textContent = nb(Calc.percent(res.missed_share));
-      bars.forEach((bar, n) => bar.classList.toggle("off", n >= state.pct));
-      const cut = $("cut");
-      cut.style.left = `calc(${state.pct}% - 1px)`;
-      cut.classList.toggle("near-start", state.pct < 8);
-      cut.classList.toggle("near-end", state.pct > 92);
-      $("cutTxt").textContent = `предоплата с ${state.pct} %`;
       const thr = $("thr");
       thr.style.left = `${key.threshold_pct}%`;
       thr.classList.toggle("near-start", key.threshold_pct < 16);
@@ -356,69 +331,78 @@ if (typeof document !== "undefined") {
       thr.textContent = `порог ${Calc.comma(key.threshold)}`;
       thr.setAttribute("aria-label", `Поставить черту на порог ${Calc.comma(key.threshold)}: предоплата с
         ${key.threshold_pct} % броней`.replace(/\s+/g, " "));
-      drawCurve(Calc.shareCurves(B, slice.idx, a));
+      drawQueue("pQueue");
+      drawCurves("pCurves", Calc.shareCurves(B, slice.idx, a));
     }
 
-    // Графики
-    const setEmpty = (svg, empty) => {
-      svg.toggleAttribute("hidden", empty);
-      svg.parentElement.querySelector(".chart-empty").hidden = !empty;
+    // Графики Plotly: вид задаёт Python (DATA.figures), здесь меняются только данные и положение черты/точки.
+    const setEmpty = (el, empty) => {
+      el.toggleAttribute("hidden", empty);
+      el.parentElement.querySelector(".chart-empty").hidden = !empty;
     };
-
-    function drawCurve(curves) {
-      const model = curves["модель"].map((r) => r.total);
-      const lead = curves["срок брони"].map((r) => r.total);
-      const unit = unitOf(Math.max(...model, ...lead));
-      const top = Math.max(...model, ...lead) / unit.div || 1;
-      const step = [0.1, 0.2, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100].find((s) => top / s <= 5) || 100;
-      const yMax = Math.ceil(top / step) * step;
-      const X = (pct) => 60 + pct * 5.5;
-      const Y = (v) => 260 - (v / unit.div / yMax) * 230;
-      const path = (k) => k.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
-      let s = `<line x1="60" y1="260" x2="610" y2="260" stroke="#DCE2EC"/>`;
-      for (let v = 0; v <= yMax + 1e-9; v += step) {
-        s += `<text class="t" x="50" y="${Y(v * unit.div) + 4}" text-anchor="end">${Calc.comma(v, step < 1 ? 1 : 0)}</text>`;
-      }
-      s += `<text class="t" x="60" y="290">0 %</text><text class="t" x="610" y="290" text-anchor="end">100 % броней
-        с предоплатой</text><text class="t" x="54" y="12">потери, ${unit.name}</text>`;
-      s += `<path d="${path(lead)}" fill="none" stroke="#6B7894" stroke-width="3" stroke-dasharray="8 6"/>`;
-      s += `<path d="${path(model)}" fill="none" stroke="#1D3FBF" stroke-width="4"/>`;
-      s += `<text class="t strong" x="${X(22)}" y="${Math.min(Y(lead[22]) - 14, 250)}">по сроку брони</text>`;
-      s += `<text class="t cob" x="${X(80)}" y="${Y(model[80]) + 26}">по модели</text>`;
-      const x = state.pct;
-      const ym = Y(model[x]);
-      const yl = Y(lead[x]);
-      const diff = lead[x] - model[x];
-      s += `<line x1="${X(x)}" y1="${yl}" x2="${X(x)}" y2="${ym}" stroke="#E8A317" stroke-width="3"/>`;
-      s += `<circle cx="${X(x)}" cy="${ym}" r="7" fill="#1D3FBF"/><circle cx="${X(x)}" cy="${yl}" r="6" fill="#6B7894"/>`;
-      const right = x < 55;
-      const text = diff >= 0 ? `модель экономит ${Calc.money(diff)}` : `модель дороже на ${Calc.money(-diff)}`;
-      s += `<text class="t saf" x="${X(x) + (right ? 12 : -12)}" y="${Math.min(Math.max(yl, ym) + 28, 250)}"
-        text-anchor="${right ? "start" : "end"}">${text}</text>`;
-      $("curve").innerHTML = s;
+    // narrow — узкий экран (телефон): длинная подпись оси и частые подписи недель там не помещаются.
+    function plot(id, name, patch) {
+      const el = $(id);
+      if (!el) return;
+      const data = clone(DATA.figures[name].data);
+      const layout = clone(DATA.figures[name].layout);
+      patch(data, layout, el.clientWidth < 560);
+      if (el.dataset.height) layout.height = Number(el.dataset.height);
+      Plotly.react(el, data, layout, DATA.plotlyConfig);
     }
 
-    function drawWeeks() {
-      const w = DATA.weeks[state.hotel];
-      const t = DATA.obTotals[state.hotel];
-      const max = Math.max(...w.actual, ...w.cautious, ...w.bench) || 1;
-      const H = (v) => (v / max) * 176;
-      const gap = 560 / w.actual.length;
-      let s = `<line x1="40" y1="260" x2="620" y2="260" stroke="#DCE2EC"/>`;
-      w.actual.forEach((f, i) => {
-        const x = 50 + i * gap;
-        s += `<rect data-i="${i}" x="${x}" y="${260 - H(f)}" width="${gap * 0.66}" height="${H(f)}" rx="6" fill="#C9D3EA"/>`;
-        if (i === 0 || w.month[i] !== w.month[i - 1]) {
-          s += `<text class="t" x="${x}" y="282">${DATA.monthShort[w.month[i]]}</text>`;
-        }
+    // Полоска n (с нуля) левее черты, если n < pct; черта стоит между столбиками pct и pct + 1 (ось x — 1..100).
+    // Процент очереди без броней (малый срез) остаётся пустым местом.
+    function drawQueue(id) {
+      plot(id, "queue", (data, layout, narrow) => {
+        const share = slice.buckets.map((b) => (b.bookings ? b.cancel_share * 100 : null));
+        const opacity = share.map((_, n) => (n < state.pct ? 1 : 0.45));
+        data[0].y = share;
+        data[0].customdata = slice.buckets.map((b) => [b.bookings, b.mean_risk * 100]);
+        data[0].marker.opacity = opacity;
+        data[1].y = share.map((v) => (v === null ? null : 100 - v));
+        data[1].marker.opacity = opacity;
+        layout.shapes[0].x0 = state.pct + 0.5;
+        layout.shapes[0].x1 = state.pct + 0.5;
+        layout.annotations[0].x = state.pct + 0.5;
+        layout.annotations[0].text = `предоплата с ${state.pct} %`;
+        layout.annotations[0].xanchor = state.pct < 8 ? "left" : state.pct > 92 ? "right" : "center";
+        if (narrow) { layout.margin.b = 16; layout.xaxis.title.text = ""; }
       });
-      const line = (k) => k.map((v, i) => `${(50 + i * gap + gap * 0.33).toFixed(1)},${(260 - H(v)).toFixed(1)}`).join(" ");
-      s += `<polyline points="${line(w.bench)}" fill="none" stroke="#6B7894" stroke-width="2.5" stroke-dasharray="7 5"/>`;
-      s += `<polyline points="${line(w.cautious)}" fill="none" stroke="#1D3FBF" stroke-width="4" stroke-linejoin="round"/>`;
-      s += `<text class="t strong" x="40" y="16">столбик — сколько броней отменили на самом деле</text>`;
-      s += `<text class="t cob" x="40" y="40">линия — сколько номеров продаём сверх брони</text>`;
-      s += `<text class="t" x="40" y="64">пунктир — та же оценка без модели</text>`;
-      $("weeks").innerHTML = s;
+    }
+
+    function drawCurves(id, curves) {
+      plot(id, "curves", (data, layout) => {
+        const model = curves["модель"].map((r) => r.total);
+        const lead = curves["срок брони"].map((r) => r.total);
+        const unit = unitOf(Math.max(...model, ...lead));
+        data[0].y = lead.map((v) => v / unit.div);
+        data[1].y = model.map((v) => v / unit.div);
+        data[2].x = [state.pct];
+        data[2].y = [model[state.pct] / unit.div];
+        [0, 1].forEach((k) => { data[k].hovertemplate = data[k].hovertemplate.replace("млн €", unit.name); });
+        layout.yaxis.title.text = `потери, ${unit.name}`;
+        const diff = lead[state.pct] - model[state.pct];
+        Object.assign(layout.annotations[0], { x: state.pct, y: model[state.pct] / unit.div,
+          text: diff >= 0 ? `модель экономит ${Calc.money(diff)}` : `модель дороже на ${Calc.money(-diff)}`,
+          xanchor: state.pct < 55 ? "left" : "right" });
+      });
+    }
+
+    function drawWeeks(id) {
+      const w = DATA.weeks[state.hotel];
+      plot(id, "weeks", (data, layout, narrow) => {
+        data.forEach((trace) => { trace.x = w.label; });
+        data[0].y = w.actual;
+        data[1].y = w.cautious;
+        data[2].y = w.bench;
+        if (narrow) layout.xaxis.nticks = 3;
+      });
+    }
+
+    // Ответ «сколько номеров продать сверх брони» — от выбора отеля (R1: «оба» — сумма решений двух отелей).
+    function drawObText() {
+      const t = DATA.obTotals[state.hotel];
       const both = state.hotel === "все отели" ? "два отеля, каждый считает сам; " : "";
       const split = state.hotel === "все отели"
         ? `<p>Городской — ${rooms(DATA.obTotals["City Hotel"].per_day)}, курортный —
@@ -434,62 +418,29 @@ if (typeof document !== "undefined") {
         <li><b>${pct1(t.covered)}</b>дат, когда номера хватило всем (${both}без модели —
           ${pct1(t.covered_bench)})</li>`);
     }
-    $("weeks").addEventListener("pointermove", (event) => {
-      const i = event.target.dataset && event.target.dataset.i;
-      if (i === undefined) { hideTip(); return; }
-      const w = DATA.weeks[state.hotel];
-      showTip(`<b>${w.label[i]}</b><br>отменили: ${Calc.count(w.actual[i])}<br>продаём сверх брони:
-        ${Calc.count(w.cautious[i])}<br>без модели: ${Calc.count(w.bench[i])}`, event.clientX, event.clientY);
-    });
-    $("weeks").addEventListener("pointerleave", hideTip);
 
-    const heatColor = (v) => {
-      const t = Math.min(v / 60, 1);
-      const mix = (from, to) => Math.round(from + (to - from) * t);
-      return `rgb(${mix(255, 232)},${mix(246, 163)},${mix(224, 23)})`;
-    };
-    function drawHeat() {
-      const svg = $("heat");
+    // Высота тепловой карты — по числу выбранных сегментов (у полного списка — как задано в Python);
+    // число броней и средний риск клетки — в подсказке.
+    function drawHeat(id) {
       const segs = DATA.segmentOrder.filter((seg) => state.segments.includes(seg));
       const months = DATA.months.filter((m) => state.months.includes(m));
       const empty = !slice || !slice.idx.length || !segs.length || !months.length;
-      setEmpty(svg, empty);
+      setEmpty($(id), empty);
       if (empty) return;
       const cells = Calc.heatCells(B, slice.idx);
-      const colW = Math.min(110, 456 / months.length);
-      svg.setAttribute("viewBox", `0 0 640 ${segs.length * 46 + 30}`);
-      let h = "";
-      months.forEach((m, c) => {
-        h += `<text class="t" x="${184 + c * colW + (colW - 6) / 2}" y="14" text-anchor="middle">${DATA.monthFull[m]}</text>`;
+      const cell = (seg, m) => cells[`${seg}|${m}`];
+      plot(id, "heatmap", (data, layout) => {
+        data[0].y = segs.map((seg) => DATA.segmentNames[seg]);
+        data[0].x = months.map((m) => DATA.monthShort[m]);
+        data[0].z = segs.map((seg) => months.map((m) => (cell(seg, m) ? cell(seg, m).cancel : null)));
+        data[0].text = data[0].z.map((row) => row.map((v) => (v === null ? "–" : `${Calc.comma(v, 0)} %`)));
+        data[0].customdata = segs.map((seg) => months.map((m) => (cell(seg, m)
+          ? [Calc.count(cell(seg, m).bookings), cell(seg, m).risk] : [0, null])));
+        const frame = layout.margin.t + layout.margin.b;
+        layout.height = frame + Math.round(((layout.height - frame) * Math.max(segs.length, 2)) / DATA.segmentOrder.length);
       });
-      segs.forEach((seg, r) => {
-        h += `<text class="t strong row" x="0" y="${r * 46 + 52}">${DATA.segmentNames[seg]}</text>`;
-        months.forEach((m, c) => {
-          const cell = cells[`${seg}|${m}`];
-          const x = 184 + c * colW;
-          const y = r * 46 + 26;
-          if (!cell) {
-            h += `<rect x="${x}" y="${y}" width="${colW - 6}" height="40" rx="10" fill="#F3F5F7"/>`;
-            h += `<text class="t" x="${x + (colW - 6) / 2}" y="${y + 25}" text-anchor="middle">—</text>`;
-            return;
-          }
-          h += `<rect data-seg="${seg}" data-m="${m}" x="${x}" y="${y}" width="${colW - 6}" height="40" rx="10"
-            fill="${heatColor(cell.cancel)}"/>`;
-          h += `<text class="t strong" x="${x + (colW - 6) / 2}" y="${y + 25}" text-anchor="middle"
-            pointer-events="none">${Calc.comma(cell.cancel, 0)} %</text>`;
-        });
-      });
-      svg.innerHTML = h;
     }
-    $("heat").addEventListener("pointermove", (event) => {
-      const { seg, m } = event.target.dataset || {};
-      if (!seg) { hideTip(); return; }
-      const cell = Calc.heatCells(B, slice.idx)[`${seg}|${m}`];
-      showTip(`<b>${DATA.segmentNames[seg]}, ${DATA.monthFull[m]}</b><br>${Calc.count(cell.bookings)} ${plural(
-        cell.bookings, ["бронь", "брони", "броней"])}<br>отменили: ${Calc.percent(cell.cancel / 100)}<br>средний
-        риск по модели: ${Calc.percent(cell.risk / 100)}`, event.clientX, event.clientY);
-    });
-    $("heat").addEventListener("pointerleave", hideTip);
+
 
     // Вкладки схем: мышь и стрелки
     const tabs = [...document.querySelectorAll("#schemeTabs [role=tab]")];
@@ -542,6 +493,7 @@ if (typeof document !== "undefined") {
           лишних номеров, чем советует оценка.</p></div></div>`);
 
     refilter();
-    drawWeeks();
+    drawWeeks("pWeeks");
+    drawObText();
   })();
 }

@@ -54,8 +54,8 @@
       <div>
         <h1>С кого брать предоплату, чтобы терять меньше</h1>
         <p class="lede">Каждая полоска — 1&nbsp;% броней. Модель выстроила их по риску отмены: слева самые рискованные.
-          Шафрановая часть полоски — доля броней, которые на деле отменили. Потяните черту, чтобы выбрать, с какой доли
-          брать предоплату.</p>
+          Шафрановая часть полоски — доля броней, которые на деле отменили. Ползунок под очередью двигает черту: левее
+          неё берём предоплату.</p>
       </div>
       <div class="outcome" id="outcome">
         <div class="loss"><div class="n"><span id="lossValue"></span> <small id="lossUnit"></small></div>
@@ -68,13 +68,15 @@
       <p class="empty" id="emptyHero" hidden>В этом срезе нет броней. Выберите другой сегмент или месяц.</p>
     </div>
     <div class="queue-box" id="queueBox">
-      <div class="queue intro" id="queue"></div>
-      <div class="cut" id="cut"><b id="cutTxt"></b></div>
-      <input id="share" type="range" min="0" max="100" step="1" value="70"
-        aria-label="Доля броней с предоплатой, процентов">
+      <div class="plot" id="pQueue" data-height="260" role="figure" aria-label="Очередь броней по риску отмены"></div>
+      <div class="track">
+        <label class="share" for="share">Предоплата с <b id="shareTxt"></b></label>
+        <input id="share" type="range" min="0" max="100" step="1" value="70"
+          aria-label="Доля броней с предоплатой, процентов">
+        <div class="marks"><button type="button" class="thr" id="thr"></button></div>
+        <div class="ends"><span>Самые рискованные</span><span>Самые надёжные</span></div>
+      </div>
     </div>
-    <div class="marks"><button type="button" class="thr" id="thr"></button></div>
-    <div class="ends"><span>Самые рискованные</span><span>Самые надёжные</span></div>
     <p class="hint">Брони «без возврата» в счётчиках не участвуют: они уже оплачены.</p>
     <p class="hint">Брони с одинаковым риском показаны общей долей отмен своей группы: модель их не различает.</p>
   </section>
@@ -84,8 +86,8 @@
       <div><h2>Модель против правила «по сроку брони»</h2>
         <p class="take">Если брать предоплату с одинаковой доли броней, выбор по модели обычно теряет меньше денег, чем
           выбор самых ранних броней. Точка — ваш выбор на черте выше.</p></div>
-      <div class="chart"><svg viewBox="0 0 640 300" id="curve" role="img"
-        aria-label="Потери при выборе броней по модели и по сроку брони"></svg>
+      <div class="chart"><div class="plot" id="pCurves" data-height="320" role="figure"
+        aria-label="Потери при выборе броней по модели и по сроку брони"></div>
         <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p></div>
     </section>
 
@@ -96,8 +98,8 @@
           дату заезда. Мы берём <b>осторожную оценку</b> — ту, что сбывается в 9 случаях из 10, — и продаём столько
           лишних номеров.</p>
         <ul class="mini" id="obTotals"></ul></div>
-      <div class="chart"><svg viewBox="0 0 640 300" id="weeks" role="img"
-        aria-label="Отмены по неделям заезда и сколько номеров продаём сверх брони"></svg></div>
+      <div class="chart"><div class="plot" id="pWeeks" data-height="320" role="figure"
+        aria-label="Отмены по неделям заезда и сколько номеров продаём сверх брони"></div></div>
       <p class="chart-note">Считается по датам заезда для всего отеля, поэтому меняется только от выбора отеля:
         сегмент и месяц на график не влияют.</p>
     </section>
@@ -108,8 +110,8 @@
           в каждом из четырёх месяцев (39–45&nbsp;%), группы — от 21 до 48&nbsp;%. Прямые гости отменяют примерно
           каждую пятую бронь (17–20&nbsp;%), корпоративные — от 5 до 34&nbsp;%. Цифра в клетке — доля
           отмен, число броней — при наведении.</p></div>
-      <div class="chart"><svg viewBox="0 0 640 380" id="heat" role="img"
-        aria-label="Доля отмен по сегментам и месяцам заезда"></svg>
+      <div class="chart"><div class="plot" id="pHeat" role="figure"
+        aria-label="Доля отмен по сегментам и месяцам заезда"></div>
         <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p></div>
     </section>
   </div>
@@ -140,7 +142,6 @@
       запуском стоит проверить правило на одном отеле или одном канале продаж в течение нескольких месяцев.</p>
   </section>
 </div>
-<div class="tip" id="tip" role="tooltip" hidden></div>
 <script type="application/json" id="data">{{data}}</script>
 <script>
 {{js}}
