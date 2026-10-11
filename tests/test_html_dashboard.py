@@ -10,7 +10,9 @@ from src.html_dashboard import MAX_BYTES, build_dashboard, pack_bookings
 
 SECTIONS = ["С кого брать предоплату, чтобы терять меньше", "Модель против правила «по сроку брони»",
             "Сколько номеров продать сверх брони", "Где отменяют чаще", "Как это устроено", "Что делать бизнесу",
-            "Допущения", "В этом срезе нет броней. Выберите другой сегмент или месяц."]
+            "Допущения", "В этом срезе нет броней. Выберите другой сегмент или месяц.", "Презентация", "Дашборд",
+            "Очередь броней по риску отмены", "Потери по сегментам", "Сегменты",
+            "Экономия против правила по сроку брони"]
 
 
 @pytest.fixture(name="page", scope="module")
@@ -33,6 +35,16 @@ def test_dashboard_has_sections_and_data(page):
     assert set(data["weeks"]) == {"все отели", "City Hotel", "Resort Hotel"}
     assert set(data["figures"]) == {"queue", "curves", "weeks", "heatmap", "segments"}
     assert 'src="figures/20_model_full_pipeline.html?theme=light"' in html
+
+
+def test_dashboard_has_two_views(page):
+    """Два вида и переключатель: презентация видна по умолчанию, дашборд — скрыт до выбора или #dashboard."""
+    _, html = page
+    assert 'id="viewTabs"' in html
+    assert re.search(r'<main[^>]*id="viewPresentation"', html)
+    assert re.search(r'<main[^>]*id="viewDashboard"[^>]*hidden', html)
+    for plot_id in ("dQueue", "dCurves", "dWeeks", "dHeat", "dSegments", "pQueue", "pCurves", "pWeeks", "pHeat"):
+        assert f'id="{plot_id}"' in html
 
 
 def test_dashboard_offline_and_small(page):

@@ -14,6 +14,11 @@
 <div class="wrap">
   <header class="top">
     <span class="logo">Отмены броней</span>
+    <div class="seg views" role="tablist" aria-label="Вид" id="viewTabs">
+      <button type="button" role="tab" data-view="presentation" aria-selected="true"
+        aria-controls="viewPresentation">Презентация</button><button type="button" role="tab" data-view="dashboard"
+        aria-selected="false" aria-controls="viewDashboard" tabindex="-1">Дашборд</button>
+    </div>
     <div class="seg" role="group" aria-label="Отель" id="hotel">
       <button type="button" data-hotel="все отели" aria-pressed="true">Оба отеля</button><button type="button"
         data-hotel="City Hotel" aria-pressed="false">Городской</button><button type="button"
@@ -49,6 +54,7 @@
     </details>
   </header>
 
+  <main id="viewPresentation">
   <section class="hero">
     <div class="hero-head">
       <div>
@@ -71,7 +77,7 @@
       <div class="plot" id="pQueue" data-height="260" role="figure" aria-label="Очередь броней по риску отмены"></div>
       <div class="track">
         <label class="share" for="share">Предоплата с <b id="shareTxt"></b></label>
-        <input id="share" type="range" min="0" max="100" step="1" value="70"
+        <input id="share" class="cut" type="range" min="0" max="100" step="1" value="70"
           aria-label="Доля броней с предоплатой, процентов">
         <div class="marks"><button type="button" class="thr" id="thr"></button></div>
         <div class="ends"><span>Самые рискованные</span><span>Самые надёжные</span></div>
@@ -141,6 +147,75 @@
     <p class="caveat">Это связь, а не причина: модель видела только прошлые брони двух португальских отелей. Перед
       запуском стоит проверить правило на одном отеле или одном канале продаж в течение нескольких месяцев.</p>
   </section>
+  </main>
+
+  <main id="viewDashboard" hidden>
+    <div class="kpis">
+      <div class="kpi main"><p class="l">Потери с предоплатой по модели</p>
+        <div class="v"><span id="kLoss"></span> <small id="kLossUnit"></small></div><p class="s" id="kLossNote"></p></div>
+      <div class="kpi"><p class="l">Предоплата с</p>
+        <div class="v"><span id="kPct"></span> <small id="kPctUnit"></small></div><p class="s" id="kPctNote"></p></div>
+      <div class="kpi caught"><p class="l">Отмен поймано</p>
+        <div class="v" id="kCaught"></div><p class="s" id="kCaughtNote"></p></div>
+      <div class="kpi"><p class="l">Надёжных гостей задето</p>
+        <div class="v" id="kTouched"></div><p class="s" id="kTouchedNote"></p></div>
+      <div class="kpi"><p class="l">Экономия против правила по сроку брони</p>
+        <div class="v"><span id="kSave"></span> <small id="kSaveUnit"></small></div></div>
+      <div class="kpi"><p class="l">Номеров сверх брони</p>
+        <div class="v"><span id="kRooms"></span> <small>в день</small></div><p class="s" id="kRoomsNote"></p></div>
+      <div class="kpi"><p class="l">Гостям не хватило номера</p>
+        <div class="v" id="kWalked"></div><p class="s" id="kWalkedNote"></p></div>
+      <div class="kpi"><p class="l">Дат, когда номера хватило всем</p>
+        <div class="v"><span id="kCovered"></span> <small>%</small></div><p class="s" id="kCoveredNote"></p></div>
+    </div>
+
+    <div class="panels">
+      <section class="panel wide">
+        <h3>Очередь броней по риску отмены</h3>
+        <p class="sub">Шафран — доля броней, которые на деле отменили. Левее черты берём предоплату.</p>
+        <div class="plot" id="dQueue" data-height="250" role="figure" aria-label="Очередь броней по риску отмены"></div>
+        <div class="track" id="dTrack">
+          <input id="dShare" class="cut" type="range" min="0" max="100" step="1" value="70"
+            aria-label="Доля броней с предоплатой, процентов">
+          <label class="share" for="dShare">Предоплата с <b id="dShareTxt"></b></label>
+        </div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p>
+      </section>
+      <section class="panel">
+        <h3>Потери от доли броней с предоплатой</h3>
+        <p class="sub">Модель против правила «брать предоплату с самых ранних броней».</p>
+        <div class="plot" id="dCurves" role="figure" aria-label="Потери при выборе броней по модели и по сроку брони"></div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p>
+      </section>
+      <section class="panel">
+        <h3>Овербукинг по неделям заезда</h3>
+        <p class="sub" id="dWeeksSub"></p>
+        <div class="plot" id="dWeeks" role="figure"
+          aria-label="Отмены по неделям заезда и сколько номеров продаём сверх брони"></div>
+      </section>
+      <section class="panel">
+        <h3>Доля отмен: сегмент × месяц</h3>
+        <p class="sub">Цифра в клетке — доля отмен, число броней — при наведении.</p>
+        <div class="plot" id="dHeat" role="figure" aria-label="Доля отмен по сегментам и месяцам заезда"></div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p>
+      </section>
+      <section class="panel">
+        <h3>Потери по сегментам</h3>
+        <p class="sub" id="dSegmentsSub"></p>
+        <div class="plot" id="dSegments" role="figure" aria-label="Потери по сегментам без предоплаты и с моделью"></div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p>
+      </section>
+      <section class="panel wide">
+        <h3>Сегменты</h3>
+        <div class="table-box"><table>
+          <thead><tr><th scope="col">Сегмент</th><th scope="col">Броней</th><th scope="col">Доля отмен</th>
+            <th scope="col">Потери без предоплаты<span class="unit"></span></th>
+            <th scope="col">С моделью<span class="unit"></span></th><th scope="col">Экономия<span class="unit"></span></th></tr></thead>
+          <tbody id="dTable"></tbody>
+        </table></div>
+      </section>
+    </div>
+  </main>
 </div>
 <script type="application/json" id="data">{{data}}</script>
 <script>

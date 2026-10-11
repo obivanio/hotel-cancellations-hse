@@ -205,6 +205,8 @@ if (typeof document !== "undefined") {
     const pct1 = (share) => `${Calc.comma(share * 100, 1)} %`;
     // Неразрывный пробел между числом и единицей: «0,64 млн €» и «90 %» не разрываются при переносе строки.
     const nb = (text) => text.replace(/ (?=млн|тыс|%|€)/g, "\u00A0");
+    // В показателях и таблице число не разрывается и внутри: «4 898» держится одной строкой.
+    const tight = (text) => nb(text).replace(/(\d) (?=\d)/g, "$1\u00A0");
     const unitOf = (max) => (max < 100000 ? { div: 1e3, name: "тыс. €" } : { div: 1e6, name: "млн €" });
 
     const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -252,8 +254,6 @@ if (typeof document !== "undefined") {
       document.querySelectorAll("#hotel button").forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
       state.hotel = button.dataset.hotel;
       refilter();
-      drawWeeks("pWeeks");
-      drawObText();
     }));
     const closePicks = (except) => document.querySelectorAll("details.pick[open]").forEach((d) => {
       if (d !== except) d.open = false;
@@ -270,7 +270,7 @@ if (typeof document !== "undefined") {
       state.loss = Number($("loss").value) / 100;
       $("unsoldOut").textContent = `${$("unsold").value} %`;
       $("lossOut").textContent = `${$("loss").value} %`;
-      update();
+      redrawAll();
     };
     $("unsold").addEventListener("input", setAssumptions);
     $("loss").addEventListener("input", setAssumptions);
@@ -281,37 +281,48 @@ if (typeof document !== "undefined") {
       setAssumptions();
     });
 
-    // Очередь броней: черту двигает ползунок под графиком (мышью или стрелками)
-    $("share").addEventListener("input", (event) => {
+    // Очередь броней: черту двигает ползунок под графиком (мышью или стрелками); ползунки двух видов — одна черта
+    ["share", "dShare"].forEach((id) => $(id).addEventListener("input", (event) => {
       state.pct = Number(event.target.value);
       state.follow = false;
-      update();
-    });
-    $("thr").addEventListener("click", () => { state.follow = true; update(); });
+      redrawAll();
+    }));
+    $("thr").addEventListener("click", () => { state.follow = true; redrawAll(); });
 
     function refilter() {
       summaries();
       const idx = Calc.filterIdx(B, state.hotel, state.segments, state.months);
       const order = Calc.queueOrder(B, idx, "proba");
       slice = { idx, prefix: Calc.prefix(B, order), buckets: Calc.queueBuckets(B, order) };
-      drawHeat("pHeat");
-      update();
+      redrawAll();
     }
 
-    function update() {
+    // Состояние общее для двух видов; рисуется только видимый вид (Plotly в скрытом блоке получает нулевую ширину),
+    // скрытый перерисуется при показе.
+    function redrawAll() {
       const a = { unsold: state.unsold, loss: state.loss };
       const empty = !slice.idx.length;
+      const key = empty ? null : Calc.keyNumbers(B, slice.idx, a);
+      if (key && state.follow) state.pct = key.threshold_pct;
+      const res = key && Calc.outcome(slice.prefix, Calc.cutSize(slice.idx.length, state.pct), a);
+      const curves = key && Calc.shareCurves(B, slice.idx, a);
+      if (views.dashboard.hidden) drawPresentation(key, res, curves);
+      else drawDashboard(key, res, curves, a);
+    }
+
+    function drawPresentation(key, res, curves) {
+      const empty = !key;
+      drawHeat("pHeat");
+      drawWeeks("pWeeks");
+      drawObText();
       document.querySelectorAll("#outcome, #queueBox, .hint").forEach((el) => { el.hidden = empty; });
       $("emptyHero").hidden = !empty;
       setEmpty($("pCurves"), empty);
       if (empty) return;
-      const key = Calc.keyNumbers(B, slice.idx, a);
-      if (state.follow) state.pct = key.threshold_pct;
       $("share").value = state.pct;
       $("share").setAttribute("aria-valuetext", `предоплата с ${state.pct} % броней`);
       $("share").style.setProperty("--p", `${state.pct}%`);
       $("shareTxt").textContent = nb(`${state.pct} %`);
-      const res = Calc.outcome(slice.prefix, Calc.cutSize(slice.idx.length, state.pct), a);
       const [value, unit] = moneyParts(res.total);
       $("lossValue").textContent = value;
       $("lossUnit").textContent = unit;
@@ -332,7 +343,80 @@ if (typeof document !== "undefined") {
       thr.setAttribute("aria-label", `Поставить черту на порог ${Calc.comma(key.threshold)}: предоплата с
         ${key.threshold_pct} % броней`.replace(/\s+/g, " "));
       drawQueue("pQueue");
-      drawCurves("pCurves", Calc.shareCurves(B, slice.idx, a));
+      drawCurves("pCurves", curves);
+    }
+
+    // Вид «Дашборд»: первые пять показателей — от фильтров, допущений и черты; последние три — только от отеля.
+    function drawDashboard(key, res, curves, a) {
+      const t = DATA.obTotals[state.hotel];
+      const set = (id, text) => { $(id).textContent = tight(text); };
+      set("kRooms", `≈ ${Calc.count(t.per_day)}`);
+      set("kRoomsNote", `по датам ${Calc.count(t.per_day_min)}–${Calc.count(t.per_day_max)}`);
+      set("kWalked", Calc.count(t.walked));
+      set("kWalkedNote", `перепродано ${Calc.count(t.resold)}`);
+      set("kCovered", Calc.comma(t.covered * 100, 1));
+      set("kCoveredNote", `без модели ${pct1(t.covered_bench)}`);
+      $("dWeeksSub").textContent = state.hotel === "все отели" ? "Оба отеля, каждый считает сам."
+        : `${state.hotel === "City Hotel" ? "Городской" : "Курортный"} отель.`;
+      drawWeeks("dWeeks");
+      drawHeat("dHeat");
+      const empty = !key;
+      setEmpty($("dQueue"), empty);
+      $("dTrack").hidden = empty;
+      setEmpty($("dCurves"), empty);
+      setEmpty($("dSegments"), empty);
+      if (empty) {
+        ["kLoss", "kPct", "kCaught", "kTouched", "kSave"].forEach((id) => set(id, "—"));
+        ["kLossUnit", "kLossNote", "kPctUnit", "kPctNote", "kCaughtNote", "kTouchedNote", "kSaveUnit",
+          "dSegmentsSub"].forEach((id) => set(id, ""));
+        $("dTable").innerHTML = `<tr><td class="none" colspan="6">В этом срезе нет броней. Выберите другой сегмент
+          или месяц.</td></tr>`;
+        return;
+      }
+      const [loss, lossUnit] = moneyParts(res.total);
+      set("kLoss", loss);
+      set("kLossUnit", lossUnit);
+      set("kLossNote", `без предоплаты ${Calc.money(key.baseline)}\nсо всех ${Calc.money(key.everyone)}`);
+      set("kPct", `${state.pct}`);
+      set("kPctUnit", "% броней");
+      set("kPctNote", `порог риска ${Calc.comma(key.threshold)}`);
+      set("kCaught", Calc.percent(res.caught_share));
+      set("kCaughtNote", `${Calc.count(res.caught)} ${plural(res.caught, ["бронь", "брони", "броней"])}`);
+      set("kTouched", Calc.percent(res.touched_share));
+      set("kTouchedNote", `${Calc.count(res.touched)} ${plural(res.touched, ["бронь", "брони", "броней"])}`);
+      const [save, saveUnit] = moneyParts(curves["срок брони"][state.pct].total - curves["модель"][state.pct].total);
+      set("kSave", save);
+      set("kSaveUnit", saveUnit);
+      $("dShare").value = state.pct;
+      $("dShare").setAttribute("aria-valuetext", `предоплата с ${state.pct} % броней`);
+      $("dShare").style.setProperty("--p", `${state.pct}%`);
+      $("dShareTxt").textContent = nb(`${state.pct} % броней`);
+      drawQueue("dQueue");
+      drawCurves("dCurves", curves);
+      const rows = Calc.segmentTable(B, slice.idx, a);
+      const unit = unitOf(Math.max(...rows.map((r) => r.baseline), 1));
+      $("dSegmentsSub").textContent = `Без предоплаты и с предоплатой по порогу риска ${Calc.comma(key.threshold)}.`;
+      plot("dSegments", "segments", (data, layout) => {
+        const names = rows.map((r) => DATA.segmentNames[r.segment]);
+        data[0].y = names;
+        data[1].y = names;
+        data[0].x = rows.map((r) => r.baseline / unit.div);
+        data[1].x = rows.map((r) => r.model / unit.div);
+        data.forEach((trace) => { trace.hovertemplate = `%{y}: %{x:.2f} ${unit.name}<extra>${trace.name}</extra>`; });
+        layout.xaxis.title.text = `потери, ${unit.name}`;
+        // Высота — по числу сегментов в срезе, как у тепловой карты: один сегмент не растягивается на весь график;
+        // легенда — над областью графика, чтобы не лечь на столбики низкого графика.
+        Object.assign(layout.legend, { y: 1.02, yanchor: "bottom" });
+        layout.margin.t = Math.max(layout.margin.t, 36);
+        const frame = layout.margin.t + layout.margin.b;
+        layout.height = frame + Math.round(((layout.height - frame) * Math.max(rows.length, 2)) / DATA.segmentOrder.length);
+      });
+      // Одна единица на всю таблицу (в заголовках): числа в столбце сравниваются напрямую.
+      const money = (value) => Calc.comma(value / unit.div, unit.div === 1e6 ? 2 : 1);
+      document.querySelectorAll("#viewDashboard .unit").forEach((el) => { el.textContent = nb(`, ${unit.name}`); });
+      $("dTable").innerHTML = rows.map((r) => tight(`<tr><td>${DATA.segmentNames[r.segment]}</td>
+        <td>${Calc.count(r.bookings)}</td><td>${Calc.percent(r.cancel_share)}</td><td>${money(r.baseline)}</td>
+        <td>${money(r.model)}</td><td class="save">${money(r.saving)}</td></tr>`)).join("");
     }
 
     // Графики Plotly: вид задаёт Python (DATA.figures), здесь меняются только данные и положение черты/точки.
@@ -346,7 +430,13 @@ if (typeof document !== "undefined") {
       if (!el) return;
       const data = clone(DATA.figures[name].data);
       const layout = clone(DATA.figures[name].layout);
-      patch(data, layout, el.clientWidth < 560);
+      const narrow = el.clientWidth < 560;
+      patch(data, layout, narrow);
+      // На узком экране легенда переносится на 2–3 строки: ставим её над областью графика и оставляем ей место сверху.
+      if (narrow && layout.showlegend) {
+        Object.assign(layout.legend, { y: 1.02, yanchor: "bottom" });
+        layout.margin.t = Math.max(layout.margin.t, 20 * data.filter((t) => t.showlegend !== false).length);
+      }
       if (el.dataset.height) layout.height = Number(el.dataset.height);
       Plotly.react(el, data, layout, DATA.plotlyConfig);
     }
@@ -492,8 +582,41 @@ if (typeof document !== "undefined") {
           в ${pct1(v.covered_city)}: там отменяют группами, разом. В городском отеле стоит продавать меньше
           лишних номеров, чем советует оценка.</p></div></div>`);
 
+    // Переключатель «Презентация / Дашборд»: мышь, стрелки, адрес #dashboard
+    const views = { presentation: $("viewPresentation"), dashboard: $("viewDashboard") };
+    const viewTabs = [...document.querySelectorAll("#viewTabs [role=tab]")];
+    const setView = (name) => {
+      Object.entries(views).forEach(([view, el]) => { el.hidden = view !== name; });
+      viewTabs.forEach((tab) => {
+        const on = tab.dataset.view === name;
+        tab.setAttribute("aria-selected", String(on));
+        tab.tabIndex = on ? 0 : -1;
+      });
+    };
+    function showView(name, push) {
+      setView(name);
+      if (push) history.replaceState(null, "", name === "dashboard" ? "#dashboard" : location.pathname + location.search);
+      redrawAll();
+      views[name].querySelectorAll(".plot").forEach((el) => { if (el.data) Plotly.Plots.resize(el); });
+    }
+    viewTabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => showView(tab.dataset.view, true));
+      tab.addEventListener("keydown", (event) => {
+        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+        const next = viewTabs[(i + (event.key === "ArrowRight" ? 1 : viewTabs.length - 1)) % viewTabs.length];
+        next.focus();
+        showView(next.dataset.view, true);
+      });
+    });
+    window.addEventListener("hashchange", () => showView(location.hash === "#dashboard" ? "dashboard" : "presentation"));
+
+    // Подстройки под узкий экран считаются при отрисовке, поэтому после изменения размера окна вид перерисовывается.
+    let resizeTimer = 0;
+    const redrawSoon = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(redrawAll, 200); };
+    window.addEventListener("resize", redrawSoon);
+    window.addEventListener("orientationchange", redrawSoon);
+
+    setView(location.hash === "#dashboard" ? "dashboard" : "presentation");
     refilter();
-    drawWeeks("pWeeks");
-    drawObText();
   })();
 }
