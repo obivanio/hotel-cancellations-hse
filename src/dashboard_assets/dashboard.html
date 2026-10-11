@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Отмены броней: с кого брать предоплату</title>
+<style>
+{{fonts}}
+{{css}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="logo">Отмены броней</span>
+    <div class="seg" role="group" aria-label="Отель" id="hotel">
+      <button type="button" data-hotel="все отели" aria-pressed="true">Оба отеля</button><button type="button"
+        data-hotel="City Hotel" aria-pressed="false">Городской</button><button type="button"
+        data-hotel="Resort Hotel" aria-pressed="false">Курортный</button>
+    </div>
+    <details class="pick" id="segPick">
+      <summary class="select" id="segSum">Все сегменты</summary>
+      <div class="pop" role="group" aria-label="Сегменты">
+        <div class="checks" id="segList"></div>
+        <button type="button" class="link" data-all="seg">Выбрать все</button>
+      </div>
+    </details>
+    <details class="pick" id="monPick">
+      <summary class="select" id="monSum">Май–август 2017</summary>
+      <div class="pop" role="group" aria-label="Месяцы заезда">
+        <div class="checks" id="monList"></div>
+        <button type="button" class="link" data-all="mon">Выбрать все</button>
+      </div>
+    </details>
+    <details class="pick" id="asPick">
+      <summary class="select">Допущения</summary>
+      <div class="pop wide">
+        <label class="slider" for="unsold"><span>Теряем при пропущенной отмене</span><output id="unsoldOut"
+          for="unsold">50 %</output></label>
+        <input type="range" id="unsold" min="30" max="70" step="5" value="50">
+        <p class="note">Какая часть цены брони пропадает, если гость отменил, а номер не успели продать заново.</p>
+        <label class="slider" for="loss"><span>Уходит гостей из-за предоплаты</span><output id="lossOut"
+          for="loss">10 %</output></label>
+        <input type="range" id="loss" min="5" max="20" step="1" value="10">
+        <p class="note">Какая часть надёжных гостей откажется от брони, если попросить предоплату.</p>
+        <button type="button" class="reset" id="reset">Вернуть как было</button>
+      </div>
+    </details>
+  </header>
+
+  <section class="hero">
+    <div class="hero-head">
+      <div>
+        <h1>С кого брать предоплату, чтобы терять меньше</h1>
+        <p class="lede">Каждая полоска — 1 % броней. Модель выстроила их по риску отмены: слева самые рискованные.
+          Шафрановая часть полоски — брони, которые на деле отменили. Потяните черту, чтобы выбрать, с какой доли
+          брать предоплату.</p>
+      </div>
+      <div class="outcome" id="outcome">
+        <div class="loss"><div class="n"><span id="lossValue"></span> <small id="lossUnit"></small></div>
+          <p id="lossNote"></p></div>
+        <div class="count cc"><div class="n c" id="caught"></div><p>отмен поймали, <b id="caughtShare"></b></p></div>
+        <div class="count rr"><div class="n" id="touched"></div><p>надёжных гостей задели,
+          <b id="touchedShare"></b></p></div>
+        <div class="count mm"><div class="n c" id="missed"></div><p>отмен пропустили, <b id="missedShare"></b></p></div>
+      </div>
+      <p class="empty" id="emptyHero" hidden>В этом срезе нет броней. Выберите другой сегмент или месяц.</p>
+    </div>
+    <div class="queue-box" id="queueBox">
+      <div class="queue intro" id="queue"></div>
+      <div class="cut" id="cut"><b id="cutTxt"></b></div>
+      <input id="share" type="range" min="0" max="100" step="1" value="70"
+        aria-label="Доля броней с предоплатой, процентов">
+    </div>
+    <div class="marks"><button type="button" class="thr" id="thr"></button></div>
+    <div class="ends"><span>Самые рискованные</span><span>Самые надёжные</span></div>
+    <p class="hint">Брони «без возврата» в счётчиках не участвуют: они уже оплачены.</p>
+    <p class="hint">Брони с одинаковым риском показаны общей долей отмен своей группы: модель их не различает.</p>
+  </section>
+
+  <div class="parts">
+    <section class="part">
+      <div><h2>Модель против правила «по сроку брони»</h2>
+        <p class="take">Если брать предоплату с одинаковой доли броней, выбор по модели теряет меньше денег, чем
+          выбор самых ранних броней. Точка — ваш выбор на черте выше.</p></div>
+      <div class="chart"><svg viewBox="0 0 640 300" id="curve" role="img"
+        aria-label="Потери при выборе броней по модели и по сроку брони"></svg></div>
+    </section>
+
+    <section class="part">
+      <div><h2>Сколько номеров продать сверх брони</h2>
+        <p class="take">Модель заранее говорит, сколько отмен ждать на неделе. Мы берём <b>осторожную оценку</b> —
+          ту, что сбывается в 9 случаях из 10, — и продаём столько лишних номеров.</p>
+        <ul class="mini" id="obTotals"></ul></div>
+      <div class="chart"><svg viewBox="0 0 640 300" id="weeks" role="img"
+        aria-label="Отмены по неделям заезда и сколько номеров продаём сверх брони"></svg>
+        <p class="chart-note">Считается по датам заезда для всего отеля, поэтому меняется только от выбора отеля:
+          сегмент и месяц на график не влияют.</p></div>
+    </section>
+
+    <section class="part">
+      <div><h2>Где отменяют чаще</h2>
+        <p class="take">Онлайн-агентства отменяют больше 40 % броней в каждом из четырёх месяцев, группы — от 21
+          до 48 %. Прямые и корпоративные гости отменяют примерно каждую пятую бронь. Цифра в клетке — доля
+          отмен, число броней — при наведении.</p></div>
+      <div class="chart"><svg viewBox="0 0 640 380" id="heat" role="img"
+        aria-label="Доля отмен по сегментам и месяцам заезда"></svg></div>
+    </section>
+  </div>
+
+  <section class="schemes">
+    <div class="schemes-head">
+      <div><h2>Как это устроено</h2>
+        <p class="take">Интерактивные схемы. Нажмите на любой шаг — откроется паспорт шага с пояснением простыми
+          словами. Колесом мыши схему можно приблизить.</p></div>
+      <div class="seg" role="tablist" aria-label="Схема" id="schemeTabs">
+        <button type="button" role="tab" id="tab20" aria-selected="true" aria-controls="scheme"
+          data-src="figures/20_model_full_pipeline.html">Как собрана модель</button><button type="button"
+          role="tab" id="tab19" aria-selected="false" aria-controls="scheme" tabindex="-1"
+          data-src="figures/19_prepayment_decision.html">Как принимается решение</button>
+      </div>
+    </div>
+    <iframe id="scheme" role="tabpanel" aria-labelledby="tab20" title="Схема: как собрана модель"
+      src="figures/20_model_full_pipeline.html?theme=light"></iframe>
+  </section>
+
+  <section class="verdict">
+    <h2>Что делать бизнесу</h2>
+    <p class="lead">Модель не принимает решения, она показывает, где риск отмены выше. Из этого следуют три действия.
+      Цифры — для обоих отелей за май–август 2017 при допущениях по умолчанию (50 % и 10 %); фильтры выше на них
+      не влияют.</p>
+    <div class="recs-row" id="recs"></div>
+    <p class="caveat">Это связь, а не причина: модель видела только прошлые брони двух португальских отелей. Перед
+      запуском стоит проверить правило на одном отеле или одном канале продаж в течение нескольких месяцев.</p>
+  </section>
+</div>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<script type="application/json" id="data">{{data}}</script>
+<script>
+{{js}}
+</script>
+</body>
+</html>
