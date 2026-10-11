@@ -413,10 +413,7 @@ if (typeof document !== "undefined") {
         data[1].x = rows.map((r) => r.model / unit.div);
         data.forEach((trace) => { trace.hovertemplate = `%{y}: %{x:.2f} ${unit.name}<extra>${trace.name}</extra>`; });
         layout.xaxis.title.text = `потери, ${unit.name}`;
-        // Высота — по числу сегментов в срезе, как у тепловой карты: один сегмент не растягивается на весь график;
-        // легенда — над областью графика, чтобы не лечь на столбики низкого графика.
-        Object.assign(layout.legend, { y: 1.02, yanchor: "bottom" });
-        layout.margin.t = Math.max(layout.margin.t, 36);
+        // Высота — по числу сегментов в срезе, как у тепловой карты: один сегмент не растягивается на весь график.
         const frame = layout.margin.t + layout.margin.b;
         layout.height = frame + Math.round(((layout.height - frame) * Math.max(rows.length, 2)) / DATA.segmentOrder.length);
       });
@@ -471,7 +468,7 @@ if (typeof document !== "undefined") {
     }
 
     function drawCurves(id, curves) {
-      plot(id, "curves", (data, layout) => {
+      plot(id, "curves", (data, layout, narrow) => {
         const model = curves["модель"].map((r) => r.total);
         const lead = curves["срок брони"].map((r) => r.total);
         const unit = unitOf(Math.max(...model, ...lead));
@@ -483,8 +480,11 @@ if (typeof document !== "undefined") {
         layout.yaxis.title.text = `потери, ${unit.name}`;
         const diff = lead[state.pct] - model[state.pct];
         Object.assign(layout.annotations[0], { x: state.pct, y: model[state.pct] / unit.div,
-          text: diff >= 0 ? `модель экономит ${Calc.money(diff)}` : `модель дороже на ${Calc.money(-diff)}`,
+          text: Calc.money(Math.abs(diff)) === Calc.money(0) ? "почти без разницы"
+            : diff >= 0 ? `модель экономит ${Calc.money(diff)}` : `модель дороже на ${Calc.money(-diff)}`,
           xanchor: state.pct < 55 ? "left" : "right" });
+        // На узком экране подпись длиннее половины графика: у краёв — к краю, в середине — по центру.
+        if (narrow) layout.annotations[0].xanchor = state.pct < 30 ? "left" : state.pct > 70 ? "right" : "center";
       });
     }
 

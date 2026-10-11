@@ -51,6 +51,8 @@ def test_heatmap_and_segments(specs):
         text == "–" for row in heat["text"] for text in row)
     assert specs["segments"]["data"][0]["orientation"] == "h"
     assert "Онлайн-агентства" in specs["segments"]["data"][0]["y"]
+    layout = specs["segments"]["layout"]
+    assert layout["legend"]["y"] == 1.02 and layout["legend"]["yanchor"] == "bottom" and layout["margin"]["t"] >= 36
 
 
 def test_config_offline():

@@ -142,7 +142,8 @@ def segments_figure(frame: pd.DataFrame) -> go.Figure:
     fig.add_bar(y=names, x=(table["model"] / 1e6).round(6).tolist(), orientation="h", name="с моделью",
                 marker_color=COBALT, hovertemplate="%{y}: %{x:.2f} млн €<extra>с моделью</extra>")
     style(fig, 320, legend=True)
-    fig.update_layout(barmode="group", bargap=0.25, margin={"l": 140, "r": 16, "t": 12, "b": 44})
+    fig.update_layout(barmode="group", bargap=0.25, margin={"l": 140, "r": 16, "t": 36, "b": 44},
+                      legend={"orientation": "h", "x": 0, "y": 1.02, "yanchor": "bottom"})
     fig.update_xaxes(showgrid=True, gridcolor=GRID, title_text="потери, млн €", rangemode="tozero")
     fig.update_yaxes(autorange="reversed", showgrid=False)
     return fig
