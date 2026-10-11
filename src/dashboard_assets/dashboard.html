@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Отмены броней: с кого брать предоплату</title>
+<style>
+{{fonts}}
+{{css}}
+</style>
+<script id="plotly-js">{{plotly}}</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="logo">Отмены броней</span>
+    <div class="seg views" role="tablist" aria-label="Вид" id="viewTabs">
+      <button type="button" role="tab" data-view="dashboard" aria-selected="true"
+        aria-controls="viewDashboard">Дашборд</button><button type="button" role="tab" data-view="presentation"
+        aria-selected="false" aria-controls="viewPresentation" tabindex="-1">Презентация</button>
+    </div>
+    <div class="seg" role="group" aria-label="Отель" id="hotel">
+      <button type="button" data-hotel="все отели" aria-pressed="true">Оба отеля</button><button type="button"
+        data-hotel="City Hotel" aria-pressed="false">Городской</button><button type="button"
+        data-hotel="Resort Hotel" aria-pressed="false">Курортный</button>
+    </div>
+    <details class="pick" id="segPick">
+      <summary class="select" id="segSum">Все сегменты</summary>
+      <div class="pop" role="group" aria-label="Сегменты">
+        <div class="checks" id="segList"></div>
+        <button type="button" class="link" data-all="seg">Выбрать все</button>
+      </div>
+    </details>
+    <details class="pick" id="monPick">
+      <summary class="select" id="monSum">Май–август 2017</summary>
+      <div class="pop" role="group" aria-label="Месяцы заезда">
+        <div class="checks" id="monList"></div>
+        <button type="button" class="link" data-all="mon">Выбрать все</button>
+      </div>
+    </details>
+    <details class="pick" id="asPick">
+      <summary class="select">Допущения</summary>
+      <div class="pop wide">
+        <label class="slider" for="unsold"><span>Теряем при пропущенной отмене</span><output id="unsoldOut"
+          for="unsold">50&nbsp;%</output></label>
+        <input type="range" id="unsold" min="30" max="70" step="5" value="50">
+        <p class="note">Какая часть цены брони пропадает, если гость отменил, а номер не успели продать заново.</p>
+        <label class="slider" for="loss"><span>Уходит гостей из-за предоплаты</span><output id="lossOut"
+          for="loss">10&nbsp;%</output></label>
+        <input type="range" id="loss" min="5" max="20" step="1" value="10">
+        <p class="note">Какая часть надёжных гостей откажется от брони, если попросить предоплату.</p>
+        <button type="button" class="reset" id="reset">Вернуть как было</button>
+      </div>
+    </details>
+  </header>
+
+  <main id="viewPresentation" hidden>
+  <section class="hero">
+    <div class="hero-head">
+      <div>
+        <h1>С кого брать предоплату, чтобы терять меньше</h1>
+        <p class="lede">Каждая полоска — 1&nbsp;% броней. Модель выстроила их по риску отмены: слева самые рискованные.
+          Шафрановая часть полоски — доля броней, которые на деле отменили. Ползунок под очередью двигает черту: левее
+          неё берём предоплату.</p>
+      </div>
+      <div class="outcome" id="outcome">
+        <div class="loss"><div class="n"><span id="lossValue"></span> <small id="lossUnit"></small></div>
+          <p id="lossNote"></p></div>
+        <div class="count cc"><div class="n c" id="caught"></div><p>отмен поймали, <b id="caughtShare"></b></p></div>
+        <div class="count rr"><div class="n" id="touched"></div><p>надёжных гостей задели,
+          <b id="touchedShare"></b></p></div>
+        <div class="count mm"><div class="n c" id="missed"></div><p>отмен пропустили, <b id="missedShare"></b></p></div>
+      </div>
+      <p class="empty" id="emptyHero" hidden>В этом срезе нет броней. Выберите другой сегмент или месяц.</p>
+    </div>
+    <div class="queue-box" id="queueBox">
+      <div class="plot" id="pQueue" data-height="260" role="figure" aria-label="Очередь броней по риску отмены"></div>
+      <div class="track">
+        <label class="share" for="share">Предоплата с <b id="shareTxt"></b></label>
+        <input id="share" class="cut" type="range" min="0" max="100" step="1" value="70"
+          aria-label="Доля броней с предоплатой, процентов">
+        <div class="marks"><button type="button" class="thr" id="thr"></button></div>
+        <div class="ends"><span>Самые рискованные</span><span>Самые надёжные</span></div>
+      </div>
+    </div>
+    <p class="hint">Брони «без возврата» в счётчиках не участвуют: они уже оплачены.</p>
+    <p class="hint">Брони с одинаковым риском показаны общей долей отмен своей группы: модель их не различает.</p>
+  </section>
+
+  <div class="parts">
+    <section class="part">
+      <div><h2>Модель против правила «по сроку брони»</h2>
+        <p class="take">Если брать предоплату с одинаковой доли броней, выбор по модели обычно теряет меньше денег, чем
+          выбор самых ранних броней. Точка — ваш выбор на черте выше.</p></div>
+      <div class="chart"><div class="plot" id="pCurves" data-height="320" role="figure"
+        aria-label="Потери при выборе броней по модели и по сроку брони"></div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p></div>
+    </section>
+
+    <section class="part">
+      <div><h2>Сколько номеров продать сверх брони</h2>
+        <div class="ob-answer" id="obAnswer"></div>
+        <p class="take">Часть броней отменят, и номера опустеют. Модель заранее говорит, сколько отмен ждать на каждую
+          дату заезда. Мы берём <b>осторожную оценку</b> — ту, что сбывается в 9 случаях из 10, — и продаём столько
+          лишних номеров.</p>
+        <ul class="mini" id="obTotals"></ul></div>
+      <div class="chart"><div class="plot" id="pWeeks" data-height="320" role="figure"
+        aria-label="Отмены по неделям заезда и сколько номеров продаём сверх брони"></div></div>
+      <p class="chart-note">Считается по датам заезда для всего отеля, поэтому меняется только от выбора отеля:
+        сегмент и месяц на график не влияют.</p>
+    </section>
+
+    <section class="part">
+      <div><h2>Где отменяют чаще</h2>
+        <p class="take">Для обоих отелей (текст не меняется от фильтра): онлайн-агентства отменяют около 40&nbsp;% броней
+          в каждом из четырёх месяцев (39–45&nbsp;%), группы — от 21 до 48&nbsp;%. Прямые гости отменяют примерно
+          каждую пятую бронь (17–20&nbsp;%), корпоративные — от 5 до 34&nbsp;%. Цифра в клетке — доля
+          отмен, число броней — при наведении.</p></div>
+      <div class="chart"><div class="plot" id="pHeat" role="figure"
+        aria-label="Доля отмен по сегментам и месяцам заезда"></div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p></div>
+    </section>
+  </div>
+
+  <div id="schemesSlotP"></div>
+
+  <section class="verdict">
+    <h2>Что делать бизнесу</h2>
+    <p class="lead">Модель не принимает решения, она показывает, где риск отмены выше. Из этого следуют три действия.
+      Цифры — для обоих отелей за май–август 2017 при допущениях по умолчанию (50&nbsp;% и 10&nbsp;%); фильтры выше на них
+      не влияют.</p>
+    <div class="recs-row" id="recs"></div>
+    <p class="caveat">Это связь, а не причина: модель видела только прошлые брони двух португальских отелей. Перед
+      запуском стоит проверить правило на одном отеле или одном канале продаж в течение нескольких месяцев.</p>
+  </section>
+  </main>
+
+  <main id="viewDashboard">
+    <div class="kpis">
+      <div class="kpi main"><p class="l">Потери с предоплатой по модели</p>
+        <div class="v"><span id="kLoss"></span> <small id="kLossUnit"></small></div><p class="s" id="kLossNote"></p></div>
+      <div class="kpi"><p class="l">Предоплата с</p>
+        <div class="v"><span id="kPct"></span> <small id="kPctUnit"></small></div><p class="s" id="kPctNote"></p></div>
+      <div class="kpi caught"><p class="l">Отмен поймано</p>
+        <div class="v" id="kCaught"></div><p class="s" id="kCaughtNote"></p></div>
+      <div class="kpi"><p class="l">Надёжных гостей задето</p>
+        <div class="v" id="kTouched"></div><p class="s" id="kTouchedNote"></p></div>
+      <div class="kpi"><p class="l" id="kSaveLabel">Экономия против правила по сроку брони</p>
+        <div class="v"><span id="kSave"></span> <small id="kSaveUnit"></small></div><p class="s" id="kSaveNote"></p></div>
+      <div class="kpi"><p class="l">Номеров сверх брони</p>
+        <div class="v"><span id="kRooms"></span> <small>в день</small></div><p class="s" id="kRoomsNote"></p></div>
+      <div class="kpi"><p class="l">Гостям не хватило номера</p>
+        <div class="v" id="kWalked"></div><p class="s" id="kWalkedNote"></p></div>
+      <div class="kpi"><p class="l">Дат, когда номера хватило всем</p>
+        <div class="v"><span id="kCovered"></span> <small>%</small></div><p class="s" id="kCoveredNote"></p></div>
+    </div>
+
+    <div class="panels">
+      <section class="panel wide">
+        <h3>Очередь броней по риску отмены</h3>
+        <p class="sub">Шафран — доля броней, которые на деле отменили. Левее черты берём предоплату.</p>
+        <div class="plot" id="dQueue" data-height="250" role="figure" aria-label="Очередь броней по риску отмены"></div>
+        <div class="track" id="dTrack">
+          <input id="dShare" class="cut" type="range" min="0" max="100" step="1" value="70"
+            aria-label="Доля броней с предоплатой, процентов">
+          <label class="share" for="dShare">Предоплата с <b id="dShareTxt"></b></label>
+        </div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p>
+      </section>
+      <section class="panel">
+        <h3>Потери от доли броней с предоплатой</h3>
+        <p class="sub">Модель против правила «брать предоплату с самых ранних броней».</p>
+        <div class="plot" id="dCurves" role="figure" aria-label="Потери при выборе броней по модели и по сроку брони"></div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p>
+      </section>
+      <section class="panel">
+        <h3>Овербукинг по неделям заезда</h3>
+        <p class="sub" id="dWeeksSub"></p>
+        <div class="plot" id="dWeeks" role="figure"
+          aria-label="Отмены по неделям заезда и сколько номеров продаём сверх брони"></div>
+      </section>
+      <section class="panel">
+        <h3>Доля отмен: сегмент × месяц</h3>
+        <p class="sub">Цифра в клетке — доля отмен, число броней — при наведении.</p>
+        <div class="plot" id="dHeat" role="figure" aria-label="Доля отмен по сегментам и месяцам заезда"></div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p>
+      </section>
+      <section class="panel">
+        <h3>Потери по сегментам</h3>
+        <p class="sub" id="dSegmentsSub"></p>
+        <div class="plot" id="dSegments" role="figure" aria-label="Потери по сегментам без предоплаты и с моделью"></div>
+        <p class="chart-empty" hidden><b>В этом срезе нет броней.</b> Выберите другой сегмент или месяц.</p>
+      </section>
+      <section class="panel wide">
+        <h3>Сегменты</h3>
+        <div class="table-box"><table>
+          <thead><tr><th scope="col">Сегмент</th><th scope="col">Броней</th><th scope="col">Доля отмен</th>
+            <th scope="col">Потери без предоплаты<span class="unit"></span></th>
+            <th scope="col">С моделью<span class="unit"></span></th><th scope="col">Экономия против работы без предоплаты<span class="unit"></span></th></tr></thead>
+          <tbody id="dTable"></tbody>
+        </table></div>
+      </section>
+    </div>
+    <div id="schemesSlotD">
+  <section class="schemes" id="schemes">
+    <div class="schemes-head">
+      <div><h2>Как это устроено</h2>
+        <p class="take">Интерактивные схемы. Нажмите на любой шаг — откроется паспорт шага с пояснением простыми
+          словами. Колесом мыши схему можно приблизить.</p></div>
+      <div class="seg" role="tablist" aria-label="Схема" id="schemeTabs">
+        <button type="button" role="tab" id="tab20" aria-selected="true" aria-controls="scheme"
+          data-src="figures/20_model_full_pipeline.html" data-k="0.53" data-pad="150">Как собрана модель</button><button type="button"
+          role="tab" id="tab19" aria-selected="false" aria-controls="scheme" tabindex="-1"
+          data-src="figures/19_prepayment_decision.html" data-k="0.44" data-pad="170">Как принимается решение</button>
+      </div>
+    </div>
+    <div class="scheme-box"><iframe id="scheme" role="tabpanel" aria-labelledby="tab20" title="Схема: как собрана модель"
+      src="figures/20_model_full_pipeline.html?theme=light"></iframe></div>
+  </section>
+    </div>
+  </main>
+</div>
+<script type="application/json" id="data">{{data}}</script>
+<script>
+{{js}}
+</script>
+</body>
+</html>
