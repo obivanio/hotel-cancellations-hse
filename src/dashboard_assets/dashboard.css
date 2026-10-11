@@ -74,6 +74,10 @@ button:focus-visible, .select:focus-visible, .checks input:focus-visible, .pop i
   box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; white-space: nowrap; }
 .thr::before { content: ""; position: absolute; left: calc(50% - 6px); top: -7px; border: 6px solid transparent;
   border-top: 0; border-bottom-color: var(--ink-2); }
+.thr.near-start { transform: none; }
+.thr.near-start::before { left: 0; }
+.thr.near-end { transform: translateX(-100%); }
+.thr.near-end::before { left: auto; right: 0; }
 .ends { display: flex; justify-content: space-between; margin-top: 8px; font-size: 15px; color: var(--ink-2); }
 .hint { font-size: 15px; color: var(--ink-2); margin: 6px 0 0; }
 

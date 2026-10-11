@@ -213,6 +213,7 @@ if (typeof document !== "undefined") {
       const segs = state.segments;
       $("segSum").textContent = segs.length === DATA.segmentOrder.length ? "Все сегменты"
         : segs.length === 1 ? DATA.segmentNames[segs[0]]
+          : segs.length === 0 ? "Сегмент не выбран"
           : `${segs.length} ${plural(segs.length, ["сегмент", "сегмента", "сегментов"])}`;
       const months = DATA.months.filter((m) => state.months.includes(m));
       $("monSum").textContent = months.length === DATA.months.length ? "Май–август 2017"
@@ -332,6 +333,8 @@ if (typeof document !== "undefined") {
       $("cutTxt").textContent = `предоплата с ${state.pct} %`;
       const thr = $("thr");
       thr.style.left = `${key.threshold_pct}%`;
+      thr.classList.toggle("near-start", key.threshold_pct < 16);
+      thr.classList.toggle("near-end", key.threshold_pct > 84);
       thr.textContent = `порог ${Calc.comma(key.threshold)}`;
       thr.setAttribute("aria-label", `Поставить черту на порог ${Calc.comma(key.threshold)}: предоплата с
         ${key.threshold_pct} % броней`.replace(/\s+/g, " "));
@@ -499,7 +502,7 @@ if (typeof document !== "undefined") {
         <p>Задеваем ${Calc.percent(v.top30_touched)} надёжных гостей, но ловим только ${Calc.percent(v.top30_caught)}
           отмен.</p></div></div>
       <div class="rec"><div><div class="n">${Calc.comma(v.covered_all * 100, 1)} <small>%</small></div>
-        <div class="cap">дат, когда номера хватило всем, — в двух отелях вместе</div></div>
+        <div class="cap">дат, когда номера хватило всем, — в среднем по двум отелям</div></div>
         <div><h3>Продавать сверх брони по осторожной оценке, в городском отеле — меньше</h3>
         <p>Каждый отель решает сам: на каждую дату продаёт столько лишних номеров, сколько отмен случится
           с вероятностью 90 %.</p>
