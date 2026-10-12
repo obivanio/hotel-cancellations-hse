@@ -10,7 +10,7 @@
 ![Ход работы](reports/figures/23_project_pipeline.png)
 
 Каждый шаг — отдельный ноутбук в `notebooks/` с пояснениями и выводами: 01 — загрузка и очистка, 02 — анализ и
-гипотезы, 03 — модель, 04 — экономика предоплаты и овербукинга. Итог собран в дашборде `reports/dashboard.html`.
+гипотезы, 03 — модель, 04 — экономика предоплаты и овербукинга. Итог собран в дашборде `reports/dashboard.html` — **[открыть дашборд в браузере](https://obivanio.github.io/hotel-cancellations-hse/reports/dashboard.html)**.
 
 ## Главные выводы
 
@@ -97,11 +97,13 @@ jupyter notebook notebooks/
 
 ## Дашборд
 
+Открыть онлайн: [дашборд](https://obivanio.github.io/hotel-cancellations-hse/reports/dashboard.html) · [презентация](https://obivanio.github.io/hotel-cancellations-hse/reports/dashboard.html#presentation) · [интерактивный отчёт](https://obivanio.github.io/hotel-cancellations-hse/reports/report.html)
+
 ![Дашборд: вид «Дашборд»](reports/figures/22_dashboard_kpi.png)
 
 ![Дашборд: вид «Презентация»](reports/figures/21_dashboard.png)
 
-Откройте `reports/dashboard.html` двойным щелчком — нужен только браузер (проверено end-to-end в Safari и Chrome), интернет и Python не
+Откройте `reports/dashboard.html` двойным щелчком — нужен только браузер (работает в Safari и Chrome), интернет и Python не
 нужны (файл ≈ 6,6 МБ, все графики на Plotly). У страницы два вида: «Дашборд» (показатели и графики на одном экране, открывается по умолчанию) и «Презентация» (рассказ с пояснениями и схемами); переключатель — вверху, ссылка `reports/dashboard.html#presentation` открывает сразу презентацию. Вверху выбираются отель, сегменты, месяцы заезда и допущения о деньгах; черту на очереди броней двигает
 ползунок под очередью (мышью или стрелками). Схемы внизу страницы берутся из соседней папки `reports/figures/`, поэтому пересылать
 нужно всю папку `reports`.
