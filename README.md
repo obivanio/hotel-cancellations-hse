@@ -12,6 +12,9 @@
 Каждый шаг — отдельный ноутбук в `notebooks/` с пояснениями и выводами: 01 — загрузка и очистка, 02 — анализ и
 гипотезы, 03 — модель, 04 — экономика предоплаты и овербукинга. Итог собран в дашборде `reports/dashboard.html` — **[открыть дашборд в браузере](https://obivanio.github.io/hotel-cancellations-hse/reports/dashboard.html)**.
 
+Презентация к защите — **[открыть в браузере](https://obivanio.github.io/hotel-cancellations-hse/presentation/)** ·
+**[скачать PDF](presentation/presentation.pdf)**.
+
 ## Главные выводы
 
 ### Что нашли
@@ -78,6 +81,8 @@ notebooks/    ноутбуки с ходом работы и выводами (0
 data/raw/     исходные данные (скачиваются автоматически, не хранятся в git)
 data/processed/  очищенный датасет (создаётся ноутбуком, не хранится в git)
 models/       обученная модель CatBoost
+presentation/ презентация к защите: слайды index.html (открываются в браузере без Python, клавиша S — заметки
+              докладчика) и та же презентация в presentation.pdf
 reports/      артефакты: журнал очистки, таблица гипотез, метрики моделей, таблицы правил и овербукинга,
               интерактивный отчёт report.html и дашборд dashboard.html (открываются в браузере без Python),
               графики и схемы (figures/)
@@ -97,7 +102,7 @@ jupyter notebook notebooks/
 
 ## Дашборд
 
-Открыть онлайн: [дашборд](https://obivanio.github.io/hotel-cancellations-hse/reports/dashboard.html) · [презентация](https://obivanio.github.io/hotel-cancellations-hse/reports/dashboard.html#presentation) · [интерактивный отчёт](https://obivanio.github.io/hotel-cancellations-hse/reports/report.html)
+Открыть онлайн: [дашборд](https://obivanio.github.io/hotel-cancellations-hse/reports/dashboard.html) · [вид «Презентация» дашборда](https://obivanio.github.io/hotel-cancellations-hse/reports/dashboard.html#presentation) · [интерактивный отчёт](https://obivanio.github.io/hotel-cancellations-hse/reports/report.html)
 
 ![Дашборд: вид «Дашборд»](reports/figures/22_dashboard_kpi.png)
 
